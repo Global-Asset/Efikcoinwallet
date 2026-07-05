@@ -1,0 +1,32 @@
+{
+  "name": "Efikcoin Wallet Core",
+  "short_name": "Efikcoin",
+  "description": "Self-custodial multi-chain crypto wallet and decentralized peer-to-peer trading ecosystem.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#060913",
+  "theme_color": "#060913",
+  "orientation": "portrait",
+  "categories": ["finance", "utilities"],
+  "icons": [
+    {
+      "src": "./assets/efc-logo-192.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "any"
+    },
+    {
+      "src": "./assets/efc-logo-192.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "maskable"
+    },
+    {
+      "src": "./assets/efc-logo-512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any"
+    }
+  ]
+}
+
