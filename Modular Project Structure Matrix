@@ -1,0 +1,16 @@
+efikcoin-wallet-core/
+│
+├── index.html                  # Main application frame, layout shell & PWA anchors
+├── manifest.json               # Native PWA compilation metadata properties
+├── sw.js                       # Service worker multi-tier offline assets caching router
+│
+├── css/
+│   └── architecture-core.css   # Full UI design engine layout and responsive matrix definitions
+│
+└── js/
+    ├── app-router.js           # Navigation state, view manager, and dynamic panel switcher
+    ├── wallet-vault.js         # Local keypair generation, private key session handling
+    ├── blockchain-engine.js    # Live Ethers.js v6 blockchain providers, state reads & ABI calls
+    ├── tx-sign-splitter.js     # Transaction constructor, gas calculations, and dual-send scripts
+    ├── p2p-desk.js             # Local peer-to-peer advertising ledger matrix and order book UI
+    └── dex-router.js           # Automated Market Maker calculations, invariants, and token swapper
