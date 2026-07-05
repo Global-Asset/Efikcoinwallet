@@ -1,0 +1,96 @@
+:root {
+    --bg-universe: #04060d;
+    --bg-surface-card: #0a0f1d;
+    --bg-input-inner: #020307;
+    --border-standard: #182235;
+    --color-primary-accent: #2563eb;
+    --color-success-bright: #10b981;
+    --color-warning-amber: #f59e0b;
+    --color-danger-crimson: #ef4444;
+    --text-primary-white: #f8fafc;
+    --text-muted-slate: #64748b;
+}
+
+body {
+    background-color: var(--bg-universe);
+    color: var(--text-primary-white);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    margin: 0; padding: 15px;
+    -webkit-font-smoothing: antialiased;
+}
+
+.application-shell { max-width: 1100px; margin: 0 auto; }
+
+.app-global-header {
+    display: flex; justify-content: space-between; align-items: center;
+    border-bottom: 1px solid var(--border-standard); padding-bottom: 20px; margin-bottom: 25px;
+}
+.branding-group h1 { font-size: 24px; font-weight: 800; margin: 0; letter-spacing: -0.5px; }
+.branding-group h1 span { color: var(--color-primary-accent); }
+.branding-group p { font-size: 12px; color: var(--text-muted-slate); margin: 4px 0 0 0; }
+
+.network-node-status { display: flex; align-items: center; gap: 8px; }
+.status-indicator-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+.status-indicator-dot.processing { background-color: var(--color-warning-amber); box-shadow: 0 0 8px var(--color-warning-amber); }
+.status-indicator-dot.online { background-color: var(--color-success-bright); box-shadow: 0 0 8px var(--color-success-bright); }
+.node-address-string { font-family: monospace; font-size: 11px; font-weight: bold; background: #111827; padding: 4px 10px; border-radius: 4px; color: var(--text-muted-slate); }
+
+.pwa-install-banner {
+    background-color: rgba(37, 99, 235, 0.1); border: 1px dashed var(--color-primary-accent);
+    padding: 12px; border-radius: 8px; font-size: 12px; text-align: center; margin-bottom: 20px; color: var(--text-primary-white); display: none;
+}
+
+.dashboard-navigation-bar { display: flex; gap: 8px; margin-bottom: 25px; border-bottom: 1px solid var(--border-standard); padding-bottom: 10px; }
+.nav-tab-element {
+    background: transparent; color: var(--text-muted-slate); border: none; padding: 10px 18px; font-weight: 600; font-size: 13px; cursor: pointer; transition: all 0.2s ease; border-radius: 6px;
+}
+.nav-tab-element.active { background: var(--color-primary-accent); color: white; }
+
+.app-view-container, .dashboard-pane-view { display: none; }
+.active-view, .active-pane { display: block; animation: panelFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+
+@keyframes panelFadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+
+.dashboard-split-grid { display: grid; grid-template-columns: 1.1fr 1.9fr; gap: 20px; }
+@media (max-width: 850px) { .dashboard-split-grid { grid-template-columns: 1fr; } }
+
+.card, .grid-card-element { background: var(--bg-surface-card); border: 1px solid var(--border-standard); border-radius: 12px; padding: 24px; position: relative; }
+.card h2, .grid-card-element h2 { font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--color-primary-accent); margin-top: 0; margin-bottom: 20px; font-weight: 700; }
+
+.input-field-group { margin-bottom: 16px; }
+.input-field-group label { display: block; font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; margin-bottom: 6px; }
+.input-field-group input, .input-field-group select {
+    width: 100%; padding: 12px; border-radius: 6px; border: 1px solid var(--border-standard); background-color: var(--bg-input-inner); color: white; font-family: monospace; box-sizing: border-box; font-size: 13px; transition: border 0.2s;
+}
+.input-field-group input:focus { border-color: var(--color-primary-accent); outline: none; }
+
+button { border-radius: 6px; font-weight: bold; font-size: 13px; text-transform: uppercase; padding: 14px; width: 100%; border: none; cursor: pointer; transition: filter 0.2s; }
+button:hover { filter: brightness(1.15); }
+.btn-primary-action { background: var(--color-primary-accent); color: white; }
+.btn-success-action { background: var(--color-success-bright); color: white; }
+.btn-danger-action { background: var(--color-danger-crimson); color: white; }
+.btn-secondary-action { background: transparent; border: 1px solid var(--border-standard); color: var(--text-muted-slate); }
+.btn-link-toggle { background: transparent; color: var(--text-muted-slate); border: 1px solid var(--border-standard); margin-top: 8px; font-size: 12px; }
+
+.key-box, .cryptographic-display-box { background: var(--bg-input-inner); border: 1px solid var(--border-standard); padding: 12px; border-radius: 6px; font-family: monospace; font-size: 11px; word-break: break-all; margin-bottom: 12px; }
+.target-address { color: var(--color-success-bright); }
+.target-private { color: var(--color-warning-amber); }
+.security-warning-notice { border: 1px solid var(--color-warning-amber); background: rgba(245, 158, 11, 0.03); color: var(--color-warning-amber); font-size: 11px; padding: 12px; border-radius: 6px; margin-bottom: 16px; line-height: 1.5; }
+
+.giant-balance-readout-frame { font-size: 36px; font-weight: 800; text-align: center; margin: 20px 0 6px 0; color: white; }
+.giant-balance-readout-frame span { font-size: 16px; color: var(--text-muted-slate); }
+.smart-contract-anchor-text { font-size: 11px; text-align: center; color: var(--text-muted-slate); margin-bottom: 25px; font-family: monospace; }
+
+.table-container-wrapper { overflow-x: auto; margin-top: 15px; }
+.data-matrix-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.data-matrix-table th, .data-matrix-table td { padding: 12px; text-align: left; border-bottom: 1px solid var(--border-standard); }
+.data-matrix-table th { text-transform: uppercase; font-size: 10px; color: var(--text-muted-slate); letter-spacing: 0.5px; }
+
+.badging { padding: 3px 6px; border-radius: 4px; font-size: 10px; font-weight: bold; }
+.sell-badge { background: rgba(239, 68, 68, 0.15); color: var(--color-danger-crimson); }
+.success-badge { background: rgba(16, 185, 129, 0.15); color: var(--color-success-bright); }
+
+.read-only-success-field { color: var(--color-success-bright) !important; font-weight: bold; }
+.liquidity-routing-divider-arrow { text-align: center; font-size: 11px; font-weight: bold; color: var(--color-primary-accent); margin: 10px 0; }
+.hidden-initially { display: none; }
+
