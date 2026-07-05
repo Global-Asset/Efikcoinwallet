@@ -14,10 +14,6 @@
     "assetBundlePatterns": [
       "**/*"
     ],
-    "ios": {
-      "supportsTablet": true,
-      "bundleIdentifier": "com.globalasset.efikcoinwallet"
-    },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
@@ -30,7 +26,7 @@
     },
     "extra": {
       "eas": {
-        "projectId": "89b205bc-775a-45e5-9f32-591ad3ced271"
+        "projectId": "efikcoin-wallet-efc"
       }
     }
   }
