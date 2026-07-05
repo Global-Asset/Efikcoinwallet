@@ -2,424 +2,235 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Efikcoin Wallet</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Efikcoin Wallet Core - Production Node</title>
     
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="manifest" href="manifest.json">
+    <link rel="manifest" href="./manifest.json">
+
+    <link rel="stylesheet" href="./css/architecture-core.css">
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.1/ethers.umd.min.js"></script>
-
-    <style>
-        :root {
-            --bg-main: #060913;
-            --bg-card: #0f1626;
-            --border-color: #1e293b;
-            --accent-color: #3b82f6;
-            --text-success: #10b981;
-            --text-warning: #f59e0b;
-            --text-muted: #64748b;
-        }
-        body {
-            font-family: 'Segoe UI', Roboto, sans-serif;
-            background-color: var(--bg-main);
-            color: #f1f5f9;
-            margin: 0; padding: 20px;
-        }
-        .container { max-width: 900px; margin: 0 auto; }
-        
-        header {
-            display: flex; justify-content: space-between; align-items: center;
-            border-bottom: 1px solid var(--border-color); padding-bottom: 20px; margin-bottom: 25px;
-        }
-        h1 { font-size: 24px; font-weight: 700; color: #fff; margin: 0; }
-        h1 span { color: var(--accent-color); }
-        
-        .pwa-download-banner {
-            background-color: rgba(59, 130, 246, 0.15);
-            border: 1px dashed var(--accent-color);
-            border-radius: 8px;
-            padding: 12px; margin-bottom: 20px;
-            text-align: center; font-size: 13px; display: none;
-        }
-
-        .nav-tabs { display: flex; gap: 10px; margin-bottom: 25px; }
-        .tab-btn {
-            background-color: var(--bg-card); color: #fff; border: 1px solid var(--border-color);
-            padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 13px;
-        }
-        .tab-btn.active { background-color: var(--accent-color); border-color: var(--accent-color); }
-
-        .app-view, .auth-subview { display: none; }
-        .active-view { display: block; }
-        
-        .grid-layout { display: grid; grid-template-columns: 1.1fr 1.9fr; gap: 25px; }
-        @media (max-width: 900px) { .grid-layout { grid-template-columns: 1fr; } }
-        
-        .card { background-color: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 25px; margin-bottom: 25px; }
-        .card h2 { font-size: 15px; color: var(--accent-color); text-transform: uppercase; margin-top: 0; margin-bottom: 20px; letter-spacing: 0.5px; }
-
-        label { display: block; margin-bottom: 6px; font-size: 11px; font-weight: 600; color: #94a3b8; text-transform: uppercase; }
-        input, select {
-            width: 100%; padding: 12px; margin-bottom: 18px; border-radius: 6px;
-            border: 1px solid #1e293b; background-color: #060913; color: #fff; box-sizing: border-box; font-family: monospace;
-        }
-        button {
-            width: 100%; padding: 14px; background-color: var(--accent-color); color: #fff;
-            border: none; border-radius: 6px; font-weight: bold; text-transform: uppercase; cursor: pointer; font-size: 13px;
-        }
-        button:hover { filter: brightness(1.1); }
-        .alt-btn { background-color: transparent; border: 1px solid var(--border-color); color: var(--text-muted); margin-top: 10px; }
-        .alt-btn:hover { color: #fff; border-color: #fff; }
-
-        .key-box {
-            background-color: #060913; border: 1px solid var(--border-color);
-            padding: 12px; border-radius: 6px; font-family: monospace; font-size: 11px;
-            word-break: break-all; margin-bottom: 15px; user-select: all;
-        }
-        .warning-box { color: var(--text-warning); font-size: 11px; border: 1px solid var(--text-warning); padding: 10px; border-radius: 6px; margin-bottom: 15px; background: rgba(245, 158, 11, 0.05); }
-
-        .balance-display { font-size: 34px; font-weight: bold; color: #fff; text-align: center; margin: 15px 0; }
-        .balance-display span { font-size: 16px; color: var(--text-muted); }
-
-        table { width: 100%; border-collapse: collapse; font-size: 13px; }
-        th, td { text-align: left; padding: 14px 12px; border-bottom: 1px solid var(--border-color); }
-        th { color: var(--text-muted); text-transform: uppercase; font-size: 11px; }
-        .status-badge { padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; }
-        .success { background-color: rgba(16, 185, 129, 0.15); color: var(--text-success); }
-    </style>
 </head>
 <body>
 
-<div class="container">
-    
-    <div id="pwaBanner" class="pwa-download-banner">
-        📱 Open browser options and tap <b>"Add to Home Screen"</b> to download the standalone app.
+    <div id="pwaBanner" class="pwa-install-banner">
+        📱 Upgrade Experience: Click <b>"Add to Home Screen"</b> via browser settings to deploy standalone node.
     </div>
 
-    <header>
-        <div>
-            <h1>Efikcoin <span>Wallet</span></h1>
-            <p style="color: var(--text-muted); margin: 5px 0 0 0; font-size: 12px;">Self-Custodial Architecture & Peer-to-Peer Clearing Core</p>
-        </div>
-        <div>
-            <div id="address-display" style="font-family: monospace; font-size: 12px; color: var(--text-success); font-weight: bold;">🔒 OFFLINE NODE</div>
-        </div>
-    </header>
-
-    <div id="view-auth" class="app-view active-view">
-        <div style="max-width: 480px; margin: 40px auto;">
-            
-            <div id="auth-login" class="card auth-subview active-view">
-                <h2>Access Secure Wallet</h2>
-                <label>Private Key String</label>
-                <input type="password" placeholder="Enter your 64-character private hex key" id="inputPrivateKey">
-                <button onclick="loginWithKey()">Unlock Wallet Session</button>
-                <button class="alt-btn" onclick="switchAuthForm('create')">Generate New Wallet Address</button>
-                <button class="alt-btn" onclick="switchAuthForm('import')">Import Account Key</button>
+    <div class="application-shell">
+        <header class="app-global-header">
+            <div class="branding-group">
+                <h1>Efikcoin <span>Wallet Core</span></h1>
+                <p>Enterprise Self-Custodial Clearing Layer & Decentralized P2P Ledger</p>
             </div>
+            <div class="network-node-status">
+                <span class="status-indicator-dot processing" id="nodeStatusLight"></span>
+                <span id="addressDisplayBox" class="node-address-string">SESSION LOCKED</span>
+            </div>
+        </header>
 
-            <div id="auth-create" class="card auth-subview">
-                <h2>Generate Clean Identity</h2>
-                <p style="font-size: 12px; color: var(--text-muted); margin-top:0;">This builds a fresh cryptographic public-private pair completely in local memory.</p>
-                <button onclick="generateFreshKeypair()">Generate Account Keys</button>
+        <main id="viewAuthGateway" class="app-view-container active-view">
+            <div class="auth-card-wrapper">
                 
-                <div id="keypairOutput" style="display: none; margin-top: 15px;">
-                    <label>Your New Wallet Public Address</label>
-                    <div class="key-box" id="newAddress" style="color: var(--text-success);"></div>
+                <section id="panelAuthLogin" class="auth-panel-node active-panel">
+                    <h2>Unlock Secure Environment</h2>
+                    <div class="input-field-group">
+                        <label>Private Key Keyphrase String</label>
+                        <input type="password" placeholder="Enter your 64-character hex key (0x...)" id="inputPrivateKey" autocomplete="off">
+                    </div>
+                    <button class="btn-primary-action" onclick="WalletVault.loginWithSecretKeyphrase()">Unlock System Node</button>
+                    <div class="auth-navigation-links">
+                        <button class="btn-link-toggle" onclick="AppRouter.switchAuthPanel('create')">Generate Clean Wallet Node</button>
+                        <button class="btn-link-toggle" onclick="AppRouter.switchAuthPanel('import')">Import External Backup Signature</button>
+                    </div>
+                </section>
+
+                <section id="panelAuthCreate" class="auth-panel-node">
+                    <h2>Cryptographic Identity Generator</h2>
+                    <p class="panel-explanatory-text">Creates an isolated private-public mathematical node pair entirely locally within the isolated browser storage engine.</p>
+                    <button class="btn-primary-action" onclick="WalletVault.generateFreshMnemonicKeyPair()">Initialize Random Address Pair</button>
                     
-                    <label>Secret Private Key (KEEP SECRET!)</label>
-                    <div class="key-box" id="newPrivateKey" style="color: var(--text-warning);"></div>
-                    <div class="warning-box">⚠️ Backup your private key safely. If you clear cache or lose it, funds are lost forever.</div>
+                    <div id="keypairGenerationOutputFrame" class="hidden-initially">
+                        <div class="input-field-group">
+                            <label>Generated Public Receiving Address</label>
+                            <div class="cryptographic-display-box target-address" id="generatedPublicAddressField"></div>
+                        </div>
+                        <div class="input-field-group">
+                            <label>Generated Private Master Key (EXPORT CRITICAL)</label>
+                            <div class="cryptographic-display-box target-private" id="generatedPrivateKeyField"></div>
+                        </div>
+                        <div class="security-warning-notice">
+                            ⚠️ BACKUP REQUIRED: Write down your Private Key. This framework is completely self-custodial. If you lose this key string, all EFC token access is permanently lost.
+                        </div>
+                        <button class="btn-success-action" onclick="AppRouter.switchAuthPanel('login')">Key Securely Saved: Proceed to Login</button>
+                    </div>
+                    <button class="btn-secondary-action back-margin" onclick="AppRouter.switchAuthPanel('login')">Return to Gateway Access</button>
+                </section>
+
+                <section id="panelAuthImport" class="auth-panel-node">
+                    <h2>Import Identity Core</h2>
+                    <div class="input-field-group">
+                        <label>Raw Private Key Hex Code</label>
+                        <input type="password" placeholder="0x..." id="inputImportKeyString" autocomplete="off">
+                    </div>
+                    <button class="btn-primary-action" onclick="WalletVault.processExternalImportRoute()">Verify and Mount Identity Node</button>
+                    <button class="btn-secondary-action back-margin" onclick="AppRouter.switchAuthPanel('login')">Cancel</button>
+                </section>
+
+            </div>
+        </main>
+
+        <main id="viewSystemDashboard" class="app-view-container">
+            
+            <nav class="dashboard-navigation-bar">
+                <button class="nav-tab-element active" id="tabLinkWallet" onclick="AppRouter.switchDashboardTab('wallet')">Portfolio & Transact</button>
+                <button class="nav-tab-element" id="tabLinkP2P" onclick="AppRouter.switchDashboardTab('p2p')">P2P Trading Ledger</button>
+                <button class="nav-tab-element" id="tabLinkDEX" onclick="AppRouter.switchDashboardTab('dex')">Automated AMM Swap</button>
+            </nav>
+
+            <div id="paneDashboardWallet" class="dashboard-pane-view active-pane">
+                <div class="dashboard-split-grid">
                     
-                    <button onclick="switchAuthForm('login')">Key Saved, Proceed to Log In</button>
+                    <div class="grid-card-element">
+                        <h2>Authorize Outgoing Settlement Payload</h2>
+                        <div class="input-field-group">
+                            <label>Target Execution Chain Environment</label>
+                            <select id="selectTargetNetworkChain">
+                                <option value="56">BNB Smart Chain Mainnet (EVM Core)</option>
+                            </select>
+                        </div>
+                        <div class="input-field-group">
+                            <label>Destination Receiver Node Address</label>
+                            <input type="text" placeholder="0x..." id="inputTxDestinationAddress">
+                        </div>
+                        <div class="input-field-group">
+                            <label>Volume Settlement Quantity (EFC)</label>
+                            <input type="number" placeholder="0.0000" step="0.000001" id="inputTxTokenVolume">
+                        </div>
+                        <button class="btn-primary-action" onclick="TxSignSplitter.initiateOwnerSignedTransactionSplit()">Sign & Broadcast Payload</button>
+                    </div>
+
+                    <div class="grid-card-element centralized-balance-card">
+                        <h2>Efikcoin Asset Ledger Balance</h2>
+                        <div class="giant-balance-readout-frame" id="frameMainEfcBalanceValue">0.0000 <span>EFC</span></div>
+                        <div class="smart-contract-anchor-text">Smart Contract Index: <span id="contractLabelString">0x677C...fED1</span></div>
+                        
+                        <div class="table-container-wrapper">
+                            <table class="data-matrix-table">
+                                <thead>
+                                    <tr><th>Asset Profile</th><th>Verified Available Balance</th></tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><strong>Efikcoin (EFC)</strong></td>
+                                        <td id="tableRowEfcBalanceValue" class="text-color-success font-weight-bold">0.0000 EFC</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <button class="btn-danger-action force-bottom" onclick="WalletVault.terminateActiveSession()">Disconnect and Clear Node Memory</button>
+                    </div>
+
                 </div>
-                <button class="alt-btn" onclick="switchAuthForm('login')">Return to Sign In</button>
             </div>
 
-            <div id="auth-import" class="card auth-subview">
-                <h2>Import External Node</h2>
-                <label>Secret Key Code</label>
-                <input type="password" placeholder="0x..." id="importPrivateKey">
-                <button onclick="processImportKey()">Verify & Import Signature</button>
-                <button class="alt-btn" onclick="switchAuthForm('login')">Back</button>
+            <div id="paneDashboardP2P" class="dashboard-pane-view">
+                <div class="dashboard-split-grid">
+                    
+                    <div class="grid-card-element">
+                        <h2>Create Escrow Escrow Advertisement</h2>
+                        <div class="input-field-group">
+                            <label>Escrow Order Parameter</label>
+                            <select id="selectP2pOrderType">
+                                <option value="SELL">Sell EFC (Lock Assets to Smart Escrow)</option>
+                                <option value="BUY">Buy EFC (Fiat Funding Request Node)</option>
+                            </select>
+                        </div>
+                        <div class="input-field-group">
+                            <label>Fiat Evaluation Price Point (NGN per 1 EFC Equivalent)</label>
+                            <input type="number" value="1600" id="inputP2pFiatRate">
+                        </div>
+                        <div class="input-field-group">
+                            <label>Target Liquidity Volume</label>
+                            <input type="number" placeholder="5000" id="inputP2pTokenVolume">
+                        </div>
+                        <button class="btn-primary-action" onclick="P2PDesk.registerLocalEscrowOrderAdvertisement()">Commit Offer Node to Local Book</button>
+                    </div>
+
+                    <div class="grid-card-element">
+                        <h2>Active Peer Clearing Order Book Matrix</h2>
+                        <div class="table-container-wrapper">
+                            <table class="data-matrix-table">
+                                <thead>
+                                    <tr><th>Counterparty Node</th><th>Type</th><th>Volume Parameters</th><th>Rate Index</th><th>Execution Action</th></tr>
+                                </thead>
+                                <tbody id="p2pOrderBookTableDynamicBody">
+                                    <tr>
+                                        <td>PeerNode_819x</td>
+                                        <td><span class="badging sell-badge">SELL</span></td>
+                                        <td>25,000 EFC</td>
+                                        <td>1,645 NGN</td>
+                                        <td><button class="btn-table-action" onclick="alert('Instantiating state channels to settle peer contract escrow asset blocks...')">Trade</button></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
             </div>
 
-        </div>
+            <div id="paneDashboardDEX" class="dashboard-pane-view">
+                <div class="dashboard-split-grid style-dex-override">
+                    
+                    <div class="grid-card-element">
+                        <h2>Automated Constant Product Liquid Swap</h2>
+                        <div class="input-field-group">
+                            <label>Pool Input Funding Asset</label>
+                            <select><option value="USDT">Tether USD (USDT - BEP20)</option></select>
+                            <input type="number" value="100" id="inputDexPairFundingVolume" oninput="DexRouter.calculateInstantPoolProductQuoteOutput()">
+                        </div>
+                        <div class="liquidity-routing-divider-arrow">⬇ AMM Router Exchange Path ⬇</div>
+                        <div class="input-field-group">
+                            <label>Calculated Target Output (EFC Tokens Received)</label>
+                            <input type="text" id="outputDexCalculatedTokenVolume" value="100.0000" readonly class="read-only-success-field">
+                        </div>
+                        <div class="pool-allocation-metadata-label">AMM Registered Tracking Pair ID Node: <span class="monospaced-string">0x676c...59d0</span></div>
+                        <button class="btn-primary-action" onclick="DexRouter.executeOnChainAtomicAMMExchangeSwap()">Sign & Confirm Swap Execution</button>
+                    </div>
+
+                    <div class="grid-card-element">
+                        <h2>Atomic Pool Activity Audit Stream</h2>
+                        <div class="table-container-wrapper">
+                            <table class="data-matrix-table">
+                                <thead>
+                                    <tr><th>Timestamp Block</th><th>Path Vector</th><th>Input Weight</th><th>Status Check</th></tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Latest Block</td>
+                                        <td>USDT ➔ EFC</td>
+                                        <td>100.00 USDT</td>
+                                        <td><span class="badging success-badge">Atomic Complete</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </main>
     </div>
 
-    <div id="view-dashboard" class="app-view">
-        
-        <div class="nav-tabs">
-            <button class="tab-btn active" onclick="switchDashboardSection('wallet')">Balances & Payments</button>
-            <button class="tab-btn" onclick="switchDashboardSection('p2p')">P2P Trading Desk</button>
-            <button class="tab-btn" onclick="switchDashboardSection('dex')">Instant DEX Swap</button>
-        </div>
-
-        <div id="dash-wallet" class="dash-section active-view">
-            <div class="grid-layout">
-                <div class="card">
-                    <h2>Sign & Broadcast Outgoing Payment</h2>
-                    <label>Select Native Protocol Chain</label>
-                    <select id="txChain">
-                        <option value="BSC">BNB Smart Chain Mainnet</option>
-                    </select>
-                    <label>Recipient Destination Wallet Address</label>
-                    <input type="text" placeholder="0x..." id="payRecipient">
-                    <label>Payment Value (EFC Tokens)</label>
-                    <input type="number" placeholder="0.00" step="0.0001" id="payAmount">
-                    <button onclick="signAndBroadcastPayment()">Sign & Broadcast Transaction</button>
-                </div>
-                <div class="card">
-                    <h2>Asset Portfolio Ledger</h2>
-                    <div class="balance-display" id="displayEfcBalance">0.00 <span>EFC</span></div>
-                    <div style="text-align:center; color: var(--text-muted); font-size:12px; margin-bottom: 20px;" id="displayEfcContract">Node: 0x677C...fED1</div>
-                    <table>
-                        <thead><tr><th>Asset Class</th><th>Live Balance</th></tr></thead>
-                        <tbody>
-                            <tr><td><b>Efikcoin (EFC)</b></td><td id="ledger-efc-bal" style="color:var(--text-success); font-weight:bold;">0.00 EFC</td></tr>
-                        </tbody>
-                    </table>
-                    <button class="alt-btn" style="width:100%; margin-top:20px;" onclick="lockAndExitSession()">Lock System Session</button>
-                </div>
-            </div>
-        </div>
-
-        <div id="dash-p2p" class="dash-section">
-            <div class="grid-layout">
-                <div class="card">
-                    <h2>Post Escrow Ad Node</h2>
-                    <label>Trade Action</label>
-                    <select id="p2pType"><option value="SELL">Sell EFC (Escrow Hold)</option><option value="BUY">Buy EFC (Fiat In)</option></select>
-                    <label>Exchange Target Rate (NGN / $)</label>
-                    <input type="number" value="1600" id="p2pRate">
-                    <label>Total Token Volume</label>
-                    <input type="number" placeholder="1000" id="p2pVolume">
-                    <button onclick="postP2PEscrowOrder()">Commit Volume to Local Book</button>
-                </div>
-                <div class="card">
-                    <h2>Active Multi-Chain Peer Orders</h2>
-                    <table>
-                        <thead><tr><th>Peer ID</th><th>Type</th><th>Volume (Asset)</th><th>Fiat Value</th><th>Action</th></tr></thead>
-                        <tbody id="p2pOrderBook">
-                            <tr>
-                                <td>PeerNode_04x</td>
-                                <td><span style="color: #ef4444; font-weight:bold;">SELL</span></td>
-                                <td>15,000 EFC</td>
-                                <td>1,620 NGN</td>
-                                <td><button style="padding: 6px 12px; font-size:11px; width:auto;" onclick="alert('Binding peer session to contract escrow matrix...')">Trade</button></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <div id="dash-dex" class="dash-section">
-            <div class="grid-layout" style="grid-template-columns: 1.2fr 1.8fr;">
-                <div class="card">
-                    <h2>AMM Liquidity Pool Router</h2>
-                    <label>Pool Input Pair Asset</label>
-                    <select><option value="USDT">Tether (USDT)</option></select>
-                    <input type="number" value="100" id="dexInput" oninput="runMockDexMath()">
-                    <div style="text-align:center; font-weight:bold; margin-bottom:15px; color:var(--accent-color);">↓ AMM Execution Path ↓</div>
-                    <label>Pool Output Asset (EFC Output)</label>
-                    <input type="text" id="dexOutput" value="100.00" readonly style="color:var(--text-success); font-weight:bold;">
-                    <div style="font-size:10px; color:var(--text-muted); margin-bottom: 12px;">Target Liquidity Pair: 0x676c...59d0</div>
-                    <button onclick="alert('Atomic Token Swap executed via contract pool path successfully.')">Execute Liquid Swap</button>
-                </div>
-                <div class="card">
-                    <h2>Recent Swap Matrix Receipts</h2>
-                    <table>
-                        <thead><tr><th>Timestamp</th><th>Path Pair Route</th><th>Total Volume</th><th>Status</th></tr></thead>
-                        <tbody><tr><td>Just Now</td><td>USDT ➔ EFC</td><td>100.00 USDT</td><td><span class="status-badge success">Settled</span></td></tr></tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-    </div>
-</div>
-
-<script>
-    // ⚡ LIVE CONTRACT & WALLET NETWORK NODE SPECIFICATIONS
-    const APPS_CONFIG = {
-        RPC_PROVIDER: "https://bsc-dataseed.binance.org/", 
-        EFC_TOKEN_CONTRACT: "0x677Ce9CBa67f7484ea951a12897CE780cFd8fED1",
-        EFC_LIQUIDITY_PAIR: "0x676cCf34C191a9D6EFE4B265b84877C619A559d0",
-        ECOSYSTEM_TREASURY: "0xa1DD6C528882Dc19EcCbC967F50bBC121A29630e",
-        GAS_FEE_RATE: 0.005 // 0.5% structural gas premium
-    };
-
-    // Standard Minimal BEP-20 / ERC-20 ABI functions
-    const efcAbi = [
-        "function balanceOf(address owner) view returns (uint256)",
-        "function transfer(address to, uint256 value) returns (bool)",
-        "function decimals() view returns (uint8)"
-    ];
-
-    let globalProvider;
-    let globalWalletSession = null;
-    let currentSessionWallet = { address: "", balance: 0.0 };
-
-    // PWA Bootstrapping Check
-    window.onload = function() {
-        if (window.navigator.standalone === false || !window.matchMedia('(display-mode: standalone)').matches) {
-            document.getElementById('pwaBanner').style.display = 'block';
-        }
-        
-        // Register client Service Worker file for downloading features
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/sw.js').catch(err => console.log("SW bypass initialized."));
-        }
-    };
-
-    function switchAuthForm(view) {
-        document.querySelectorAll('.auth-subview').forEach(el => el.classList.remove('active-view'));
-        document.getElementById(`auth-${view}`).classList.add('active-view');
-    }
-
-    function switchDashboardSection(section) {
-        document.querySelectorAll('.dash-section').forEach(el => el.classList.remove('active-view'));
-        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-        document.getElementById(`dash-${section}`).classList.add('active-view');
-        event.currentTarget.classList.add('active');
-    }
-
-    // 🔑 AUTH 1: Unlock Wallet Identity via Key
-    async function loginWithKey() {
-        const key = document.getElementById('inputPrivateKey').value.trim();
-        if(!key) return alert("Please supply a valid private key signature.");
-        
-        try {
-            globalProvider = new ethers.JsonRpcProvider(APPS_CONFIG.RPC_PROVIDER);
-            globalWalletSession = new ethers.Wallet(key, globalProvider);
-            
-            currentSessionWallet.address = globalWalletSession.address;
-            document.getElementById('address-display').innerText = `🔐 NODE: ${currentSessionWallet.address.slice(0,6)}...${currentSessionWallet.address.slice(-4)}`;
-            
-            // Switch main views and perform on-chain state request
-            document.getElementById('view-auth').classList.remove('active-view');
-            document.getElementById('view-dashboard').classList.add('active-view');
-            
-            await fetchLiveBlockchainBalances();
-        } catch(e) {
-            alert("Cryptographic runtime error. Verify private key structure.");
-        }
-    }
-
-    // 🔑 AUTH 2: Generate Locally
-    function generateFreshKeypair() {
-        const hex = '0123456789abcdef';
-        let priv = "0x", addr = "0x677";
-        for(let i=0; i<64; i++) priv += hex[Math.floor(Math.random()*16)];
-        for(let i=0; i<37; i++) addr += hex[Math.floor(Math.random()*16)];
-
-        document.getElementById('newAddress').innerText = addr;
-        document.getElementById('newPrivateKey').innerText = priv;
-        document.getElementById('keypairOutput').style.display = 'block';
-    }
-
-    // 🔑 AUTH 3: Import Account Key
-    function processImportKey() {
-        const key = document.getElementById('importPrivateKey').value.trim();
-        if(!key.startsWith("0x") || key.length < 30) return alert("Invalid private signature layout format.");
-        document.getElementById('inputPrivateKey').value = key;
-        loginWithKey();
-    }
-
-    // 📊 REVENUE & METRICS: Pull Live Data across Provider
-    async function fetchLiveBlockchainBalances() {
-        if(!globalWalletSession) return;
-        try {
-            const contract = new ethers.Contract(APPS_CONFIG.EFC_TOKEN_CONTRACT, efcAbi, globalProvider);
-            const rawBal = await contract.balanceOf(globalWalletSession.address);
-            const decimals = await contract.decimals();
-            
-            currentSessionWallet.balance = parseFloat(ethers.formatUnits(rawBal, decimals));
-            
-            document.getElementById('displayEfcBalance').innerHTML = `${currentSessionWallet.balance.toLocaleString(undefined, {minimumFractionDigits: 4})} <span>EFC</span>`;
-            document.getElementById('ledger-efc-bal').innerText = `${currentSessionWallet.balance.toLocaleString()} EFC`;
-        } catch (err) {
-            console.log("Contract query aborted. Working via sandbox nodes.");
-        }
-    }
-
-    // ✍️ PAYMENTS: Complete Owner-Signed Split Transactions directly to Treasury
-    async function signAndBroadcastPayment() {
-        if(!globalWalletSession) return alert("Session expired. Re-authenticate node key.");
-        
-        const recipient = document.getElementById('payRecipient').value.trim();
-        const totalAmt = parseFloat(document.getElementById('payAmount').value || "0");
-
-        if(!ethers.isAddress(recipient)) return alert("Invalid transaction destination node address.");
-        if(totalAmt <= 0 || totalAmt > currentSessionWallet.balance) return alert("Requested volume parameter is out of pool bounds.");
-
-        const gasFeeComponent = totalAmt * APPS_CONFIG.GAS_FEE_RATE;
-        const netRecipientAmount = totalAmt - gasFeeComponent;
-
-        // Challenge owner explicit authorization popup signature request
-        const ownerConsentSignature = confirm(
-            `🔐 AUTHORIZE LIVE SIGNATURE\n\n` +
-            `Recipient Node: ${recipient}\n` +
-            `Net Pay Out: ${netRecipientAmount.toFixed(4)} EFC\n` +
-            `Ecosystem Gas Surcharge: ${gasFeeComponent.toFixed(4)} EFC (Reroutes to Treasury)\n\n` +
-            `Confirm transaction payload signing?`
-        );
-
-        if(!ownerConsentSignature) return alert("Broadcast aborted: Owner signature refused.");
-
-        try {
-            const contract = new ethers.Contract(APPS_CONFIG.EFC_TOKEN_CONTRACT, efcAbi, globalWalletSession);
-            const decimals = await contract.decimals();
-
-            const parsedRecipientValue = ethers.parseUnits(netRecipientAmount.toFixed(decimals), decimals);
-            const parsedTreasuryValue = ethers.parseUnits(gasFeeComponent.toFixed(decimals), decimals);
-
-            // Execute component A: Recipient payment settlement
-            const txA = await contract.transfer(recipient, parsedRecipientValue);
-            await txA.wait();
-
-            // Execute component B: Internal Gas Reroute back to Ecosystem Treasury Address Node
-            const txB = await contract.transfer(APPS_CONFIG.ECOSYSTEM_TREASURY, parsedTreasuryValue);
-            await txB.wait();
-
-            alert("🎉 Atomic transaction split successfully finalized across contract blocks!");
-            await fetchLiveBlockchainBalances();
-            
-            document.getElementById('payAmount').value = "";
-            document.getElementById('payRecipient').value = "";
-        } catch(err) {
-            alert("Broadcast dropped or rejected by gas miners: " + err.reason);
-        }
-    }
-
-    function postP2PEscrowOrder() {
-        const type = document.getElementById('p2pType').value;
-        const rate = document.getElementById('p2pRate').value;
-        const vol = document.getElementById('p2pVolume').value;
-        if(!vol) return;
-
-        const book = document.getElementById('p2pOrderBook');
-        const tr = document.createElement('tr');
-        tr.innerHTML = `<td>LocalPeer</td><td><span style="color:${type==='SELL'?'#ef4444':'#10b981'}; font-weight:bold;">${type}</span></td><td>${vol} EFC</td><td>${rate} NGN</td><td><button style="padding:6px 12px; font-size:11px; width:auto;" onclick="alert('Connecting...')">Trade</button></td>`;
-        book.insertBefore(tr, book.firstChild);
-    }
-
-    function runMockDexMath() {
-        const input = parseFloat(document.getElementById('dexInput').value || "0");
-        document.getElementById('dexOutput').value = (input * 1.00).toFixed(2);
-    }
-
-    function lockAndExitSession() {
-        globalWalletSession = null;
-        document.getElementById('inputPrivateKey').value = "";
-        document.getElementById('address-display').innerText = "🔒 OFFLINE NODE";
-        document.getElementById('view-dashboard').classList.remove('active-view');
-        document.getElementById('view-auth').classList.add('active-view');
-        switchAuthForm('login');
-    }
-</script>
+    <script src="./js/app-router.js"></script>
+    <script src="./js/wallet-vault.js"></script>
+    <script src="./js/blockchain-engine.js"></script>
+    <script src="./js/tx-sign-splitter.js"></script>
+    <script src="./js/p2p-desk.js"></script>
+    <script src="./js/dex-router.js"></script>
 </body>
 </html>
