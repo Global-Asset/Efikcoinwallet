@@ -10,9 +10,112 @@
     <link rel="manifest" href="./manifest.json">
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.1/ethers.umd.min.js"></script>
-    
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.1/ethers.umd.min.js"></script>
+    <style>
+        :root {
+            --bg-universe: #04060d;
+            --bg-surface-card: #0a0f1d;
+            --bg-input-inner: #020307;
+            --border-standard: #182235;
+            --color-primary-accent: #2563eb;
+            --color-success-bright: #10b981;
+            --color-warning-amber: #f59e0b;
+            --color-danger-crimson: #ef4444;
+            --text-primary-white: #f8fafc;
+            --text-muted-slate: #64748b;
+        }
+
+        body {
+            background-color: var(--bg-universe);
+            color: var(--text-primary-white);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            margin: 0; padding: 15px;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .application-shell { max-width: 1100px; margin: 0 auto; }
+
+        .app-global-header {
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid var(--border-standard); padding-bottom: 20px; margin-bottom: 25px;
+        }
+        .branding-group h1 { font-size: 24px; font-weight: 800; margin: 0; letter-spacing: -0.5px; }
+        .branding-group h1 span { color: var(--color-primary-accent); }
+        .branding-group p { font-size: 12px; color: var(--text-muted-slate); margin: 4px 0 0 0; }
+
+        .network-node-status { display: flex; align-items: center; gap: 8px; }
+        .status-indicator-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+        .status-indicator-dot.processing { background-color: var(--color-warning-amber); box-shadow: 0 0 8px var(--color-warning-amber); }
+        .status-indicator-dot.online { background-color: var(--color-success-bright); box-shadow: 0 0 8px var(--color-success-bright); }
+        .node-address-string { font-family: monospace; font-size: 11px; font-weight: bold; background: #111827; padding: 4px 10px; border-radius: 4px; color: var(--text-muted-slate); }
+
+        .pwa-install-banner {
+            background-color: rgba(37, 99, 235, 0.1); border: 1px dashed var(--color-primary-accent);
+            padding: 12px; border-radius: 8px; font-size: 12px; text-align: center; margin-bottom: 20px; color: var(--text-primary-white); display: none;
+        }
+
+        .dashboard-navigation-bar { display: flex; gap: 8px; margin-bottom: 25px; border-bottom: 1px solid var(--border-standard); padding-bottom: 10px; }
+        .nav-tab-element {
+            background: transparent; color: var(--text-muted-slate); border: none; padding: 10px 18px; font-weight: 600; font-size: 13px; cursor: pointer; transition: all 0.2s ease; border-radius: 6px;
+        }
+        .nav-tab-element.active { background: var(--color-primary-accent); color: white; }
+
+        .app-view-container, .dashboard-pane-view { display: none; }
+        .active-view, .active-pane { display: block; animation: panelFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+
+        @keyframes panelFadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+
+        .dashboard-split-grid { display: grid; grid-template-columns: 1.1fr 1.9fr; gap: 20px; }
+        @media (max-width: 850px) { .dashboard-split-grid { grid-template-columns: 1fr; } }
+
+        .card, .grid-card-element { background: var(--bg-surface-card); border: 1px solid var(--border-standard); border-radius: 12px; padding: 24px; position: relative; margin-bottom: 20px; }
+        .card h2, .grid-card-element h2 { font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--color-primary-accent); margin-top: 0; margin-bottom: 20px; font-weight: 700; }
+
+        .auth-card-wrapper { max-width: 480px; margin: 40px auto; }
+        .auth-panel-node { display: none; background: var(--bg-surface-card); border: 1px solid var(--border-standard); border-radius: 12px; padding: 24px; }
+        .auth-panel-node.active-panel { display: block; }
+        .panel-explanatory-text { font-size: 12px; color: var(--text-muted-slate); margin-top: 0; margin-bottom: 16px; line-height: 1.5; }
+        .auth-navigation-links { display: flex; flex-direction: column; margin-top: 10px; }
+
+        .input-field-group { margin-bottom: 16px; }
+        .input-field-group label { display: block; font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; margin-bottom: 6px; }
+        .input-field-group input, .input-field-group select {
+            width: 100%; padding: 12px; border-radius: 6px; border: 1px solid var(--border-standard); background-color: var(--bg-input-inner); color: white; font-family: monospace; box-sizing: border-box; font-size: 13px; transition: border 0.2s;
+        }
+        .input-field-group input:focus { border-color: var(--color-primary-accent); outline: none; }
+
+        button { border-radius: 6px; font-weight: bold; font-size: 13px; text-transform: uppercase; padding: 14px; width: 100%; border: none; cursor: pointer; transition: filter 0.2s; }
+        button:hover { filter: brightness(1.15); }
+        .btn-primary-action { background: var(--color-primary-accent); color: white; }
+        .btn-success-action { background: var(--color-success-bright); color: white; }
+        .btn-danger-action { background: var(--color-danger-crimson); color: white; }
+        .btn-secondary-action { background: transparent; border: 1px solid var(--border-standard); color: var(--text-muted-slate); }
+        .btn-link-toggle { background: transparent; color: var(--text-muted-slate); border: 1px solid var(--border-standard); margin-top: 8px; font-size: 12px; }
+        .btn-table-action { padding: 6px 12px; font-size: 11px; width: auto; background: var(--color-primary-accent); color: white; }
+
+        .key-box, .cryptographic-display-box { background: var(--bg-input-inner); border: 1px solid var(--border-standard); padding: 12px; border-radius: 6px; font-family: monospace; font-size: 11px; word-break: break-all; margin-bottom: 12px; }
+        .target-address { color: var(--color-success-bright); }
+        .target-private { color: var(--color-warning-amber); }
+        .security-warning-notice { border: 1px solid var(--color-warning-amber); background: rgba(245, 158, 11, 0.03); color: var(--color-warning-amber); font-size: 11px; padding: 12px; border-radius: 6px; margin-bottom: 16px; line-height: 1.5; }
+
+        .giant-balance-readout-frame { font-size: 36px; font-weight: 800; text-align: center; margin: 20px 0 6px 0; color: white; }
+        .giant-balance-readout-frame span { font-size: 16px; color: var(--text-muted-slate); }
+        .smart-contract-anchor-text { font-size: 11px; text-align: center; color: var(--text-muted-slate); margin-bottom: 25px; font-family: monospace; }
+
+        .table-container-wrapper { overflow-x: auto; margin-top: 15px; }
+        .data-matrix-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        .data-matrix-table th, .data-matrix-table td { padding: 12px; text-align: left; border-bottom: 1px solid var(--border-standard); }
+        .data-matrix-table th { text-transform: uppercase; font-size: 10px; color: var(--text-muted-slate); letter-spacing: 0.5px; }
+
+        .badging { padding: 3px 6px; border-radius: 4px; font-size: 10px; font-weight: bold; }
+        .sell-badge { background: rgba(239, 68, 68, 0.15); color: var(--color-danger-crimson); }
+        .success-badge { background: rgba(16, 185, 129, 0.15); color: var(--color-success-bright); }
+
+        .read-only-success-field { color: var(--color-success-bright) !important; font-weight: bold; }
+        .liquidity-routing-divider-arrow { text-align: center; font-size: 11px; font-weight: bold; color: var(--color-primary-accent); margin: 10px 0; }
+        .hidden-initially { display: none; }
+        .back-margin { margin-top: 10px; }
+    </style>
 </head>
 <body>
 
@@ -141,7 +244,7 @@
                 <div class="dashboard-split-grid">
                     
                     <div class="grid-card-element">
-                        <h2>Create Escrow Escrow Advertisement</h2>
+                        <h2>Create Escrow Advertisement</h2>
                         <div class="input-field-group">
                             <label>Escrow Order Parameter</label>
                             <select id="selectP2pOrderType">
@@ -227,11 +330,254 @@
         </main>
     </div>
 
-    <script src="./js/app-router.js"></script>
-    <script src="./js/wallet-vault.js"></script>
-    <script src="./js/blockchain-engine.js"></script>
-    <script src="./js/tx-sign-splitter.js"></script>
-    <script src="./js/p2p-desk.js"></script>
-    <script src="./js/dex-router.js"></script>
+    <script>
+        /**
+         * ARCHITECTURAL LAYER: APPLICATION STATE ROUTER
+         */
+        const AppRouter = {
+            switchAuthPanel: function(targetPanelId) {
+                document.querySelectorAll('.auth-panel-node').forEach(panel => {
+                    panel.classList.remove('active-panel');
+                    panel.style.display = 'none';
+                });
+                
+                const chosenPanel = document.getElementById(`panelAuth${targetPanelId.charAt(0).toUpperCase() + targetPanelId.slice(1)}`);
+                if (chosenPanel) {
+                    chosenPanel.classList.add('active-panel');
+                    chosenPanel.style.display = 'block';
+                }
+            },
+
+            switchDashboardTab: function(targetTabPaneId) {
+                document.querySelectorAll('.dashboard-pane-view').forEach(pane => pane.classList.remove('active-pane'));
+                document.querySelectorAll('.nav-tab-element').forEach(tab => tab.classList.remove('active'));
+                
+                const targetPane = document.getElementById(`paneDashboard${targetTabPaneId.toUpperCase()}`);
+                const targetTab = document.getElementById(`tabLink${targetTabPaneId.toUpperCase()}`);
+                
+                if (targetPane && targetTab) {
+                    targetPane.classList.add('active-pane');
+                    targetTab.classList.add('active');
+                }
+            },
+
+            transitionGatewayToSystemCore: function(isOnline = false) {
+                document.getElementById('viewAuthGateway').classList.remove('active-view');
+                document.getElementById('viewSystemDashboard').classList.add('active-view');
+                
+                const light = document.getElementById('nodeStatusLight');
+                if (isOnline) {
+                    light.classList.remove('processing');
+                    light.classList.add('online');
+                }
+            },
+
+            revertToLockscreenGateway: function() {
+                document.getElementById('viewSystemDashboard').classList.remove('active-view');
+                document.getElementById('viewAuthGateway').classList.add('active-view');
+                this.switchAuthPanel('login');
+                
+                const light = document.getElementById('nodeStatusLight');
+                light.classList.remove('online');
+                light.classList.add('processing');
+            }
+        };
+
+        /**
+         * ARCHITECTURAL LAYER: SECURE VAULT
+         */
+        const WalletVault = {
+            _runtimeKeySecret: null,
+
+            loginWithSecretKeyphrase: async function() {
+                const inputKey = document.getElementById('inputPrivateKey').value.trim();
+                if (!inputKey) return alert("System Notification: Input string cannot be blank.");
+
+                try {
+                    const status = await BlockchainEngine.instantiateSessionNode(inputKey);
+                    if (status) {
+                        this._runtimeKeySecret = inputKey;
+                        AppRouter.transitionGatewayToSystemCore(true);
+                    }
+                } catch (error) {
+                    alert("Security Registry Rejection: Invalid key parsing sequence.");
+                }
+            },
+
+            generateFreshMnemonicKeyPair: function() {
+                const hexChars = '0123456789abcdef';
+                let generatedPrivateKey = "0x", generatedAddress = "0x677";
+                
+                for (let i = 0; i < 64; i++) generatedPrivateKey += hexChars[Math.floor(Math.random() * 16)];
+                for (let i = 0; i < 37; i++) generatedAddress += hexChars[Math.floor(Math.random() * 16)];
+
+                document.getElementById('generatedPublicAddressField').innerText = generatedAddress;
+                document.getElementById('generatedPrivateKeyField').innerText = generatedPrivateKey;
+                document.getElementById('keypairGenerationOutputFrame').classList.remove('hidden-initially');
+            },
+
+            processExternalImportRoute: function() {
+                const key = document.getElementById('inputImportKeyString').value.trim();
+                if (!key.startsWith("0x") || key.length < 30) {
+                    return alert("Formatting Error: Private key must use a valid Hex format.");
+                }
+                document.getElementById('inputPrivateKey').value = key;
+                this.loginWithSecretKeyphrase();
+            },
+
+            terminateActiveSession: function() {
+                this._runtimeKeySecret = null;
+                document.getElementById('inputPrivateKey').value = "";
+                document.getElementById('inputImportKeyString').value = "";
+                document.getElementById('addressDisplayBox').innerText = "SESSION LOCKED";
+                BlockchainEngine.wipeSignerContext();
+                AppRouter.revertToLockscreenGateway();
+            }
+        };
+
+        /**
+         * ARCHITECTURAL LAYER: BLOCKCHAIN ENGINE
+         */
+        const BlockchainEngine = {
+            NETWORK_CONFIG: {
+                RPC_URL: "https://bsc-dataseed.binance.org/",
+                TOKEN_CONTRACT: "0x677Ce9CBa67f7484ea951a12897CE780cFd8fED1"
+            },
+
+            MINIMAL_BEP20_ABI: [
+                "function balanceOf(address owner) view returns (uint256)",
+                "function transfer(address to, uint256 value) returns (bool)",
+                "function decimals() view returns (uint8)"
+            ],
+
+            provider: null,
+            signer: null,
+
+            instantiateSessionNode: async function(privateKeyString) {
+                try {
+                    this.provider = new ethers.JsonRpcProvider(this.NETWORK_CONFIG.RPC_URL);
+                    this.signer = new ethers.Wallet(privateKeyString, this.provider);
+                    
+                    const shortAddress = `${this.signer.address.slice(0, 6)}...${this.signer.address.slice(-4)}`;
+                    document.getElementById('addressDisplayBox').innerText = `BSC: ${shortAddress}`;
+                    
+                    this.refreshOnChainBalances();
+                    return true;
+                } catch (e) {
+                    return false;
+                }
+            },
+
+            refreshOnChainBalances: async function() {
+                if (!this.signer) return;
+                try {
+                    const tokenContract = new ethers.Contract(this.NETWORK_CONFIG.TOKEN_CONTRACT, this.MINIMAL_BEP20_ABI, this.provider);
+                    const balanceRaw = await tokenContract.balanceOf(this.signer.address);
+                    const decimals = await tokenContract.decimals();
+                    
+                    const normalizedBalance = parseFloat(ethers.formatUnits(balanceRaw, decimals));
+                    
+                    document.getElementById('frameMainEfcBalanceValue').innerHTML = `${normalizedBalance.toLocaleString(undefined, {minimumFractionDigits: 4})} <span>EFC</span>`;
+                    document.getElementById('tableRowEfcBalanceValue').innerText = `${normalizedBalance.toLocaleString()} EFC`;
+                } catch (error) {
+                    document.getElementById('frameMainEfcBalanceValue').innerHTML = `0.0000 <span>EFC</span>`;
+                }
+            },
+
+            wipeSignerContext: function() {
+                this.provider = null;
+                this.signer = null;
+            }
+        };
+
+        /**
+         * ARCHITECTURAL LAYER: SPLIT TRANSACTIONS
+         */
+        const TxSignSplitter = {
+            SETTING_PARAMETERS: {
+                TREASURY_VAULT: "0xa1DD6C528882Dc19EcCbC967F50bBC121A29630e",
+                SURCHARGE_RATE: 0.005
+            },
+
+            initiateOwnerSignedTransactionSplit: async function() {
+                if (!BlockchainEngine.signer) return alert("System error: Cryptographic signature context missing.");
+
+                const recipient = document.getElementById('inputTxDestinationAddress').value.trim();
+                const rawAmount = parseFloat(document.getElementById('inputTxTokenVolume').value || "0");
+
+                if (!ethers.isAddress(recipient)) return alert("Input Error: Recipient is not a valid address.");
+                if (rawAmount <= 0) return alert("Input Error: Volume must exceed zero.");
+
+                const totalCalculatedGasFee = rawAmount * this.SETTING_PARAMETERS.SURCHARGE_RATE;
+                const netRecipientValue = rawAmount - totalCalculatedGasFee;
+
+                const isOwnerSignatureApproved = confirm(
+                    `🔐 AUTHORIZE SPLIT PAYLOAD\n\nRecipient: ${recipient}\nNet Value: ${netRecipientValue.toFixed(4)} EFC\nTreasury Fee: ${totalCalculatedGasFee.toFixed(4)} EFC`
+                );
+
+                if (!isOwnerSignatureApproved) return alert("Aborted.");
+
+                try {
+                    const tokenContract = new ethers.Contract(BlockchainEngine.NETWORK_CONFIG.TOKEN_CONTRACT, BlockchainEngine.MINIMAL_BEP20_ABI, BlockchainEngine.signer);
+                    const decimals = await tokenContract.decimals();
+
+                    const atomicRecipientUnits = ethers.parseUnits(netRecipientValue.toFixed(decimals), decimals);
+                    const atomicTreasuryUnits = ethers.parseUnits(totalCalculatedGasFee.toFixed(decimals), decimals);
+
+                    const transactionBlockA = await tokenContract.transfer(recipient, atomicRecipientUnits);
+                    await transactionBlockA.wait();
+
+                    const transactionBlockB = await tokenContract.transfer(this.SETTING_PARAMETERS.TREASURY_VAULT, atomicTreasuryUnits);
+                    await transactionBlockB.wait();
+
+                    alert("🎉 Success! Gas split completed.");
+                    BlockchainEngine.refreshOnChainBalances();
+                } catch (error) {
+                    alert("Error: " + (error.reason || "Execution rejected. Check gas levels."));
+                }
+            }
+        };
+
+        /**
+         * ARCHITECTURAL LAYER: P2P & DEX MOCKS
+         */
+        const P2PDesk = {
+            registerLocalEscrowOrderAdvertisement: function() {
+                const orderType = document.getElementById('selectP2pOrderType').value;
+                const rateNGN = document.getElementById('inputP2pFiatRate').value;
+                const totalVolume = document.getElementById('inputP2pTokenVolume').value;
+
+                if (!totalVolume || totalVolume <= 0) return alert("Parameters missing.");
+
+                const tableBody = document.getElementById('p2pOrderBookTableDynamicBody');
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>LocalNode</td>
+                    <td><span class="badging ${orderType === 'SELL' ? 'sell-badge' : 'success-badge'}">${orderType}</span></td>
+                    <td>${parseFloat(totalVolume).toLocaleString()} EFC</td>
+                    <td>${parseFloat(rateNGN).toLocaleString()} NGN</td>
+                    <td><button class="btn-table-action" onclick="alert('Connecting...')">Trade</button></td>
+                `;
+                tableBody.insertBefore(tr, tableBody.firstChild);
+                document.getElementById('inputP2pTokenVolume').value = "";
+            }
+        };
+
+        const DexRouter = {
+            calculateInstantPoolProductQuoteOutput: function() {
+                const fundingVolumeInput = parseFloat(document.getElementById('inputDexPairFundingVolume').value || "0");
+                document.getElementById('outputDexCalculatedTokenVolume').value = (fundingVolumeInput * 1.00).toFixed(4);
+            },
+            executeOnChainAtomicAMMExchangeSwap: function() {
+                alert("Atomic swap simulation executed successfully.");
+            }
+        };
+
+        window.onload = function() {
+            if (window.navigator.standalone === false || !window.matchMedia('(display-mode: standalone)').matches) {
+                document.getElementById('pwaBanner').style.display = 'block';
+            }
+        };
+    </script>
 </body>
 </html>
