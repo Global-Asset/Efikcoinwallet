@@ -5,12 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Efikcoin Wallet Core - Production Node</title>
     
+    <!-- Progressive Web App Capabilities -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="manifest" href="./manifest.json">
 
+    <!-- Third-Party Cryptographic Core CDN Layer (Ethers.js v6) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.1/ethers.umd.min.js"></script>
 
+    <!-- BUILT-IN SYSTEM CSS STYLING ENGINE -->
     <style>
         :root {
             --bg-universe: #04060d;
@@ -115,10 +118,16 @@
         .liquidity-routing-divider-arrow { text-align: center; font-size: 11px; font-weight: bold; color: var(--color-primary-accent); margin: 10px 0; }
         .hidden-initially { display: none; }
         .back-margin { margin-top: 10px; }
+        
+        /* Layout fix for inline forms */
+        .inline-input-group { display: flex; gap: 8px; margin-top: 8px; }
+        .inline-input-group input { flex: 1; padding: 10px; background: var(--bg-input-inner); border: 1px solid var(--border-standard); color: white; border-radius: 4px; font-family: monospace; font-size: 12px; }
+        .inline-input-group button { width: auto; padding: 0 20px; font-size: 11px; background: var(--color-success-bright); }
     </style>
 </head>
 <body>
 
+    <!-- PWA Smart Banner -->
     <div id="pwaBanner" class="pwa-install-banner">
         📱 Upgrade Experience: Click <b>"Add to Home Screen"</b> via browser settings to deploy standalone node.
     </div>
@@ -135,9 +144,11 @@
             </div>
         </header>
 
+        <!-- SUB-SYSTEM CONTAINER 1: AUTHENTICATION GATEWAY -->
         <main id="viewAuthGateway" class="app-view-container active-view">
             <div class="auth-card-wrapper">
                 
+                <!-- VIEW: ACCESS VIA PRIVATE KEY -->
                 <section id="panelAuthLogin" class="auth-panel-node active-panel">
                     <h2>Unlock Secure Environment</h2>
                     <div class="input-field-group">
@@ -151,6 +162,7 @@
                     </div>
                 </section>
 
+                <!-- VIEW: GENERATE FRESH WALLET NODE -->
                 <section id="panelAuthCreate" class="auth-panel-node">
                     <h2>Cryptographic Identity Generator</h2>
                     <p class="panel-explanatory-text">Creates an isolated private-public mathematical node pair entirely locally within the isolated browser storage engine.</p>
@@ -173,6 +185,7 @@
                     <button class="btn-secondary-action back-margin" onclick="AppRouter.switchAuthPanel('login')">Return to Gateway Access</button>
                 </section>
 
+                <!-- VIEW: IMPORT INTERFACE OPTIONS -->
                 <section id="panelAuthImport" class="auth-panel-node">
                     <h2>Import Identity Core</h2>
                     <div class="input-field-group">
@@ -186,14 +199,17 @@
             </div>
         </main>
 
+        <!-- SUB-SYSTEM CONTAINER 2: SYSTEM OPERATIONAL DASHBOARD -->
         <main id="viewSystemDashboard" class="app-view-container">
             
+            <!-- GLOBAL NAVIGATION MENU MATRIX -->
             <nav class="dashboard-navigation-bar">
                 <button class="nav-tab-element active" id="tabLinkWallet" onclick="AppRouter.switchDashboardTab('wallet')">Portfolio & Transact</button>
                 <button class="nav-tab-element" id="tabLinkP2P" onclick="AppRouter.switchDashboardTab('p2p')">P2P Trading Ledger</button>
                 <button class="nav-tab-element" id="tabLinkDEX" onclick="AppRouter.switchDashboardTab('dex')">Automated AMM Swap</button>
             </nav>
 
+            <!-- SUB-PANEL: PORTFOLIO & PAYMENTS -->
             <div id="paneDashboardWallet" class="dashboard-pane-view active-pane">
                 <div class="dashboard-split-grid">
                     
@@ -217,29 +233,42 @@
                     </div>
 
                     <div class="grid-card-element centralized-balance-card">
-                        <h2>Efikcoin Asset Ledger Balance</h2>
+                        <h2>Multi-Asset Ledger Registry</h2>
                         <div class="giant-balance-readout-frame" id="frameMainEfcBalanceValue">0.0000 <span>EFC</span></div>
-                        <div class="smart-contract-anchor-text">Smart Contract Index: <span id="contractLabelString">0x677C...fED1</span></div>
+                        <div class="smart-contract-anchor-text">Core System Tracker Node Connected</div>
                         
                         <div class="table-container-wrapper">
                             <table class="data-matrix-table">
                                 <thead>
-                                    <tr><th>Asset Profile</th><th>Verified Available Balance</th></tr>
+                                    <tr><th>Asset Tracked Profile</th><th style="text-align:right;">Verified Balance</th></tr>
                                 </thead>
-                                <tbody>
+                                <tbody id="dynamicAssetTableBody">
+                                    <!-- Dynamic rows from TokenRegistry append here -->
                                     <tr>
-                                        <td><strong>Efikcoin (EFC)</strong></td>
-                                        <td id="tableRowEfcBalanceValue" class="text-color-success font-weight-bold">0.0000 EFC</td>
+                                        <td><strong>Efikcoin (EFC)</strong><br><small style="font-size:10px; color:#64748b;">0x677C...fED1</small></td>
+                                        <td id="tableRowEfcBalanceValue" style="color:#10b981; font-weight:bold; text-align:right;">0.0000 EFC</td>
                                     </tr>
                                 </tbody>
                             </table>
                         </div>
-                        <button class="btn-danger-action force-bottom" onclick="WalletVault.terminateActiveSession()">Disconnect and Clear Node Memory</button>
+
+                        <!-- EMBEDDED DYNAMIC IMPORT TOKEN INTERFACE FRAMEWORK -->
+                        <div style="margin-top: 25px; border-top: 1px dashed var(--border-standard); padding-top: 15px;">
+                            <h3 style="font-size: 11px; text-transform: uppercase; color: var(--color-primary-accent); margin-bottom: 4px; font-weight:700;">Import Custom Asset Node</h3>
+                            <p style="font-size: 11px; color: var(--text-muted-slate); margin: 0 0 10px 0;">Track new cryptographic contracts on the Mainnet environment.</p>
+                            <div class="inline-input-group">
+                                <input type="text" id="inputCustomTokenImportAddress" placeholder="Paste BEP-20 Contract Address (0x...)">
+                                <button onclick="TokenRegistry.importCustomTokenContract(document.getElementById('inputCustomTokenImportAddress').value)">Verify & Add</button>
+                            </div>
+                        </div>
+
+                        <button class="btn-danger-action force-bottom" style="margin-top:25px;" onclick="WalletVault.terminateActiveSession()">Disconnect and Clear Node Memory</button>
                     </div>
 
                 </div>
             </div>
 
+            <!-- SUB-PANEL: PEER-TO-PEER TRADING DESK -->
             <div id="paneDashboardP2P" class="dashboard-pane-view">
                 <div class="dashboard-split-grid">
                     
@@ -286,6 +315,7 @@
                 </div>
             </div>
 
+            <!-- SUB-PANEL: AUTOMATED DECENTRALIZED SWAP (DEX) ROUTER -->
             <div id="paneDashboardDEX" class="dashboard-pane-view">
                 <div class="dashboard-split-grid style-dex-override">
                     
@@ -330,6 +360,7 @@
         </main>
     </div>
 
+    <!-- JavaScript Architectural Core Implementation Logic Script Bindings -->
     <script>
         /**
          * ARCHITECTURAL LAYER: APPLICATION STATE ROUTER
@@ -436,7 +467,7 @@
         };
 
         /**
-         * ARCHITECTURAL LAYER: BLOCKCHAIN ENGINE
+         * ARCHITECTURAL LAYER: BLOCKCHAIN ENGINE (MAINNET ROUTING)
          */
         const BlockchainEngine = {
             NETWORK_CONFIG: {
@@ -447,7 +478,9 @@
             MINIMAL_BEP20_ABI: [
                 "function balanceOf(address owner) view returns (uint256)",
                 "function transfer(address to, uint256 value) returns (bool)",
-                "function decimals() view returns (uint8)"
+                "function decimals() view returns (uint8)",
+                "function symbol() view returns (string)",
+                "function name() view returns (string)"
             ],
 
             provider: null,
@@ -461,32 +494,101 @@
                     const shortAddress = `${this.signer.address.slice(0, 6)}...${this.signer.address.slice(-4)}`;
                     document.getElementById('addressDisplayBox').innerText = `BSC: ${shortAddress}`;
                     
-                    this.refreshOnChainBalances();
+                    TokenRegistry.refreshAllBalances();
                     return true;
                 } catch (e) {
                     return false;
                 }
             },
 
-            refreshOnChainBalances: async function() {
-                if (!this.signer) return;
-                try {
-                    const tokenContract = new ethers.Contract(this.NETWORK_CONFIG.TOKEN_CONTRACT, this.MINIMAL_BEP20_ABI, this.provider);
-                    const balanceRaw = await tokenContract.balanceOf(this.signer.address);
-                    const decimals = await tokenContract.decimals();
-                    
-                    const normalizedBalance = parseFloat(ethers.formatUnits(balanceRaw, decimals));
-                    
-                    document.getElementById('frameMainEfcBalanceValue').innerHTML = `${normalizedBalance.toLocaleString(undefined, {minimumFractionDigits: 4})} <span>EFC</span>`;
-                    document.getElementById('tableRowEfcBalanceValue').innerText = `${normalizedBalance.toLocaleString()} EFC`;
-                } catch (error) {
-                    document.getElementById('frameMainEfcBalanceValue').innerHTML = `0.0000 <span>EFC</span>`;
-                }
-            },
-
             wipeSignerContext: function() {
                 this.provider = null;
                 this.signer = null;
+            }
+        };
+
+        /**
+         * ARCHITECTURAL LAYER: DYNAMIC ASSET REGISTRY MECHANISM
+         */
+        const TokenRegistry = {
+            trackedTokens: [
+                {
+                    symbol: "EFC",
+                    name: "Efikcoin",
+                    contract: "0x677Ce9CBa67f7484ea951a12897CE780cFd8fED1",
+                    decimals: 18,
+                    balance: "0.0000"
+                }
+            ],
+
+            refreshAllBalances: async function() {
+                if (!BlockchainEngine.signer) return;
+                
+                const tableBody = document.getElementById('dynamicAssetTableBody');
+                tableBody.innerHTML = ""; 
+
+                for (let token of this.trackedTokens) {
+                    try {
+                        const tokenContract = new ethers.Contract(
+                            token.contract, 
+                            BlockchainEngine.MINIMAL_BEP20_ABI, 
+                            BlockchainEngine.provider
+                        );
+                        
+                        const balanceRaw = await tokenContract.balanceOf(BlockchainEngine.signer.address);
+                        const decimals = token.decimals || await tokenContract.decimals();
+                        const normalizedBalance = parseFloat(ethers.formatUnits(balanceRaw, decimals));
+                        
+                        token.balance = normalizedBalance.toLocaleString(undefined, { minimumFractionDigits: 4 });
+                        
+                        // Keep the primary balance frame updated with the core native asset (EFC)
+                        if(token.symbol === "EFC") {
+                            document.getElementById('frameMainEfcBalanceValue').innerHTML = `${token.balance} <span>EFC</span>`;
+                        }
+                    } catch (error) {
+                        token.balance = "0.0000 (Node Offline)";
+                    }
+
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td><strong>${token.name} (${token.symbol})</strong><br><small style="font-size:10px; color:#64748b;">${token.contract.slice(0,6)}...${token.contract.slice(-4)}</small></td>
+                        <td style="color:#10b981; font-weight:bold; text-align:right;">${token.balance} ${token.symbol}</td>
+                    `;
+                    tableBody.appendChild(row);
+                }
+            },
+
+            importCustomTokenContract: async function(contractAddress) {
+                const address = contractAddress.trim();
+                if (!ethers.isAddress(address)) {
+                    return alert("Registry Rejection: Invalid cryptographic address format.");
+                }
+
+                if (this.trackedTokens.some(t => t.contract.toLowerCase() === address.toLowerCase())) {
+                    return alert("Registry Notice: This asset contract is already tracked.");
+                }
+
+                try {
+                    const tokenContract = new ethers.Contract(address, BlockchainEngine.MINIMAL_BEP20_ABI, BlockchainEngine.provider);
+                    
+                    const symbol = await tokenContract.symbol();
+                    const name = await tokenContract.name();
+                    const decimals = await tokenContract.decimals();
+
+                    this.trackedTokens.push({
+                        symbol: symbol,
+                        name: name,
+                        contract: address,
+                        decimals: Number(decimals),
+                        balance: "0.0000"
+                    });
+
+                    alert(`🎉 Asset Verified! Successfully tracked: ${name} (${symbol})`);
+                    document.getElementById('inputCustomTokenImportAddress').value = "";
+                    this.refreshAllBalances();
+                } catch (error) {
+                    alert("Verification Failed: Address provided is not a standard BEP-20 token contract, or RPC node timed out.");
+                }
             }
         };
 
@@ -531,7 +633,7 @@
                     await transactionBlockB.wait();
 
                     alert("🎉 Success! Gas split completed.");
-                    BlockchainEngine.refreshOnChainBalances();
+                    TokenRegistry.refreshAllBalances();
                 } catch (error) {
                     alert("Error: " + (error.reason || "Execution rejected. Check gas levels."));
                 }
