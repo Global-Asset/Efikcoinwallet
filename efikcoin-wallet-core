@@ -1,0 +1,10 @@
+efikcoin-wallet-core/             📁 (Your Main Project Folder)
+│
+├── index.html                   📄 (Your Code File)
+├── manifest.json                📄 (Your PWA Config File)
+├── sw.js                        📄 (Your Service Worker Script)
+│
+└── assets/                      📁 [This is the folder created by "assets/"]
+    ├── efc-logo-192.png         📷 [This is your uploaded image file]
+    └── efc-logo-512.png         📷 [This is a copy of your image for larger screens]
+    
