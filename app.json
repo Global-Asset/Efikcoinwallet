@@ -1,1 +1,29 @@
-npm install --global eas-cli && npx create-expo-app efikcoinwallet && cd efikcoinwallet && eas init --id 6599c0d7-44e8-4f4b-bb1d-86351a643fea
+{
+  "expo": {
+    "name": "Efikcoin Wallet",
+    "slug": "efikcoin-wallet-efc",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "scheme": "efikcoin",
+    "userInterfaceStyle": "automatic",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#0B0B0F"
+    },
+    "ios": {
+      "bundleIdentifier": "com.efikcoin.wallet",
+      "buildNumber": "1.0.0"
+    },
+    "android": {
+      "package": "com.efikcoin.wallet",
+      "versionCode": 1
+    },
+    "extra": {
+      "eas": {
+        "projectId": "89b205bc-775a-45e5-9f32-591ad3ced271"
+      }
+    }
+  }
+}
