@@ -3,218 +3,385 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Efikcoin Wallet</title>
+  <title>Efikcoin Wallet v2.0</title>
   <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
-    body { background: #0B0B0F; color: #fff; padding: 20px; max-width: 500px; margin: 0 auto; }
+    body { background: #0B0B0F; color: #fff; padding: 0; max-width: 500px; margin: 0 auto; min-height: 100vh; }
+    .screen { display: none; padding: 20px; animation: fadeIn 0.3s; }
+    .screen.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     h1 { color: #F0B90B; text-align: center; margin: 20px 0; font-size: 28px; }
+    h2 { font-size: 22px; margin-bottom: 15px; }
     .card { background: #1A1A1F; border-radius: 16px; padding: 20px; margin: 15px 0; border: 1px solid #2A2A2F; }
     .label { color: #888; font-size: 13px; margin-bottom: 5px; }
     .value { font-size: 16px; word-break: break-all; margin-bottom: 15px; }
     .balance { font-size: 32px; font-weight: bold; margin: 10px 0; }
-    input, textarea { width: 100%; padding: 12px; background: #0B0B0F; border: 1px solid #2A2A2F; border-radius: 8px; color: #fff; font-size: 16px; margin: 8px 0; }
-    button { width: 100%; padding: 15px; background: #F0B90B; color: #000; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; margin: 8px 0; }
-    button.secondary { background: #1E90FF; color: #fff; }
+    input, textarea { width: 100%; padding: 15px; background: #0B0B0F; border: 1px solid #2A2A2F; border-radius: 12px; color: #fff; font-size: 16px; margin: 8px 0; }
+    button { width: 100%; padding: 16px; background: #F0B90B; color: #000; border: none; border-radius: 12px; font-size: 16px; font-weight: bold; cursor: pointer; margin: 8px 0; }
+    button.secondary { background: #2A2A2F; color: #fff; }
     button.danger { background: #E63946; color: #fff; }
     button:disabled { opacity: 0.5; cursor: not-allowed; }
-    .hidden { display: none; }
-    .warning { background: #E63946; padding: 15px; border-radius: 8px; margin: 15px 0; font-size: 14px; }
+    .warning { background: #E63946; padding: 15px; border-radius: 12px; margin: 15px 0; font-size: 14px; line-height: 1.5; }
     .row { display: flex; gap: 10px; }
     .row button { flex: 1; }
-    .footer { text-align: center; color: #555; font-size: 12px; margin-top: 30px; }
+    .coin-item { display: flex; align-items: center; padding: 15px; background: #1A1A1F; border-radius: 12px; margin: 10px 0; cursor: pointer; border: 1px solid #2A2A2F; }
+    .coin-item:hover { background: #252530; }
+    .coin-logo { width: 40px; height: 40px; border-radius: 50%; margin-right: 15px; }
+    .coin-info { flex: 1; }
+    .coin-name { font-weight: bold; font-size: 16px; }
+    .coin-price { color: #888; font-size: 14px; }
+    .coin-balance { text-align: right; }
+    .tabs { display: flex; background: #1A1A1F; border-radius: 12px; padding: 5px; margin: 20px 0; }
+    .tab { flex: 1; padding: 12px; text-align: center; border-radius: 8px; cursor: pointer; color: #888; }
+    .tab.active { background: #F0B90B; color: #000; font-weight: bold; }
+    .logo-header { width: 60px; height: 60px; margin: 0 auto 20px; display: block; border-radius: 50%; }
+    #chartContainer { height: 200px; margin: 20px 0; }
   </style>
 </head>
 <body>
-  <h1>Efikcoin Wallet</h1>
-
-  <!-- ONBOARDING -->
-  <div id="onboarding" class="card">
-    <h2 style="margin-bottom: 20px;">Self-Custodial EFC Wallet</h2>
-    <p style="color: #888; margin-bottom: 20px;">Your keys, your Efikcoin. Runs on BSC Network.</p>
-    <button onclick="createWallet()">Create New Wallet</button>
-    <button class="secondary" onclick="showImport()">Import Existing Wallet</button>
-  </div>
-
-  <!-- IMPORT -->
-  <div id="import" class="card hidden">
-    <h2 style="margin-bottom: 20px;">Import Wallet</h2>
-    <div class="label">Enter 12-word Seed Phrase</div>
-    <textarea id="mnemonicInput" rows="3" placeholder="word1 word2 word3..."></textarea>
-    <button onclick="importWallet()">Import</button>
-    <button class="secondary" onclick="showOnboarding()">Back</button>
-  </div>
-
-  <!-- WALLET -->
-  <div id="wallet" class="hidden">
+  <!-- LOCK SCREEN -->
+  <div id="lockScreen" class="screen active">
+    <img src="https://ipfs.io/ipfs/bafybeihrzyodihyp5met2hs32ppj37qlowuxarvs2lnlrgujgrlwxc7fwe" class="logo-header">
+    <h1>Efikcoin Wallet</h1>
     <div class="card">
-      <div class="label">Your BSC Address</div>
-      <div class="value" id="address" onclick="copyAddress()" style="cursor: pointer;"></div>
-      
-      <div class="label">Efikcoin Balance</div>
-      <div class="balance" id="efcBalance">0 EFC</div>
-      
-      <div class="label">BNB for Gas Fees</div>
-      <div class="balance" id="bnbBalance" style="font-size: 20px;">0 BNB</div>
-      
-      <div class="row">
-        <button onclick="showSend()">Send EFC</button>
-        <button class="secondary" onclick="refreshBalances()">Refresh</button>
+      <h2>Welcome Back</h2>
+      <div class="label">Enter Password to Unlock</div>
+      <input type="password" id="unlockPassword" placeholder="Password">
+      <button onclick="unlockWallet()">Unlock Wallet</button>
+      <button class="secondary" onclick="showScreen('setupScreen')">Create New Wallet</button>
+    </div>
+  </div>
+
+  <!-- SETUP SCREEN -->
+  <div id="setupScreen" class="screen">
+    <img src="https://ipfs.io/ipfs/bafybeihrzyodihyp5met2hs32ppj37qlowuxarvs2lnlrgujgrlwxc7fwe" class="logo-header">
+    <h1>Efikcoin Wallet</h1>
+    <div class="card">
+      <h2>Create Password</h2>
+      <div class="warning">⚠️ This password encrypts your wallet. If you forget it, your EFC is GONE FOREVER. Write it down.</div>
+      <input type="password" id="newPassword" placeholder="Min 8 characters">
+      <input type="password" id="confirmPassword" placeholder="Confirm Password">
+      <button onclick="createWallet()">Create Wallet</button>
+      <button class="secondary" onclick="showScreen('importScreen')">Import Existing Wallet</button>
+    </div>
+  </div>
+
+  <!-- IMPORT SCREEN -->
+  <div id="importScreen" class="screen">
+    <div class="card">
+      <h2>Import Wallet</h2>
+      <div class="label">12-Word Seed Phrase</div>
+      <textarea id="mnemonicInput" rows="3" placeholder="word1 word2 word3..."></textarea>
+      <div class="label">Set New Password</div>
+      <input type="password" id="importPassword" placeholder="Min 8 characters">
+      <button onclick="importWallet()">Import & Encrypt</button>
+      <button class="secondary" onclick="showScreen('setupScreen')">Back</button>
+    </div>
+  </div>
+
+  <!-- SEED SCREEN -->
+  <div id="seedScreen" class="screen">
+    <div class="card">
+      <div class="warning">⚠️ WRITE THESE 12 WORDS ON PAPER NOW. Screenshot = risk of theft. We CANNOT recover them.</div>
+      <div class="value" id="seedPhrase" style="background: #0B0B0F; padding: 15px; border-radius: 8px; line-height: 1.8; font-size: 18px;"></div>
+      <button onclick="confirmSeedSaved()">I Wrote Down My Seed Phrase</button>
+    </div>
+  </div>
+
+  <!-- HOME SCREEN -->
+  <div id="homeScreen" class="screen">
+    <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0;">
+      <img src="https://ipfs.io/ipfs/bafybeihrzyodihyp5met2hs32ppj37qlowuxarvs2lnlrgujgrlwxc7fwe" style="width: 32px; height: 32px; border-radius: 50%;">
+      <h2 style="margin: 0;">Efikcoin Wallet</h2>
+      <div onclick="lockWallet()" style="cursor: pointer; font-size: 24px;">🔒</div>
+    </div>
+    
+    <div class="card">
+      <div class="label">Total Portfolio Value</div>
+      <div class="balance" id="totalValue">$0.00</div>
+      <div class="label">BSC Address</div>
+      <div class="value" id="walletAddress" onclick="copyAddress()" style="cursor: pointer; font-size: 12px;"></div>
+    </div>
+
+    <div class="tabs">
+      <div class="tab active" onclick="switchTab('tokens')">Tokens</div>
+      <div class="tab" onclick="switchTab('discover')">Discover</div>
+    </div>
+
+    <div id="tokensTab">
+      <div id="tokenList"></div>
+      <button class="secondary" onclick="showScreen('addTokenScreen')">+ Import Token</button>
+    </div>
+
+    <div id="discoverTab" style="display: none;">
+      <input type="text" id="searchToken" placeholder="Search token by contract address" onkeyup="searchToken()">
+      <div id="searchResults"></div>
+    </div>
+  </div>
+
+  <!-- COIN DASHBOARD -->
+  <div id="coinDashboard" class="screen">
+    <div style="display: flex; align-items: center; margin-bottom: 20px;">
+      <div onclick="showScreen('homeScreen')" style="cursor: pointer; font-size: 24px; margin-right: 15px;">←</div>
+      <img id="dashLogo" style="width: 40px; height: 40px; border-radius: 50%; margin-right: 15px;">
+      <div>
+        <div id="dashName" style="font-size: 20px; font-weight: bold;"></div>
+        <div id="dashSymbol" style="color: #888;"></div>
       </div>
     </div>
 
     <div class="card">
-      <div class="label">EFC Contract</div>
-      <div class="value" style="font-size: 12px;">0xa1dd6c528882dc19eccbc967f50bbc121a29630e</div>
-      <div class="label">LP Pair Pool</div>
-      <div class="value" style="font-size: 12px;">0x677ce9cba67f7484ea951a12897ce780cfd8fed1</div>
+      <div class="balance" id="dashBalance">0</div>
+      <div class="label" id="dashValue">$0.00</div>
+      <div id="chartContainer"><canvas id="priceChart"></canvas></div>
     </div>
 
-    <div class="card">
-      <button class="secondary" onclick="exportKey()">Export Private Key</button>
-      <button class="danger" onclick="logout()">Logout + Delete Wallet</button>
+    <div class="row">
+      <button onclick="showSendModal()">Send</button>
+      <button class="secondary" onclick="showReceiveModal()">Receive</button>
+    </div>
+    <div class="row">
+      <button class="secondary" onclick="showSwapModal()">Swap</button>
+      <button class="secondary" onclick="showStakeModal()">Stake</button>
     </div>
   </div>
 
-  <!-- SEND -->
-  <div id="send" class="card hidden">
-    <h2 style="margin-bottom: 20px;">Send EFC</h2>
-    <div class="label">To Address</div>
-    <input id="toAddress" placeholder="0x..." />
-    <div class="label">Amount EFC</div>
-    <input id="amount" type="number" placeholder="0.0" step="0.01" />
-    <button onclick="sendEFC()" id="sendBtn">Send EFC</button>
-    <button class="secondary" onclick="showWallet()">Cancel</button>
+  <!-- TRANSACTION AUTH MODAL -->
+  <div id="authModal" class="screen" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.9); z-index: 1000;">
+    <div class="card" style="margin-top: 50%;">
+      <h2>Authorize Transaction</h2>
+      <div class="label">Enter Password to Confirm</div>
+      <input type="password" id="authPassword" placeholder="Password">
+      <button onclick="confirmTransaction()">Confirm</button>
+      <button class="secondary" onclick="cancelTransaction()">Cancel</button>
+    </div>
   </div>
-
-  <!-- SEED PHRASE MODAL -->
-  <div id="seedModal" class="card hidden">
-    <div class="warning">⚠️ WRITE THESE 12 WORDS DOWN NOW. Screenshot = risk. We cannot recover them. Anyone with these words steals your EFC.</div>
-    <div class="value" id="seedPhrase" style="background: #0B0B0F; padding: 15px; border-radius: 8px; line-height: 1.6;"></div>
-    <button onclick="confirmSaved()">I Wrote Down My Seed Phrase</button>
-  </div>
-
-  <div class="footer">Efikcoin Wallet v1.0 — Self Custodial — BSC Network</div>
 
 <script>
-// EFC Token Contract - This shows YOUR EFC balance
-const EFC_ADDRESS = '0xa1dd6c528882dc19eccbc967f50bbc121a29630e'; 
-// LP Pair Address - For reference only: 0x677ce9cba67f7484ea951a12897ce780cfd8fed1
-
+const EFC_ADDRESS = '0xa1dd6c528882dc19eccbc967f50bbc121a29630e';
+const EFC_LOGO = 'https://ipfs.io/ipfs/bafybeihrzyodihyp5met2hs32ppj37qlowuxarvs2lnlrgujgrlwxc7fwe';
+const WBNB_ADDRESS = '0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c';
+const PANCAKE_ROUTER = '0x10ED43C718714eb63d5aA57B78B54704E256024E';
 const BSC_RPC = 'https://bsc-dataseed.binance.org/';
-const ERC20_ABI = ['function balanceOf(address) view returns (uint256)', 'function decimals() view returns (uint8)', 'function transfer(address to, uint amount) returns (bool)', 'function symbol() view returns (string)'];
+const ERC20_ABI = ['function balanceOf(address) view returns (uint256)', 'function decimals() view returns (uint8)', 'function symbol() view returns (string)', 'function name() view returns (string)', 'function transfer(address to, uint amount) returns (bool)', 'function approve(address spender, uint amount) returns (bool)'];
+const ROUTER_ABI = ['function swapExactETHForTokens(uint amountOutMin, address[] calldata path, address to, uint deadline) payable returns (uint[] memory amounts)', 'function swapExactTokensForETH(uint amountIn, uint amountOutMin, address[] calldata path, address to, uint deadline) returns (uint[] memory amounts)'];
 
 let wallet = null;
 let provider = new ethers.providers.JsonRpcProvider(BSC_RPC);
+let currentPassword = null;
+let pendingTransaction = null;
+let priceChart = null;
+let tokens = [
+  { address: EFC_ADDRESS, symbol: 'EFC', name: 'Efikcoin', logo: EFC_LOGO, decimals: 18 },
+  { address: WBNB_ADDRESS, symbol: 'BNB', name: 'BNB', logo: 'https://tokens.pancakeswap.finance/images/0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c.png', decimals: 18 }
+];
+let currentCoin = null;
 
 window.onload = () => {
-  const saved = localStorage.getItem('efc_mnemonic');
-  if (saved) {
-    loadWallet(saved);
+  if (localStorage.getItem('encryptedWallet')) {
+    showScreen('lockScreen');
+  } else {
+    showScreen('setupScreen');
   }
 };
 
-function showOnboarding() { hideAll(); document.getElementById('onboarding').classList.remove('hidden'); }
-function showImport() { hideAll(); document.getElementById('import').classList.remove('hidden'); }
-function showWallet() { hideAll(); document.getElementById('wallet').classList.remove('hidden'); refreshBalances(); }
-function showSend() { hideAll(); document.getElementById('send').classList.remove('hidden'); }
-function hideAll() {
-  ['onboarding', 'import', 'wallet', 'send', 'seedModal'].forEach(id => {
-    document.getElementById(id).classList.add('hidden');
-  });
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
 }
 
-function createWallet() {
+function encrypt(text, password) {
+  return CryptoJS.AES.encrypt(text, password).toString();
+}
+
+function decrypt(ciphertext, password) {
+  try {
+    const bytes = CryptoJS.AES.decrypt(ciphertext, password);
+    return bytes.toString(CryptoJS.enc.Utf8);
+  } catch (e) {
+    return null;
+  }
+}
+
+async function createWallet() {
+  const pass = document.getElementById('newPassword').value;
+  const confirm = document.getElementById('confirmPassword').value;
+  if (pass.length < 8) return alert('Password must be 8+ characters');
+  if (pass !== confirm) return alert('Passwords do not match');
+  
   const newWallet = ethers.Wallet.createRandom();
   document.getElementById('seedPhrase').textContent = newWallet.mnemonic.phrase;
-  hideAll();
-  document.getElementById('seedModal').classList.remove('hidden');
-  localStorage.setItem('efc_mnemonic_temp', newWallet.mnemonic.phrase);
+  localStorage.setItem('tempEncrypted', encrypt(newWallet.mnemonic.phrase, pass));
+  showScreen('seedScreen');
 }
 
-function confirmSaved() {
-  const mnemonic = localStorage.getItem('efc_mnemonic_temp');
-  localStorage.setItem('efc_mnemonic', mnemonic);
-  localStorage.removeItem('efc_mnemonic_temp');
-  loadWallet(mnemonic);
+function confirmSeedSaved() {
+  localStorage.setItem('encryptedWallet', localStorage.getItem('tempEncrypted'));
+  localStorage.removeItem('tempEncrypted');
+  alert('Wallet created! Now unlock with your password.');
+  showScreen('lockScreen');
 }
 
-function importWallet() {
+async function importWallet() {
   const mnemonic = document.getElementById('mnemonicInput').value.trim();
+  const pass = document.getElementById('importPassword').value;
+  if (pass.length < 8) return alert('Password must be 8+ characters');
   try {
     ethers.Wallet.fromMnemonic(mnemonic);
-    localStorage.setItem('efc_mnemonic', mnemonic);
-    loadWallet(mnemonic);
+    localStorage.setItem('encryptedWallet', encrypt(mnemonic, pass));
+    alert('Wallet imported! Now unlock with your password.');
+    showScreen('lockScreen');
   } catch (e) {
-    alert('Invalid seed phrase. Check all 12 words are correct and in order.');
+    alert('Invalid seed phrase');
   }
 }
 
-async function loadWallet(mnemonic) {
+async function unlockWallet() {
+  const pass = document.getElementById('unlockPassword').value;
+  const encrypted = localStorage.getItem('encryptedWallet');
+  const mnemonic = decrypt(encrypted, pass);
+  if (!mnemonic) return alert('Wrong password');
+  
+  currentPassword = pass;
   wallet = ethers.Wallet.fromMnemonic(mnemonic).connect(provider);
-  document.getElementById('address').textContent = wallet.address;
-  showWallet();
+  document.getElementById('walletAddress').textContent = wallet.address;
+  showScreen('homeScreen');
+  loadTokenBalances();
 }
 
-async function refreshBalances() {
-  if (!wallet) return;
-  try {
-    const efcContract = new ethers.Contract(EFC_ADDRESS, ERC20_ABI, provider);
-    const [efcRaw, decimals, bnbRaw] = await Promise.all([
-      efcContract.balanceOf(wallet.address),
-      efcContract.decimals(),
-      provider.getBalance(wallet.address)
-    ]);
-    document.getElementById('efcBalance').textContent = parseFloat(ethers.utils.formatUnits(efcRaw, decimals)).toFixed(2) + ' EFC';
-    document.getElementById('bnbBalance').textContent = parseFloat(ethers.utils.formatEther(bnbRaw)).toFixed(4) + ' BNB';
-  } catch (e) {
-    alert('Error loading balances. Check internet connection.');
-  }
+function lockWallet() {
+  wallet = null;
+  currentPassword = null;
+  showScreen('lockScreen');
 }
 
-async function sendEFC() {
-  const to = document.getElementById('toAddress').value.trim();
-  const amount = document.getElementById('amount').value;
-  const btn = document.getElementById('sendBtn');
+async function loadTokenBalances() {
+  let total = 0;
+  const list = document.getElementById('tokenList');
+  list.innerHTML = '';
   
-  if (!ethers.utils.isAddress(to)) return alert('Invalid BSC address');
-  if (!amount || amount <= 0) return alert('Enter amount > 0');
-  
-  btn.disabled = true;
-  btn.textContent = 'Sending...';
-  
-  try {
-    const efcContract = new ethers.Contract(EFC_ADDRESS, ERC20_ABI, wallet);
-    const decimals = await efcContract.decimals();
-    const tx = await efcContract.transfer(to, ethers.utils.parseUnits(amount, decimals));
-    alert('Success! TX Hash:\n' + tx.hash + '\n\nCheck BSCScan to confirm.');
-    document.getElementById('toAddress').value = '';
-    document.getElementById('amount').value = '';
-    setTimeout(refreshBalances, 3000);
-    showWallet();
-  } catch (e) {
-    alert('Failed: ' + (e.reason || e.message));
+  for (let token of tokens) {
+    try {
+      const contract = new ethers.Contract(token.address, ERC20_ABI, provider);
+      const balance = await contract.balanceOf(wallet.address);
+      const formatted = ethers.utils.formatUnits(balance, token.decimals);
+      
+      // Get price from CoinGecko
+      let price = 0;
+      if (token.symbol === 'EFC') {
+        // EFC price - replace with your CoinGecko ID when listed
+        price = 0.001; // Placeholder
+      } else if (token.symbol === 'BNB') {
+        const res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=binancecoin&vs_currencies=usd');
+        const data = await res.json();
+        price = data.binancecoin.usd;
+      }
+      
+      const value = parseFloat(formatted) * price;
+      total += value;
+      
+      list.innerHTML += `
+        <div class="coin-item" onclick="openCoinDashboard('${token.address}')">
+          <img src="${token.logo}" class="coin-logo">
+          <div class="coin-info">
+            <div class="coin-name">${token.name}</div>
+            <div class="coin-price">$${price.toFixed(6)}</div>
+          </div>
+          <div class="coin-balance">
+            <div style="font-weight: bold;">${parseFloat(formatted).toFixed(4)}</div>
+            <div style="color: #888; font-size: 14px;">$${value.toFixed(2)}</div>
+          </div>
+        </div>
+      `;
+    } catch (e) { console.error(e); }
   }
+  document.getElementById('totalValue').textContent = '$' + total.toFixed(2);
+}
+
+async function openCoinDashboard(address) {
+  currentCoin = tokens.find(t => t.address === address);
+  document.getElementById('dashLogo').src = currentCoin.logo;
+  document.getElementById('dashName').textContent = currentCoin.name;
+  document.getElementById('dashSymbol').textContent = currentCoin.symbol;
   
-  btn.disabled = false;
-  btn.textContent = 'Send EFC';
+  const contract = new ethers.Contract(address, ERC20_ABI, provider);
+  const balance = await contract.balanceOf(wallet.address);
+  document.getElementById('dashBalance').textContent = parseFloat(ethers.utils.formatUnits(balance, currentCoin.decimals)).toFixed(4) + ' ' + currentCoin.symbol;
+  
+  // Load chart
+  loadPriceChart(currentCoin.symbol);
+  showScreen('coinDashboard');
+}
+
+async function loadPriceChart(symbol) {
+  const ctx = document.getElementById('priceChart').getContext('2d');
+  if (priceChart) priceChart.destroy();
+  
+  // Dummy data - replace with CoinGecko API
+  const data = { labels: ['7d', '6d', '5d', '4d', '3d', '2d', '1d'], datasets: [{ data: [0.0008, 0.0009, 0.001, 0.0011, 0.001, 0.0012, 0.001], borderColor: '#F0B90B', tension: 0.4 }] };
+  
+  priceChart = new Chart(ctx, { type: 'line', data: data, options: { plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { display: false } } } });
+}
+
+function switchTab(tab) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById('tokensTab').style.display = tab === 'tokens' ? 'block' : 'none';
+  document.getElementById('discoverTab').style.display = tab === 'discover' ? 'block' : 'none';
 }
 
 function copyAddress() {
   navigator.clipboard.writeText(wallet.address);
-  alert('Address copied to clipboard');
+  alert('Address copied');
 }
 
-function exportKey() {
-  if (confirm('NEVER share your private key. Anyone with it steals all your EFC. Show it?')) {
-    alert('Your Private Key:\n\n' + wallet.privateKey + '\n\nDELETE THIS MESSAGE after saving.');
+function showSendModal() {
+  pendingTransaction = 'send';
+  showScreen('authModal');
+}
+
+function showSwapModal() {
+  alert('Swap: Coming soon. Will use PancakeSwap router.');
+}
+
+function showStakeModal() {
+  alert('Staking: Connect your EFC staking contract here.');
+}
+
+function showReceiveModal() {
+  alert('Your Address:\n' + wallet.address);
+}
+
+function confirmTransaction() {
+  const pass = document.getElementById('authPassword').value;
+  if (pass !== currentPassword) return alert('Wrong password');
+  
+  document.getElementById('authModal').classList.remove('active');
+  
+  if (pendingTransaction === 'send') {
+    const to = prompt('Enter recipient address:');
+    const amount = prompt('Enter amount ' + currentCoin.symbol + ':');
+    if (to && amount) executeSend(to, amount);
   }
+  pendingTransaction = null;
 }
 
-function logout() {
-  if (confirm('This deletes wallet from this browser. You MUST have saved your 12 words to recover. Continue?')) {
-    localStorage.removeItem('efc_mnemonic');
-    location.reload();
+function cancelTransaction() {
+  pendingTransaction = null;
+  showScreen('coinDashboard');
+}
+
+async function executeSend(to, amount) {
+  try {
+    const contract = new ethers.Contract(currentCoin.address, ERC20_ABI, wallet);
+    const tx = await contract.transfer(to, ethers.utils.parseUnits(amount, currentCoin.decimals));
+    alert('Sent! TX: ' + tx.hash);
+    loadTokenBalances();
+  } catch (e) {
+    alert('Failed: ' + e.message);
   }
 }
 </script>
