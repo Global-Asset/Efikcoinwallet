@@ -1,685 +1,222 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Efikcoin Wallet Core - Production Node</title>
-    
-    <!-- Progressive Web App Capabilities -->
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="manifest" href="./manifest.json">
-
-    <!-- Third-Party Cryptographic Core CDN Layer (Ethers.js v6) -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.1/ethers.umd.min.js"></script>
-
-    <!-- BUILT-IN SYSTEM CSS STYLING ENGINE -->
-    <style>
-        :root {
-            --bg-universe: #04060d;
-            --bg-surface-card: #0a0f1d;
-            --bg-input-inner: #020307;
-            --border-standard: #182235;
-            --color-primary-accent: #2563eb;
-            --color-success-bright: #10b981;
-            --color-warning-amber: #f59e0b;
-            --color-danger-crimson: #ef4444;
-            --text-primary-white: #f8fafc;
-            --text-muted-slate: #64748b;
-        }
-
-        body {
-            background-color: var(--bg-universe);
-            color: var(--text-primary-white);
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            margin: 0; padding: 15px;
-            -webkit-font-smoothing: antialiased;
-        }
-
-        .application-shell { max-width: 1100px; margin: 0 auto; }
-
-        .app-global-header {
-            display: flex; justify-content: space-between; align-items: center;
-            border-bottom: 1px solid var(--border-standard); padding-bottom: 20px; margin-bottom: 25px;
-        }
-        .branding-group h1 { font-size: 24px; font-weight: 800; margin: 0; letter-spacing: -0.5px; }
-        .branding-group h1 span { color: var(--color-primary-accent); }
-        .branding-group p { font-size: 12px; color: var(--text-muted-slate); margin: 4px 0 0 0; }
-
-        .network-node-status { display: flex; align-items: center; gap: 8px; }
-        .status-indicator-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
-        .status-indicator-dot.processing { background-color: var(--color-warning-amber); box-shadow: 0 0 8px var(--color-warning-amber); }
-        .status-indicator-dot.online { background-color: var(--color-success-bright); box-shadow: 0 0 8px var(--color-success-bright); }
-        .node-address-string { font-family: monospace; font-size: 11px; font-weight: bold; background: #111827; padding: 4px 10px; border-radius: 4px; color: var(--text-muted-slate); }
-
-        .pwa-install-banner {
-            background-color: rgba(37, 99, 235, 0.1); border: 1px dashed var(--color-primary-accent);
-            padding: 12px; border-radius: 8px; font-size: 12px; text-align: center; margin-bottom: 20px; color: var(--text-primary-white); display: none;
-        }
-
-        .dashboard-navigation-bar { display: flex; gap: 8px; margin-bottom: 25px; border-bottom: 1px solid var(--border-standard); padding-bottom: 10px; }
-        .nav-tab-element {
-            background: transparent; color: var(--text-muted-slate); border: none; padding: 10px 18px; font-weight: 600; font-size: 13px; cursor: pointer; transition: all 0.2s ease; border-radius: 6px;
-        }
-        .nav-tab-element.active { background: var(--color-primary-accent); color: white; }
-
-        .app-view-container, .dashboard-pane-view { display: none; }
-        .active-view, .active-pane { display: block; animation: panelFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
-
-        @keyframes panelFadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
-
-        .dashboard-split-grid { display: grid; grid-template-columns: 1.1fr 1.9fr; gap: 20px; }
-        @media (max-width: 850px) { .dashboard-split-grid { grid-template-columns: 1fr; } }
-
-        .card, .grid-card-element { background: var(--bg-surface-card); border: 1px solid var(--border-standard); border-radius: 12px; padding: 24px; position: relative; margin-bottom: 20px; }
-        .card h2, .grid-card-element h2 { font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--color-primary-accent); margin-top: 0; margin-bottom: 20px; font-weight: 700; }
-
-        .auth-card-wrapper { max-width: 480px; margin: 40px auto; }
-        .auth-panel-node { display: none; background: var(--bg-surface-card); border: 1px solid var(--border-standard); border-radius: 12px; padding: 24px; }
-        .auth-panel-node.active-panel { display: block; }
-        .panel-explanatory-text { font-size: 12px; color: var(--text-muted-slate); margin-top: 0; margin-bottom: 16px; line-height: 1.5; }
-        .auth-navigation-links { display: flex; flex-direction: column; margin-top: 10px; }
-
-        .input-field-group { margin-bottom: 16px; }
-        .input-field-group label { display: block; font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; margin-bottom: 6px; }
-        .input-field-group input, .input-field-group select {
-            width: 100%; padding: 12px; border-radius: 6px; border: 1px solid var(--border-standard); background-color: var(--bg-input-inner); color: white; font-family: monospace; box-sizing: border-box; font-size: 13px; transition: border 0.2s;
-        }
-        .input-field-group input:focus { border-color: var(--color-primary-accent); outline: none; }
-
-        button { border-radius: 6px; font-weight: bold; font-size: 13px; text-transform: uppercase; padding: 14px; width: 100%; border: none; cursor: pointer; transition: filter 0.2s; }
-        button:hover { filter: brightness(1.15); }
-        .btn-primary-action { background: var(--color-primary-accent); color: white; }
-        .btn-success-action { background: var(--color-success-bright); color: white; }
-        .btn-danger-action { background: var(--color-danger-crimson); color: white; }
-        .btn-secondary-action { background: transparent; border: 1px solid var(--border-standard); color: var(--text-muted-slate); }
-        .btn-link-toggle { background: transparent; color: var(--text-muted-slate); border: 1px solid var(--border-standard); margin-top: 8px; font-size: 12px; }
-        .btn-table-action { padding: 6px 12px; font-size: 11px; width: auto; background: var(--color-primary-accent); color: white; }
-
-        .key-box, .cryptographic-display-box { background: var(--bg-input-inner); border: 1px solid var(--border-standard); padding: 12px; border-radius: 6px; font-family: monospace; font-size: 11px; word-break: break-all; margin-bottom: 12px; }
-        .target-address { color: var(--color-success-bright); }
-        .target-private { color: var(--color-warning-amber); }
-        .security-warning-notice { border: 1px solid var(--color-warning-amber); background: rgba(245, 158, 11, 0.03); color: var(--color-warning-amber); font-size: 11px; padding: 12px; border-radius: 6px; margin-bottom: 16px; line-height: 1.5; }
-
-        .giant-balance-readout-frame { font-size: 36px; font-weight: 800; text-align: center; margin: 20px 0 6px 0; color: white; }
-        .giant-balance-readout-frame span { font-size: 16px; color: var(--text-muted-slate); }
-        .smart-contract-anchor-text { font-size: 11px; text-align: center; color: var(--text-muted-slate); margin-bottom: 25px; font-family: monospace; }
-
-        .table-container-wrapper { overflow-x: auto; margin-top: 15px; }
-        .data-matrix-table { width: 100%; border-collapse: collapse; font-size: 12px; }
-        .data-matrix-table th, .data-matrix-table td { padding: 12px; text-align: left; border-bottom: 1px solid var(--border-standard); }
-        .data-matrix-table th { text-transform: uppercase; font-size: 10px; color: var(--text-muted-slate); letter-spacing: 0.5px; }
-
-        .badging { padding: 3px 6px; border-radius: 4px; font-size: 10px; font-weight: bold; }
-        .sell-badge { background: rgba(239, 68, 68, 0.15); color: var(--color-danger-crimson); }
-        .success-badge { background: rgba(16, 185, 129, 0.15); color: var(--color-success-bright); }
-
-        .read-only-success-field { color: var(--color-success-bright) !important; font-weight: bold; }
-        .liquidity-routing-divider-arrow { text-align: center; font-size: 11px; font-weight: bold; color: var(--color-primary-accent); margin: 10px 0; }
-        .hidden-initially { display: none; }
-        .back-margin { margin-top: 10px; }
-        
-        /* Layout fix for inline forms */
-        .inline-input-group { display: flex; gap: 8px; margin-top: 8px; }
-        .inline-input-group input { flex: 1; padding: 10px; background: var(--bg-input-inner); border: 1px solid var(--border-standard); color: white; border-radius: 4px; font-family: monospace; font-size: 12px; }
-        .inline-input-group button { width: auto; padding: 0 20px; font-size: 11px; background: var(--color-success-bright); }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Efikcoin Wallet</title>
+  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+    body { background: #0B0B0F; color: #fff; padding: 20px; max-width: 500px; margin: 0 auto; }
+    h1 { color: #F0B90B; text-align: center; margin: 20px 0; font-size: 28px; }
+    .card { background: #1A1A1F; border-radius: 16px; padding: 20px; margin: 15px 0; border: 1px solid #2A2A2F; }
+    .label { color: #888; font-size: 13px; margin-bottom: 5px; }
+    .value { font-size: 16px; word-break: break-all; margin-bottom: 15px; }
+    .balance { font-size: 32px; font-weight: bold; margin: 10px 0; }
+    input, textarea { width: 100%; padding: 12px; background: #0B0B0F; border: 1px solid #2A2A2F; border-radius: 8px; color: #fff; font-size: 16px; margin: 8px 0; }
+    button { width: 100%; padding: 15px; background: #F0B90B; color: #000; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; margin: 8px 0; }
+    button.secondary { background: #1E90FF; color: #fff; }
+    button.danger { background: #E63946; color: #fff; }
+    button:disabled { opacity: 0.5; cursor: not-allowed; }
+    .hidden { display: none; }
+    .warning { background: #E63946; padding: 15px; border-radius: 8px; margin: 15px 0; font-size: 14px; }
+    .row { display: flex; gap: 10px; }
+    .row button { flex: 1; }
+    .footer { text-align: center; color: #555; font-size: 12px; margin-top: 30px; }
+  </style>
 </head>
 <body>
+  <h1>Efikcoin Wallet</h1>
 
-    <!-- PWA Smart Banner -->
-    <div id="pwaBanner" class="pwa-install-banner">
-        📱 Upgrade Experience: Click <b>"Add to Home Screen"</b> via browser settings to deploy standalone node.
+  <!-- ONBOARDING -->
+  <div id="onboarding" class="card">
+    <h2 style="margin-bottom: 20px;">Self-Custodial EFC Wallet</h2>
+    <p style="color: #888; margin-bottom: 20px;">Your keys, your Efikcoin. Runs on BSC Network.</p>
+    <button onclick="createWallet()">Create New Wallet</button>
+    <button class="secondary" onclick="showImport()">Import Existing Wallet</button>
+  </div>
+
+  <!-- IMPORT -->
+  <div id="import" class="card hidden">
+    <h2 style="margin-bottom: 20px;">Import Wallet</h2>
+    <div class="label">Enter 12-word Seed Phrase</div>
+    <textarea id="mnemonicInput" rows="3" placeholder="word1 word2 word3..."></textarea>
+    <button onclick="importWallet()">Import</button>
+    <button class="secondary" onclick="showOnboarding()">Back</button>
+  </div>
+
+  <!-- WALLET -->
+  <div id="wallet" class="hidden">
+    <div class="card">
+      <div class="label">Your BSC Address</div>
+      <div class="value" id="address" onclick="copyAddress()" style="cursor: pointer;"></div>
+      
+      <div class="label">Efikcoin Balance</div>
+      <div class="balance" id="efcBalance">0 EFC</div>
+      
+      <div class="label">BNB for Gas Fees</div>
+      <div class="balance" id="bnbBalance" style="font-size: 20px;">0 BNB</div>
+      
+      <div class="row">
+        <button onclick="showSend()">Send EFC</button>
+        <button class="secondary" onclick="refreshBalances()">Refresh</button>
+      </div>
     </div>
 
-    <div class="application-shell">
-        <header class="app-global-header">
-            <div class="branding-group">
-                <h1>Efikcoin <span>Wallet Core</span></h1>
-                <p>Enterprise Self-Custodial Clearing Layer & Decentralized P2P Ledger</p>
-            </div>
-            <div class="network-node-status">
-                <span class="status-indicator-dot processing" id="nodeStatusLight"></span>
-                <span id="addressDisplayBox" class="node-address-string">SESSION LOCKED</span>
-            </div>
-        </header>
-
-        <!-- SUB-SYSTEM CONTAINER 1: AUTHENTICATION GATEWAY -->
-        <main id="viewAuthGateway" class="app-view-container active-view">
-            <div class="auth-card-wrapper">
-                
-                <!-- VIEW: ACCESS VIA PRIVATE KEY -->
-                <section id="panelAuthLogin" class="auth-panel-node active-panel">
-                    <h2>Unlock Secure Environment</h2>
-                    <div class="input-field-group">
-                        <label>Private Key Keyphrase String</label>
-                        <input type="password" placeholder="Enter your 64-character hex key (0x...)" id="inputPrivateKey" autocomplete="off">
-                    </div>
-                    <button class="btn-primary-action" onclick="WalletVault.loginWithSecretKeyphrase()">Unlock System Node</button>
-                    <div class="auth-navigation-links">
-                        <button class="btn-link-toggle" onclick="AppRouter.switchAuthPanel('create')">Generate Clean Wallet Node</button>
-                        <button class="btn-link-toggle" onclick="AppRouter.switchAuthPanel('import')">Import External Backup Signature</button>
-                    </div>
-                </section>
-
-                <!-- VIEW: GENERATE FRESH WALLET NODE -->
-                <section id="panelAuthCreate" class="auth-panel-node">
-                    <h2>Cryptographic Identity Generator</h2>
-                    <p class="panel-explanatory-text">Creates an isolated private-public mathematical node pair entirely locally within the isolated browser storage engine.</p>
-                    <button class="btn-primary-action" onclick="WalletVault.generateFreshMnemonicKeyPair()">Initialize Random Address Pair</button>
-                    
-                    <div id="keypairGenerationOutputFrame" class="hidden-initially">
-                        <div class="input-field-group">
-                            <label>Generated Public Receiving Address</label>
-                            <div class="cryptographic-display-box target-address" id="generatedPublicAddressField"></div>
-                        </div>
-                        <div class="input-field-group">
-                            <label>Generated Private Master Key (EXPORT CRITICAL)</label>
-                            <div class="cryptographic-display-box target-private" id="generatedPrivateKeyField"></div>
-                        </div>
-                        <div class="security-warning-notice">
-                            ⚠️ BACKUP REQUIRED: Write down your Private Key. This framework is completely self-custodial. If you lose this key string, all EFC token access is permanently lost.
-                        </div>
-                        <button class="btn-success-action" onclick="AppRouter.switchAuthPanel('login')">Key Securely Saved: Proceed to Login</button>
-                    </div>
-                    <button class="btn-secondary-action back-margin" onclick="AppRouter.switchAuthPanel('login')">Return to Gateway Access</button>
-                </section>
-
-                <!-- VIEW: IMPORT INTERFACE OPTIONS -->
-                <section id="panelAuthImport" class="auth-panel-node">
-                    <h2>Import Identity Core</h2>
-                    <div class="input-field-group">
-                        <label>Raw Private Key Hex Code</label>
-                        <input type="password" placeholder="0x..." id="inputImportKeyString" autocomplete="off">
-                    </div>
-                    <button class="btn-primary-action" onclick="WalletVault.processExternalImportRoute()">Verify and Mount Identity Node</button>
-                    <button class="btn-secondary-action back-margin" onclick="AppRouter.switchAuthPanel('login')">Cancel</button>
-                </section>
-
-            </div>
-        </main>
-
-        <!-- SUB-SYSTEM CONTAINER 2: SYSTEM OPERATIONAL DASHBOARD -->
-        <main id="viewSystemDashboard" class="app-view-container">
-            
-            <!-- GLOBAL NAVIGATION MENU MATRIX -->
-            <nav class="dashboard-navigation-bar">
-                <button class="nav-tab-element active" id="tabLinkWallet" onclick="AppRouter.switchDashboardTab('wallet')">Portfolio & Transact</button>
-                <button class="nav-tab-element" id="tabLinkP2P" onclick="AppRouter.switchDashboardTab('p2p')">P2P Trading Ledger</button>
-                <button class="nav-tab-element" id="tabLinkDEX" onclick="AppRouter.switchDashboardTab('dex')">Automated AMM Swap</button>
-            </nav>
-
-            <!-- SUB-PANEL: PORTFOLIO & PAYMENTS -->
-            <div id="paneDashboardWallet" class="dashboard-pane-view active-pane">
-                <div class="dashboard-split-grid">
-                    
-                    <div class="grid-card-element">
-                        <h2>Authorize Outgoing Settlement Payload</h2>
-                        <div class="input-field-group">
-                            <label>Target Execution Chain Environment</label>
-                            <select id="selectTargetNetworkChain">
-                                <option value="56">BNB Smart Chain Mainnet (EVM Core)</option>
-                            </select>
-                        </div>
-                        <div class="input-field-group">
-                            <label>Destination Receiver Node Address</label>
-                            <input type="text" placeholder="0x..." id="inputTxDestinationAddress">
-                        </div>
-                        <div class="input-field-group">
-                            <label>Volume Settlement Quantity (EFC)</label>
-                            <input type="number" placeholder="0.0000" step="0.000001" id="inputTxTokenVolume">
-                        </div>
-                        <button class="btn-primary-action" onclick="TxSignSplitter.initiateOwnerSignedTransactionSplit()">Sign & Broadcast Payload</button>
-                    </div>
-
-                    <div class="grid-card-element centralized-balance-card">
-                        <h2>Multi-Asset Ledger Registry</h2>
-                        <div class="giant-balance-readout-frame" id="frameMainEfcBalanceValue">0.0000 <span>EFC</span></div>
-                        <div class="smart-contract-anchor-text">Core System Tracker Node Connected</div>
-                        
-                        <div class="table-container-wrapper">
-                            <table class="data-matrix-table">
-                                <thead>
-                                    <tr><th>Asset Tracked Profile</th><th style="text-align:right;">Verified Balance</th></tr>
-                                </thead>
-                                <tbody id="dynamicAssetTableBody">
-                                    <!-- Dynamic rows from TokenRegistry append here -->
-                                    <tr>
-                                        <td><strong>Efikcoin (EFC)</strong><br><small style="font-size:10px; color:#64748b;">0x677C...fED1</small></td>
-                                        <td id="tableRowEfcBalanceValue" style="color:#10b981; font-weight:bold; text-align:right;">0.0000 EFC</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-
-                        <!-- EMBEDDED DYNAMIC IMPORT TOKEN INTERFACE FRAMEWORK -->
-                        <div style="margin-top: 25px; border-top: 1px dashed var(--border-standard); padding-top: 15px;">
-                            <h3 style="font-size: 11px; text-transform: uppercase; color: var(--color-primary-accent); margin-bottom: 4px; font-weight:700;">Import Custom Asset Node</h3>
-                            <p style="font-size: 11px; color: var(--text-muted-slate); margin: 0 0 10px 0;">Track new cryptographic contracts on the Mainnet environment.</p>
-                            <div class="inline-input-group">
-                                <input type="text" id="inputCustomTokenImportAddress" placeholder="Paste BEP-20 Contract Address (0x...)">
-                                <button onclick="TokenRegistry.importCustomTokenContract(document.getElementById('inputCustomTokenImportAddress').value)">Verify & Add</button>
-                            </div>
-                        </div>
-
-                        <button class="btn-danger-action force-bottom" style="margin-top:25px;" onclick="WalletVault.terminateActiveSession()">Disconnect and Clear Node Memory</button>
-                    </div>
-
-                </div>
-            </div>
-
-            <!-- SUB-PANEL: PEER-TO-PEER TRADING DESK -->
-            <div id="paneDashboardP2P" class="dashboard-pane-view">
-                <div class="dashboard-split-grid">
-                    
-                    <div class="grid-card-element">
-                        <h2>Create Escrow Advertisement</h2>
-                        <div class="input-field-group">
-                            <label>Escrow Order Parameter</label>
-                            <select id="selectP2pOrderType">
-                                <option value="SELL">Sell EFC (Lock Assets to Smart Escrow)</option>
-                                <option value="BUY">Buy EFC (Fiat Funding Request Node)</option>
-                            </select>
-                        </div>
-                        <div class="input-field-group">
-                            <label>Fiat Evaluation Price Point (NGN per 1 EFC Equivalent)</label>
-                            <input type="number" value="1600" id="inputP2pFiatRate">
-                        </div>
-                        <div class="input-field-group">
-                            <label>Target Liquidity Volume</label>
-                            <input type="number" placeholder="5000" id="inputP2pTokenVolume">
-                        </div>
-                        <button class="btn-primary-action" onclick="P2PDesk.registerLocalEscrowOrderAdvertisement()">Commit Offer Node to Local Book</button>
-                    </div>
-
-                    <div class="grid-card-element">
-                        <h2>Active Peer Clearing Order Book Matrix</h2>
-                        <div class="table-container-wrapper">
-                            <table class="data-matrix-table">
-                                <thead>
-                                    <tr><th>Counterparty Node</th><th>Type</th><th>Volume Parameters</th><th>Rate Index</th><th>Execution Action</th></tr>
-                                </thead>
-                                <tbody id="p2pOrderBookTableDynamicBody">
-                                    <tr>
-                                        <td>PeerNode_819x</td>
-                                        <td><span class="badging sell-badge">SELL</span></td>
-                                        <td>25,000 EFC</td>
-                                        <td>1,645 NGN</td>
-                                        <td><button class="btn-table-action" onclick="alert('Instantiating state channels to settle peer contract escrow asset blocks...')">Trade</button></td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-
-            <!-- SUB-PANEL: AUTOMATED DECENTRALIZED SWAP (DEX) ROUTER -->
-            <div id="paneDashboardDEX" class="dashboard-pane-view">
-                <div class="dashboard-split-grid style-dex-override">
-                    
-                    <div class="grid-card-element">
-                        <h2>Automated Constant Product Liquid Swap</h2>
-                        <div class="input-field-group">
-                            <label>Pool Input Funding Asset</label>
-                            <select><option value="USDT">Tether USD (USDT - BEP20)</option></select>
-                            <input type="number" value="100" id="inputDexPairFundingVolume" oninput="DexRouter.calculateInstantPoolProductQuoteOutput()">
-                        </div>
-                        <div class="liquidity-routing-divider-arrow">⬇ AMM Router Exchange Path ⬇</div>
-                        <div class="input-field-group">
-                            <label>Calculated Target Output (EFC Tokens Received)</label>
-                            <input type="text" id="outputDexCalculatedTokenVolume" value="100.0000" readonly class="read-only-success-field">
-                        </div>
-                        <div class="pool-allocation-metadata-label">AMM Registered Tracking Pair ID Node: <span class="monospaced-string">0x676c...59d0</span></div>
-                        <button class="btn-primary-action" onclick="DexRouter.executeOnChainAtomicAMMExchangeSwap()">Sign & Confirm Swap Execution</button>
-                    </div>
-
-                    <div class="grid-card-element">
-                        <h2>Atomic Pool Activity Audit Stream</h2>
-                        <div class="table-container-wrapper">
-                            <table class="data-matrix-table">
-                                <thead>
-                                    <tr><th>Timestamp Block</th><th>Path Vector</th><th>Input Weight</th><th>Status Check</th></tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>Latest Block</td>
-                                        <td>USDT ➔ EFC</td>
-                                        <td>100.00 USDT</td>
-                                        <td><span class="badging success-badge">Atomic Complete</span></td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-
-        </main>
+    <div class="card">
+      <div class="label">EFC Contract</div>
+      <div class="value" style="font-size: 12px;">0xa1dd6c528882dc19eccbc967f50bbc121a29630e</div>
+      <div class="label">LP Pair Pool</div>
+      <div class="value" style="font-size: 12px;">0x677ce9cba67f7484ea951a12897ce780cfd8fed1</div>
     </div>
 
-    <!-- JavaScript Architectural Core Implementation Logic Script Bindings -->
-    <script>
-        /**
-         * ARCHITECTURAL LAYER: APPLICATION STATE ROUTER
-         */
-        const AppRouter = {
-            switchAuthPanel: function(targetPanelId) {
-                document.querySelectorAll('.auth-panel-node').forEach(panel => {
-                    panel.classList.remove('active-panel');
-                    panel.style.display = 'none';
-                });
-                
-                const chosenPanel = document.getElementById(`panelAuth${targetPanelId.charAt(0).toUpperCase() + targetPanelId.slice(1)}`);
-                if (chosenPanel) {
-                    chosenPanel.classList.add('active-panel');
-                    chosenPanel.style.display = 'block';
-                }
-            },
+    <div class="card">
+      <button class="secondary" onclick="exportKey()">Export Private Key</button>
+      <button class="danger" onclick="logout()">Logout + Delete Wallet</button>
+    </div>
+  </div>
 
-            switchDashboardTab: function(targetTabPaneId) {
-                document.querySelectorAll('.dashboard-pane-view').forEach(pane => pane.classList.remove('active-pane'));
-                document.querySelectorAll('.nav-tab-element').forEach(tab => tab.classList.remove('active'));
-                
-                const targetPane = document.getElementById(`paneDashboard${targetTabPaneId.toUpperCase()}`);
-                const targetTab = document.getElementById(`tabLink${targetTabPaneId.toUpperCase()}`);
-                
-                if (targetPane && targetTab) {
-                    targetPane.classList.add('active-pane');
-                    targetTab.classList.add('active');
-                }
-            },
+  <!-- SEND -->
+  <div id="send" class="card hidden">
+    <h2 style="margin-bottom: 20px;">Send EFC</h2>
+    <div class="label">To Address</div>
+    <input id="toAddress" placeholder="0x..." />
+    <div class="label">Amount EFC</div>
+    <input id="amount" type="number" placeholder="0.0" step="0.01" />
+    <button onclick="sendEFC()" id="sendBtn">Send EFC</button>
+    <button class="secondary" onclick="showWallet()">Cancel</button>
+  </div>
 
-            transitionGatewayToSystemCore: function(isOnline = false) {
-                document.getElementById('viewAuthGateway').classList.remove('active-view');
-                document.getElementById('viewSystemDashboard').classList.add('active-view');
-                
-                const light = document.getElementById('nodeStatusLight');
-                if (isOnline) {
-                    light.classList.remove('processing');
-                    light.classList.add('online');
-                }
-            },
+  <!-- SEED PHRASE MODAL -->
+  <div id="seedModal" class="card hidden">
+    <div class="warning">⚠️ WRITE THESE 12 WORDS DOWN NOW. Screenshot = risk. We cannot recover them. Anyone with these words steals your EFC.</div>
+    <div class="value" id="seedPhrase" style="background: #0B0B0F; padding: 15px; border-radius: 8px; line-height: 1.6;"></div>
+    <button onclick="confirmSaved()">I Wrote Down My Seed Phrase</button>
+  </div>
 
-            revertToLockscreenGateway: function() {
-                document.getElementById('viewSystemDashboard').classList.remove('active-view');
-                document.getElementById('viewAuthGateway').classList.add('active-view');
-                this.switchAuthPanel('login');
-                
-                const light = document.getElementById('nodeStatusLight');
-                light.classList.remove('online');
-                light.classList.add('processing');
-            }
-        };
+  <div class="footer">Efikcoin Wallet v1.0 — Self Custodial — BSC Network</div>
 
-        /**
-         * ARCHITECTURAL LAYER: SECURE VAULT
-         */
-        const WalletVault = {
-            _runtimeKeySecret: null,
+<script>
+// EFC Token Contract - This shows YOUR EFC balance
+const EFC_ADDRESS = '0xa1dd6c528882dc19eccbc967f50bbc121a29630e'; 
+// LP Pair Address - For reference only: 0x677ce9cba67f7484ea951a12897ce780cfd8fed1
 
-            loginWithSecretKeyphrase: async function() {
-                const inputKey = document.getElementById('inputPrivateKey').value.trim();
-                if (!inputKey) return alert("System Notification: Input string cannot be blank.");
+const BSC_RPC = 'https://bsc-dataseed.binance.org/';
+const ERC20_ABI = ['function balanceOf(address) view returns (uint256)', 'function decimals() view returns (uint8)', 'function transfer(address to, uint amount) returns (bool)', 'function symbol() view returns (string)'];
 
-                try {
-                    const status = await BlockchainEngine.instantiateSessionNode(inputKey);
-                    if (status) {
-                        this._runtimeKeySecret = inputKey;
-                        AppRouter.transitionGatewayToSystemCore(true);
-                    }
-                } catch (error) {
-                    alert("Security Registry Rejection: Invalid key parsing sequence.");
-                }
-            },
+let wallet = null;
+let provider = new ethers.providers.JsonRpcProvider(BSC_RPC);
 
-            generateFreshMnemonicKeyPair: function() {
-                const hexChars = '0123456789abcdef';
-                let generatedPrivateKey = "0x", generatedAddress = "0x677";
-                
-                for (let i = 0; i < 64; i++) generatedPrivateKey += hexChars[Math.floor(Math.random() * 16)];
-                for (let i = 0; i < 37; i++) generatedAddress += hexChars[Math.floor(Math.random() * 16)];
+window.onload = () => {
+  const saved = localStorage.getItem('efc_mnemonic');
+  if (saved) {
+    loadWallet(saved);
+  }
+};
 
-                document.getElementById('generatedPublicAddressField').innerText = generatedAddress;
-                document.getElementById('generatedPrivateKeyField').innerText = generatedPrivateKey;
-                document.getElementById('keypairGenerationOutputFrame').classList.remove('hidden-initially');
-            },
+function showOnboarding() { hideAll(); document.getElementById('onboarding').classList.remove('hidden'); }
+function showImport() { hideAll(); document.getElementById('import').classList.remove('hidden'); }
+function showWallet() { hideAll(); document.getElementById('wallet').classList.remove('hidden'); refreshBalances(); }
+function showSend() { hideAll(); document.getElementById('send').classList.remove('hidden'); }
+function hideAll() {
+  ['onboarding', 'import', 'wallet', 'send', 'seedModal'].forEach(id => {
+    document.getElementById(id).classList.add('hidden');
+  });
+}
 
-            processExternalImportRoute: function() {
-                const key = document.getElementById('inputImportKeyString').value.trim();
-                if (!key.startsWith("0x") || key.length < 30) {
-                    return alert("Formatting Error: Private key must use a valid Hex format.");
-                }
-                document.getElementById('inputPrivateKey').value = key;
-                this.loginWithSecretKeyphrase();
-            },
+function createWallet() {
+  const newWallet = ethers.Wallet.createRandom();
+  document.getElementById('seedPhrase').textContent = newWallet.mnemonic.phrase;
+  hideAll();
+  document.getElementById('seedModal').classList.remove('hidden');
+  localStorage.setItem('efc_mnemonic_temp', newWallet.mnemonic.phrase);
+}
 
-            terminateActiveSession: function() {
-                this._runtimeKeySecret = null;
-                document.getElementById('inputPrivateKey').value = "";
-                document.getElementById('inputImportKeyString').value = "";
-                document.getElementById('addressDisplayBox').innerText = "SESSION LOCKED";
-                BlockchainEngine.wipeSignerContext();
-                AppRouter.revertToLockscreenGateway();
-            }
-        };
+function confirmSaved() {
+  const mnemonic = localStorage.getItem('efc_mnemonic_temp');
+  localStorage.setItem('efc_mnemonic', mnemonic);
+  localStorage.removeItem('efc_mnemonic_temp');
+  loadWallet(mnemonic);
+}
 
-        /**
-         * ARCHITECTURAL LAYER: BLOCKCHAIN ENGINE (MAINNET ROUTING)
-         */
-        const BlockchainEngine = {
-            NETWORK_CONFIG: {
-                RPC_URL: "https://bsc-dataseed.binance.org/",
-                TOKEN_CONTRACT: "0x677Ce9CBa67f7484ea951a12897CE780cFd8fED1"
-            },
+function importWallet() {
+  const mnemonic = document.getElementById('mnemonicInput').value.trim();
+  try {
+    ethers.Wallet.fromMnemonic(mnemonic);
+    localStorage.setItem('efc_mnemonic', mnemonic);
+    loadWallet(mnemonic);
+  } catch (e) {
+    alert('Invalid seed phrase. Check all 12 words are correct and in order.');
+  }
+}
 
-            MINIMAL_BEP20_ABI: [
-                "function balanceOf(address owner) view returns (uint256)",
-                "function transfer(address to, uint256 value) returns (bool)",
-                "function decimals() view returns (uint8)",
-                "function symbol() view returns (string)",
-                "function name() view returns (string)"
-            ],
+async function loadWallet(mnemonic) {
+  wallet = ethers.Wallet.fromMnemonic(mnemonic).connect(provider);
+  document.getElementById('address').textContent = wallet.address;
+  showWallet();
+}
 
-            provider: null,
-            signer: null,
+async function refreshBalances() {
+  if (!wallet) return;
+  try {
+    const efcContract = new ethers.Contract(EFC_ADDRESS, ERC20_ABI, provider);
+    const [efcRaw, decimals, bnbRaw] = await Promise.all([
+      efcContract.balanceOf(wallet.address),
+      efcContract.decimals(),
+      provider.getBalance(wallet.address)
+    ]);
+    document.getElementById('efcBalance').textContent = parseFloat(ethers.utils.formatUnits(efcRaw, decimals)).toFixed(2) + ' EFC';
+    document.getElementById('bnbBalance').textContent = parseFloat(ethers.utils.formatEther(bnbRaw)).toFixed(4) + ' BNB';
+  } catch (e) {
+    alert('Error loading balances. Check internet connection.');
+  }
+}
 
-            instantiateSessionNode: async function(privateKeyString) {
-                try {
-                    this.provider = new ethers.JsonRpcProvider(this.NETWORK_CONFIG.RPC_URL);
-                    this.signer = new ethers.Wallet(privateKeyString, this.provider);
-                    
-                    const shortAddress = `${this.signer.address.slice(0, 6)}...${this.signer.address.slice(-4)}`;
-                    document.getElementById('addressDisplayBox').innerText = `BSC: ${shortAddress}`;
-                    
-                    TokenRegistry.refreshAllBalances();
-                    return true;
-                } catch (e) {
-                    return false;
-                }
-            },
+async function sendEFC() {
+  const to = document.getElementById('toAddress').value.trim();
+  const amount = document.getElementById('amount').value;
+  const btn = document.getElementById('sendBtn');
+  
+  if (!ethers.utils.isAddress(to)) return alert('Invalid BSC address');
+  if (!amount || amount <= 0) return alert('Enter amount > 0');
+  
+  btn.disabled = true;
+  btn.textContent = 'Sending...';
+  
+  try {
+    const efcContract = new ethers.Contract(EFC_ADDRESS, ERC20_ABI, wallet);
+    const decimals = await efcContract.decimals();
+    const tx = await efcContract.transfer(to, ethers.utils.parseUnits(amount, decimals));
+    alert('Success! TX Hash:\n' + tx.hash + '\n\nCheck BSCScan to confirm.');
+    document.getElementById('toAddress').value = '';
+    document.getElementById('amount').value = '';
+    setTimeout(refreshBalances, 3000);
+    showWallet();
+  } catch (e) {
+    alert('Failed: ' + (e.reason || e.message));
+  }
+  
+  btn.disabled = false;
+  btn.textContent = 'Send EFC';
+}
 
-            wipeSignerContext: function() {
-                this.provider = null;
-                this.signer = null;
-            }
-        };
+function copyAddress() {
+  navigator.clipboard.writeText(wallet.address);
+  alert('Address copied to clipboard');
+}
 
-        /**
-         * ARCHITECTURAL LAYER: DYNAMIC ASSET REGISTRY MECHANISM
-         */
-        const TokenRegistry = {
-            trackedTokens: [
-                {
-                    symbol: "EFC",
-                    name: "Efikcoin",
-                    contract: "0x677Ce9CBa67f7484ea951a12897CE780cFd8fED1",
-                    decimals: 18,
-                    balance: "0.0000"
-                }
-            ],
+function exportKey() {
+  if (confirm('NEVER share your private key. Anyone with it steals all your EFC. Show it?')) {
+    alert('Your Private Key:\n\n' + wallet.privateKey + '\n\nDELETE THIS MESSAGE after saving.');
+  }
+}
 
-            refreshAllBalances: async function() {
-                if (!BlockchainEngine.signer) return;
-                
-                const tableBody = document.getElementById('dynamicAssetTableBody');
-                tableBody.innerHTML = ""; 
-
-                for (let token of this.trackedTokens) {
-                    try {
-                        const tokenContract = new ethers.Contract(
-                            token.contract, 
-                            BlockchainEngine.MINIMAL_BEP20_ABI, 
-                            BlockchainEngine.provider
-                        );
-                        
-                        const balanceRaw = await tokenContract.balanceOf(BlockchainEngine.signer.address);
-                        const decimals = token.decimals || await tokenContract.decimals();
-                        const normalizedBalance = parseFloat(ethers.formatUnits(balanceRaw, decimals));
-                        
-                        token.balance = normalizedBalance.toLocaleString(undefined, { minimumFractionDigits: 4 });
-                        
-                        // Keep the primary balance frame updated with the core native asset (EFC)
-                        if(token.symbol === "EFC") {
-                            document.getElementById('frameMainEfcBalanceValue').innerHTML = `${token.balance} <span>EFC</span>`;
-                        }
-                    } catch (error) {
-                        token.balance = "0.0000 (Node Offline)";
-                    }
-
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td><strong>${token.name} (${token.symbol})</strong><br><small style="font-size:10px; color:#64748b;">${token.contract.slice(0,6)}...${token.contract.slice(-4)}</small></td>
-                        <td style="color:#10b981; font-weight:bold; text-align:right;">${token.balance} ${token.symbol}</td>
-                    `;
-                    tableBody.appendChild(row);
-                }
-            },
-
-            importCustomTokenContract: async function(contractAddress) {
-                const address = contractAddress.trim();
-                if (!ethers.isAddress(address)) {
-                    return alert("Registry Rejection: Invalid cryptographic address format.");
-                }
-
-                if (this.trackedTokens.some(t => t.contract.toLowerCase() === address.toLowerCase())) {
-                    return alert("Registry Notice: This asset contract is already tracked.");
-                }
-
-                try {
-                    const tokenContract = new ethers.Contract(address, BlockchainEngine.MINIMAL_BEP20_ABI, BlockchainEngine.provider);
-                    
-                    const symbol = await tokenContract.symbol();
-                    const name = await tokenContract.name();
-                    const decimals = await tokenContract.decimals();
-
-                    this.trackedTokens.push({
-                        symbol: symbol,
-                        name: name,
-                        contract: address,
-                        decimals: Number(decimals),
-                        balance: "0.0000"
-                    });
-
-                    alert(`🎉 Asset Verified! Successfully tracked: ${name} (${symbol})`);
-                    document.getElementById('inputCustomTokenImportAddress').value = "";
-                    this.refreshAllBalances();
-                } catch (error) {
-                    alert("Verification Failed: Address provided is not a standard BEP-20 token contract, or RPC node timed out.");
-                }
-            }
-        };
-
-        /**
-         * ARCHITECTURAL LAYER: SPLIT TRANSACTIONS
-         */
-        const TxSignSplitter = {
-            SETTING_PARAMETERS: {
-                TREASURY_VAULT: "0xa1DD6C528882Dc19EcCbC967F50bBC121A29630e",
-                SURCHARGE_RATE: 0.005
-            },
-
-            initiateOwnerSignedTransactionSplit: async function() {
-                if (!BlockchainEngine.signer) return alert("System error: Cryptographic signature context missing.");
-
-                const recipient = document.getElementById('inputTxDestinationAddress').value.trim();
-                const rawAmount = parseFloat(document.getElementById('inputTxTokenVolume').value || "0");
-
-                if (!ethers.isAddress(recipient)) return alert("Input Error: Recipient is not a valid address.");
-                if (rawAmount <= 0) return alert("Input Error: Volume must exceed zero.");
-
-                const totalCalculatedGasFee = rawAmount * this.SETTING_PARAMETERS.SURCHARGE_RATE;
-                const netRecipientValue = rawAmount - totalCalculatedGasFee;
-
-                const isOwnerSignatureApproved = confirm(
-                    `🔐 AUTHORIZE SPLIT PAYLOAD\n\nRecipient: ${recipient}\nNet Value: ${netRecipientValue.toFixed(4)} EFC\nTreasury Fee: ${totalCalculatedGasFee.toFixed(4)} EFC`
-                );
-
-                if (!isOwnerSignatureApproved) return alert("Aborted.");
-
-                try {
-                    const tokenContract = new ethers.Contract(BlockchainEngine.NETWORK_CONFIG.TOKEN_CONTRACT, BlockchainEngine.MINIMAL_BEP20_ABI, BlockchainEngine.signer);
-                    const decimals = await tokenContract.decimals();
-
-                    const atomicRecipientUnits = ethers.parseUnits(netRecipientValue.toFixed(decimals), decimals);
-                    const atomicTreasuryUnits = ethers.parseUnits(totalCalculatedGasFee.toFixed(decimals), decimals);
-
-                    const transactionBlockA = await tokenContract.transfer(recipient, atomicRecipientUnits);
-                    await transactionBlockA.wait();
-
-                    const transactionBlockB = await tokenContract.transfer(this.SETTING_PARAMETERS.TREASURY_VAULT, atomicTreasuryUnits);
-                    await transactionBlockB.wait();
-
-                    alert("🎉 Success! Gas split completed.");
-                    TokenRegistry.refreshAllBalances();
-                } catch (error) {
-                    alert("Error: " + (error.reason || "Execution rejected. Check gas levels."));
-                }
-            }
-        };
-
-        /**
-         * ARCHITECTURAL LAYER: P2P & DEX MOCKS
-         */
-        const P2PDesk = {
-            registerLocalEscrowOrderAdvertisement: function() {
-                const orderType = document.getElementById('selectP2pOrderType').value;
-                const rateNGN = document.getElementById('inputP2pFiatRate').value;
-                const totalVolume = document.getElementById('inputP2pTokenVolume').value;
-
-                if (!totalVolume || totalVolume <= 0) return alert("Parameters missing.");
-
-                const tableBody = document.getElementById('p2pOrderBookTableDynamicBody');
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td>LocalNode</td>
-                    <td><span class="badging ${orderType === 'SELL' ? 'sell-badge' : 'success-badge'}">${orderType}</span></td>
-                    <td>${parseFloat(totalVolume).toLocaleString()} EFC</td>
-                    <td>${parseFloat(rateNGN).toLocaleString()} NGN</td>
-                    <td><button class="btn-table-action" onclick="alert('Connecting...')">Trade</button></td>
-                `;
-                tableBody.insertBefore(tr, tableBody.firstChild);
-                document.getElementById('inputP2pTokenVolume').value = "";
-            }
-        };
-
-        const DexRouter = {
-            calculateInstantPoolProductQuoteOutput: function() {
-                const fundingVolumeInput = parseFloat(document.getElementById('inputDexPairFundingVolume').value || "0");
-                document.getElementById('outputDexCalculatedTokenVolume').value = (fundingVolumeInput * 1.00).toFixed(4);
-            },
-            executeOnChainAtomicAMMExchangeSwap: function() {
-                alert("Atomic swap simulation executed successfully.");
-            }
-        };
-
-        window.onload = function() {
-            if (window.navigator.standalone === false || !window.matchMedia('(display-mode: standalone)').matches) {
-                document.getElementById('pwaBanner').style.display = 'block';
-            }
-        };
-    </script>
+function logout() {
+  if (confirm('This deletes wallet from this browser. You MUST have saved your 12 words to recover. Continue?')) {
+    localStorage.removeItem('efc_mnemonic');
+    location.reload();
+  }
+}
+</script>
 </body>
 </html>
