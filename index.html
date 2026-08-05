@@ -1,627 +1,1984 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <meta name="theme-color" content="#0B0B0F">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <title>Efikcoin Wallet Global</title>
-  <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIkVmaWtjb2luIFdhbGxldCBHbG9iYWwiLAogICJzaG9ydF9uYW1lIjogIkVGQyBXYWxsZXQiLAogICJzdGFydF91cmwiOiAiLiIsCiAgImRpc3BsYXkiOiAic3RhbmRhbG9uZSIsCiAgImJhY2tncm91bmRfY29sb3IiOiAiIzBCMEIwRiIsCiAgInRoZW1lX2NvbG9yIjogIiNGMEI5MEIiLAogICJpY29ucyI6IFt7ICJzcmMiOiAiaHR0cHM6Ly9pcGZzLmlvL2lwZnMvYmFmeWJlaWhyenlvZGloeXA1bWV0MmhzMzJwcGozN3Fsb3d1eGFydnMybG5scmd1amdybHd4Yzdmd2UiLCAic2l6ZXMiOiAiNTEyeDUxMiIsICJ0eXBlIjogImltYWdlL3BuZyIgfSBdCn0=">
-  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; -webkit-tap-highlight-color: transparent; }
-    body { background: #0B0B0F; color: #fff; max-width: 500px; margin: 0 auto; min-height: 100vh; }
-  .screen { display: none; padding: 20px; padding-bottom: 100px; animation: fadeIn 0.3s; }
-  .screen.active { display: block; }
-    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-    h1 { color: #F0B90B; text-align: center; margin: 15px 0; font-size: 26px; font-weight: 800; }
-    h2 { font-size: 20px; margin-bottom: 15px; }
-    h3 { font-size: 17px; margin-bottom: 12px; }
-  .card { background: rgba(26, 26, 31, 0.9); backdrop-filter: blur(20px); border-radius: 20px; padding: 20px; margin: 15px 0; border: 1px solid rgba(240, 185, 11, 0.2); }
-  .label { color: #888; font-size: 11px; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px; }
-  .value { font-size: 14px; word-break: break-all; margin-bottom: 14px; }
-  .balance { font-size: 36px; font-weight: 800; margin: 10px 0; background: linear-gradient(90deg, #F0B90B, #FFD700); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    input, select, textarea { width: 100%; padding: 16px; background: rgba(11, 11, 15, 0.8); border: 1px solid rgba(255,255,255,0.1); border-radius: 14px; color: #fff; font-size: 16px; margin: 8px 0; }
-    button { width: 100%; padding: 18px; background: linear-gradient(90deg, #F0B90B, #FFD700); color: #000; border: none; border-radius: 14px; font-size: 16px; font-weight: 700; cursor: pointer; margin: 8px 0; }
-    button:active { transform: scale(0.98); }
-    button.secondary { background: rgba(42, 42, 47, 0.8); color: #fff; }
-    button.danger { background: linear-gradient(90deg, #E63946, #FF4757); color: #fff; }
-    button.success { background: linear-gradient(90deg, #00C851, #00E676); color: #fff; }
-  .warning { background: #E63946; padding: 16px; border-radius: 14px; margin: 15px 0; font-size: 13px; line-height: 1.6; }
-  .coin-item { display: flex; align-items: center; justify-content: space-between; padding: 16px; background: rgba(26, 26, 31, 0.6); border-radius: 16px; margin: 12px 0; cursor: pointer; border: 1px solid rgba(255,255,0.05); }
-  .coin-item:active { transform: scale(0.98); background: rgba(40, 40, 50, 0.8); }
-  .coin-left { display: flex; align-items: center; flex: 1; }
-  .coin-logo { width: 44px; height: 44px; border-radius: 50%; margin-right: 14px; }
-  .coin-chain { font-size: 10px; color: #F0B90B; background: rgba(240, 185, 11, 0.2); padding: 2px 6px; border-radius: 4px; margin-left: 6px; }
-  .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; max-width: 500px; margin: 0 auto; background: rgba(11, 11, 15, 0.95); backdrop-filter: blur(20px); display: flex; padding: 8px 0; border-top: 1px solid rgba(240, 185, 11, 0.2); z-index: 100; }
-  .nav-item { flex: 1; text-align: center; padding: 8px; color: #888; cursor: pointer; font-size: 11px; }
-  .nav-item.active { color: #F0B90B; }
-  .nav-icon { font-size: 22px; margin-bottom: 2px; }
-  .logo { width: 80px; height: 80px; margin: 20px auto; display: block; border-radius: 50%; box-shadow: 0 0 50px rgba(240, 185, 11, 0.6); }
-  .modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.95); z-index: 1000; display: none; padding: 20px; overflow-y: auto; }
-  .modal.active { display: flex; align-items: flex-start; justify-content: center; padding-top: 40px; }
-  .tx-item { padding: 14px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
-  .tx-hash { font-size: 11px; color: #F0B90B; cursor: pointer; }
-  .top-selects { position: absolute; top: 15px; right: 15px; display: flex; gap: 8px; z-index: 50; }
-  .top-selects select { width: auto; padding: 8px 10px; font-size: 12px; margin: 0; }
-  .dapp-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-  .dapp-item { background: rgba(26,26,31,0.8); padding: 20px 10px; border-radius: 14px; text-align: center; cursor: pointer; border: 1px solid rgba(255,255,0.05); }
-  .dapp-logo { width: 40px; height: 40px; margin: 0 auto 8px; border-radius: 10px; }
-  #chartContainer { height: 200px; margin: 20px 0; }
-  .browser-frame { width: 100%; height: 60vh; border: none; border-radius: 12px; background: #fff; }
-  </style>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Efikcoin EFC — Blockchain for Life</title>
+<meta name="description" content="Efikcoin EFC — The people's BEP-20 token. Stake, earn, send, receive, P2P. Built for real payments globally."/>
+<meta name="theme-color" content="#D4A843"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="EFC Wallet"/>
+<link rel="manifest" id="pwa-manifest"/>
+<link rel="apple-touch-icon" href="https://ipfs.io/ipfs/bafybeihrzyodihyp5met2hs32ppj37qlowuxarvs2lnlrgujgrlwxc7fwe"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script type="module">
+import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import{getFirestore,collection,doc,getDoc,getDocs,setDoc,updateDoc,query,where}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+const cfg={apiKey:"AIzaSyCRjxHqv5WOslB5FDgtkpUhsaO8aqlLAwA",authDomain:"efikcoin-admin.firebaseapp.com",projectId:"efikcoin-admin",storageBucket:"efikcoin-admin.firebasestorage.app",messagingSenderId:"229956311964",appId:"1:229956311964:web:44cdecfeb1f069bc7f4659"};
+const app=initializeApp(cfg);const db=getFirestore(app);
+window.__fb={db,collection,doc,getDoc,getDocs,setDoc,updateDoc,query,where};
+window.__fbReady=true;window.dispatchEvent(new Event("fb-ready"));
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800;900&family=Syne:wght@400;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --gold:#D4A843;--gold-l:#F0C96B;--gold-d:#8A6A28;--gold-xd:#3A2D10;
+  --obs:#030507;--surf:#090C10;--surf2:#0D1118;
+  --bdr:#1A2030;--bdr2:#242E40;
+  --text:#E8E4DC;--muted:#6A7888;--dim:#2A3040;
+  --green:#3DD68C;--red:#E05050;--red-l:#F08080;--blue:#4A8FE0;--amber:#E0A040;
+}
+html{font-size:16px;scroll-behavior:smooth}
+body{background:var(--obs);color:var(--text);font-family:"Syne",sans-serif;line-height:1.65;min-height:100vh;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+button{cursor:pointer;border:none;background:none;font-family:inherit;color:inherit}
+input,select,textarea{font-family:inherit}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:var(--obs)}::-webkit-scrollbar-thumb{background:var(--bdr2);border-radius:3px}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+@keyframes pulse{0%,100%{opacity:.5}50%{opacity:1}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes spinR{to{transform:rotate(-360deg)}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+@keyframes glow{0%,100%{box-shadow:0 0 20px rgba(212,168,67,.3)}50%{box-shadow:0 0 50px rgba(212,168,67,.7)}}
+@keyframes ticker{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+@keyframes shine{0%{background-position:-200% 0}100%{background-position:200% 0}}
+@keyframes orbitA{from{transform:rotate(0deg) translateX(110px)}to{transform:rotate(360deg) translateX(110px)}}
+@keyframes orbitB{from{transform:rotate(90deg) translateX(85px)}to{transform:rotate(450deg) translateX(85px)}}
+@keyframes orbitC{from{transform:rotate(200deg) translateX(65px)}to{transform:rotate(560deg) translateX(65px)}}
+#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none}
+.wrap{position:relative;z-index:1}
+/* Topbar */
+.topbar{position:fixed;top:0;left:0;right:0;z-index:500;display:flex;align-items:center;gap:12px;padding:0 20px;height:60px;background:rgba(3,5,7,.93);border-bottom:1px solid var(--bdr);backdrop-filter:blur(20px)}
+.tb-brand{font-family:"Orbitron",monospace;font-weight:900;font-size:.95rem;color:var(--gold);letter-spacing:2px;display:flex;align-items:center;gap:7px;flex-shrink:0}
+.tb-dot{width:7px;height:7px;border-radius:50%;background:var(--green);animation:pulse 2s infinite}
+.nav-tabs{display:flex;gap:2px;overflow-x:auto;flex:1;scrollbar-width:none}
+.nav-tabs::-webkit-scrollbar{display:none}
+.ntab{font-family:"Space Mono",monospace;font-size:8.5px;letter-spacing:.5px;color:var(--muted);padding:7px 11px;border-radius:6px;cursor:pointer;white-space:nowrap;transition:all .2s;text-transform:uppercase}
+.ntab:hover{color:var(--text);background:var(--surf)}
+.ntab.active{color:var(--gold);background:rgba(212,168,67,.08);border:1px solid var(--gold-d)}
+.tb-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.lang-sel{background:var(--surf);border:1px solid var(--bdr2);color:var(--gold);border-radius:6px;padding:5px 7px;font-family:"Space Mono",monospace;font-size:8.5px;outline:none;cursor:pointer}
+.conn-btn{font-family:"Orbitron",monospace;font-size:8.5px;font-weight:700;letter-spacing:1px;padding:8px 14px;border-radius:8px;text-transform:uppercase;background:linear-gradient(135deg,var(--gold-l),var(--gold));color:var(--obs);transition:all .2s;white-space:nowrap}
+.conn-btn:hover{box-shadow:0 0 24px rgba(212,168,67,.5);transform:translateY(-1px)}
+.conn-btn.live{background:rgba(61,214,140,.1);border:1px solid rgba(61,214,140,.3);color:var(--green)}
+/* Ticker */
+.ticker-wrap{background:rgba(212,168,67,.04);border-bottom:1px solid var(--bdr);overflow:hidden;height:34px;display:flex;align-items:center;margin-top:60px}
+.ticker-track{display:flex;white-space:nowrap;animation:ticker 35s linear infinite}
+.ticker-item{display:flex;align-items:center;gap:6px;padding:0 22px;font-family:"Space Mono",monospace;font-size:9px;color:var(--muted);border-right:1px solid var(--bdr)}
+.ticker-item strong{color:var(--text)}.up{color:var(--green)}.dn{color:var(--red-l)}
+/* Pages */
+.page{display:none;padding:76px 20px 40px;max-width:960px;margin:0 auto;animation:fadeUp .35s ease}
+.page.active{display:block}
+/* Sections */
+.sec-tag{display:inline-flex;align-items:center;gap:7px;font-family:"Space Mono",monospace;font-size:8.5px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);background:rgba(212,168,67,.08);border:1px solid var(--gold-d);padding:5px 12px;border-radius:20px;margin-bottom:12px}
+.sec-title{font-family:"Orbitron",monospace;font-size:1.5rem;font-weight:900;color:var(--text);line-height:1.2;margin-bottom:10px}
+.acc{background:linear-gradient(135deg,var(--gold-l),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.sec-sub{color:var(--muted);font-size:.88rem;max-width:560px;line-height:1.8;margin-bottom:24px}
+/* Hero coin */
+.hero{text-align:center;padding:48px 0 32px}
+.coin-scene{position:relative;width:230px;height:230px;margin:0 auto 32px;display:flex;align-items:center;justify-content:center}
+.geo-ring{position:absolute;border-radius:50%;border:1px solid rgba(212,168,67,.18)}
+.geo-ring-1{width:215px;height:215px;animation:spin 22s linear infinite}
+.geo-ring-2{width:170px;height:170px;animation:spinR 15s linear infinite;border-style:dashed}
+.geo-ring-3{width:130px;height:130px;animation:spin 10s linear infinite}
+.orb{position:absolute;border-radius:50%;top:50%;left:50%;transform-origin:0 0}
+.orb-a{width:10px;height:10px;background:var(--gold);box-shadow:0 0 12px var(--gold);animation:orbitA 5s linear infinite;margin:-5px 0 0 -5px}
+.orb-b{width:8px;height:8px;background:var(--green);box-shadow:0 0 10px var(--green);animation:orbitB 7.5s linear infinite;margin:-4px 0 0 -4px}
+.orb-c{width:7px;height:7px;background:var(--blue);box-shadow:0 0 10px var(--blue);animation:orbitC 12s linear infinite;margin:-3.5px 0 0 -3.5px}
+.coin-core{width:96px;height:96px;border-radius:50%;position:relative;z-index:2;animation:float 4s ease-in-out infinite}
+.coin-ring{position:absolute;inset:0;border-radius:50%;background:conic-gradient(var(--gold-xd),var(--gold-d),var(--gold),var(--gold-l),var(--gold),var(--gold-d),var(--gold-xd));animation:spin 5s linear infinite}
+.coin-img{position:absolute;inset:4px;border-radius:50%;object-fit:cover;z-index:2}
+.coin-fall{position:absolute;inset:4px;border-radius:50%;background:radial-gradient(circle at 35% 35%,var(--gold-l),var(--gold),var(--gold-d));display:flex;align-items:center;justify-content:center;font-family:"Orbitron",monospace;font-size:20px;font-weight:900;color:var(--obs);z-index:2;overflow:hidden}
+.coin-fall::after{content:"";position:absolute;inset:0;background:linear-gradient(110deg,transparent 35%,rgba(255,255,255,.4) 50%,transparent 65%);background-size:200% 100%;animation:shine 2.5s linear infinite}
+.coin-glow{position:absolute;inset:-18px;border-radius:50%;background:radial-gradient(circle,rgba(212,168,67,.22),transparent 70%);animation:glow 3s ease-in-out infinite}
+h1.hero-t{font-family:"Orbitron",monospace;font-size:1.8rem;font-weight:900;line-height:1.15;margin-bottom:12px;background:linear-gradient(135deg,var(--text),var(--gold-l));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-sub{color:var(--muted);font-size:.88rem;max-width:520px;margin:0 auto 24px;line-height:1.8}
+.hero-btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:22px}
+.btn-g{font-family:"Orbitron",monospace;font-size:9px;font-weight:700;letter-spacing:1.5px;padding:12px 22px;border-radius:9px;text-transform:uppercase;background:linear-gradient(135deg,var(--gold-l),var(--gold));color:var(--obs);transition:all .2s;display:inline-flex;align-items:center;gap:6px}
+.btn-g:hover{box-shadow:0 0 28px rgba(212,168,67,.5);transform:translateY(-2px)}
+.btn-o{font-family:"Orbitron",monospace;font-size:9px;font-weight:700;letter-spacing:1px;padding:11px 20px;border-radius:9px;text-transform:uppercase;border:1px solid var(--bdr2);color:var(--muted);transition:all .2s;display:inline-flex;align-items:center;gap:6px}
+.btn-o:hover{border-color:var(--gold-d);color:var(--gold)}
+.addr-strip{display:flex;gap:7px;justify-content:center;flex-wrap:wrap;margin-bottom:20px}
+.addr-chip{display:flex;align-items:center;gap:5px;background:var(--surf);border:1px solid var(--bdr2);padding:6px 11px;border-radius:7px;font-family:"Space Mono",monospace;font-size:8px;color:var(--muted);cursor:pointer;transition:border-color .2s}
+.addr-chip:hover{border-color:var(--gold-d);color:var(--gold)}
+.addr-chip .d{width:5px;height:5px;border-radius:50%;background:var(--green)}
+/* Stats */
+.stats-band{display:grid;grid-template-columns:repeat(4,1fr);gap:11px;margin:22px 0}
+.stat-box{background:var(--surf);border:1px solid var(--bdr);border-radius:10px;padding:16px;text-align:center}
+.stat-n{font-family:"Orbitron",monospace;font-size:1.3rem;font-weight:900;color:var(--gold);display:block}
+.stat-l{font-family:"Space Mono",monospace;font-size:8px;color:var(--muted);margin-top:4px;letter-spacing:.5px}
+/* Features */
+.feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:18px 0 30px}
+.feat-card{background:var(--surf);border:1px solid var(--bdr);border-radius:14px;padding:20px;transition:all .25s}
+.feat-card:hover{border-color:var(--gold-d);transform:translateY(-3px)}
+.feat-icon{font-size:26px;margin-bottom:10px}
+.feat-t{font-family:"Orbitron",monospace;font-size:.75rem;font-weight:700;color:var(--text);margin-bottom:6px}
+.feat-d{font-size:.76rem;color:var(--muted);line-height:1.65}
+/* Social */
+.social-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:11px;margin:14px 0}
+.social-card{display:flex;align-items:center;gap:13px;background:var(--surf);border:1px solid var(--bdr);border-radius:13px;padding:16px;transition:all .2s}
+.social-card:hover{border-color:var(--gold-d);transform:translateY(-2px)}
+.s-ico{font-size:24px;flex-shrink:0}
+.s-name{font-family:"Orbitron",monospace;font-size:.75rem;font-weight:700;color:var(--text);margin-bottom:2px}
+.s-desc{font-size:.74rem;color:var(--muted)}
+/* Panel */
+.panel{background:var(--surf);border:1px solid var(--bdr);border-radius:13px;padding:20px;margin-bottom:14px}
+.panel-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--bdr)}
+.panel-t{font-family:"Orbitron",monospace;font-size:.82rem;font-weight:700;color:var(--text)}
+/* Form */
+.f-group{margin-bottom:13px}
+.f-lbl{font-family:"Space Mono",monospace;font-size:8.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:5px}
+.f-inp{width:100%;background:var(--surf2);border:1px solid var(--bdr2);border-radius:7px;padding:10px 12px;color:var(--text);font-size:.84rem;outline:none;transition:border-color .2s}
+.f-inp:focus{border-color:var(--gold-d);box-shadow:0 0 0 3px rgba(212,168,67,.07)}
+.f-inp::placeholder{color:var(--dim)}
+textarea.f-inp{resize:vertical;font-family:"Space Mono",monospace;font-size:.76rem;line-height:1.7;min-height:80px}
+/* Tabs */
+.tabs{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:14px}
+.tab{font-family:"Space Mono",monospace;font-size:8.5px;padding:7px 13px;border-radius:7px;border:1px solid var(--bdr2);color:var(--muted);cursor:pointer;transition:all .2s;text-transform:uppercase;letter-spacing:.5px}
+.tab:hover{color:var(--text);border-color:var(--bdr)}
+.tab.active{color:var(--gold);border-color:var(--gold-d);background:rgba(212,168,67,.07)}
+.tab-panel{display:none}
+.tab-panel.active{display:block;animation:fadeUp .25s ease}
+/* Balance cards */
+.bal-grid{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-bottom:14px}
+.bal-card{background:var(--surf2);border:1px solid var(--bdr);border-radius:11px;padding:15px;transition:border-color .2s}
+.bal-card:hover{border-color:var(--bdr2)}
+.b-lbl{font-family:"Space Mono",monospace;font-size:8px;letter-spacing:1px;color:var(--muted);text-transform:uppercase;display:block;margin-bottom:5px}
+.b-val{font-family:"Orbitron",monospace;font-size:1rem;font-weight:800;color:var(--text);display:block;margin-bottom:2px}
+.b-val.gold{color:var(--gold)}.b-val.green{color:var(--green)}
+.b-sub{font-family:"Space Mono",monospace;font-size:8px;color:var(--muted)}
+/* Quick actions */
+.quick-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px}
+.qbtn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;background:var(--surf2);border:1px solid var(--bdr);border-radius:10px;padding:13px 7px;cursor:pointer;transition:all .2s}
+.qbtn:hover{border-color:var(--gold-d);background:rgba(212,168,67,.05)}
+.q-ic{font-size:19px}.q-lbl{font-family:"Space Mono",monospace;font-size:7.5px;color:var(--muted)}
+/* TX list */
+.tx-list{display:flex;flex-direction:column}
+.tx-row{display:flex;align-items:center;gap:9px;padding:10px 0;border-bottom:1px solid var(--bdr)}
+.tx-row:last-child{border:none}
+.tx-ic{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+.tx-ic.rcv{background:rgba(61,214,140,.08);border:1px solid rgba(61,214,140,.2)}
+.tx-ic.snt{background:rgba(224,80,80,.08);border:1px solid rgba(224,80,80,.2)}
+.tx-ic.stk{background:rgba(212,168,67,.08);border:1px solid var(--gold-d)}
+.tx-body{flex:1;min-width:0}
+.tx-type{font-family:"Space Mono",monospace;font-size:8.5px;font-weight:700;text-transform:uppercase;color:var(--text)}
+.tx-hash{font-family:"Space Mono",monospace;font-size:7.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tx-right{text-align:right;flex-shrink:0}
+.tx-amt{font-family:"Orbitron",monospace;font-size:.78rem;font-weight:700}
+.tx-time{font-family:"Space Mono",monospace;font-size:7px;color:var(--muted)}
+/* Wallet generator */
+.gen-box{background:var(--surf2);border:1px solid var(--bdr);border-radius:13px;padding:26px;text-align:center}
+.gen-addr{font-family:"Space Mono",monospace;font-size:.7rem;color:var(--gold);word-break:break-all;background:var(--obs);border:1px solid var(--bdr2);border-radius:7px;padding:9px 11px;margin:7px 0 11px}
+.gen-key{font-family:"Space Mono",monospace;font-size:.7rem;color:var(--red-l);word-break:break-all;background:var(--obs);border:1px solid rgba(224,80,80,.2);border-radius:7px;padding:9px 11px;margin:7px 0 11px}
+.seed-words{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:10px 0}
+.seed-w{background:var(--obs);border:1px solid var(--bdr2);border-radius:6px;padding:6px 9px;text-align:left}
+.sw-n{font-family:"Space Mono",monospace;font-size:7px;color:var(--muted)}
+.sw-t{font-family:"Space Mono",monospace;font-size:.76rem;color:var(--gold-l);font-weight:700}
+/* Tiers */
+.tier-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:11px;margin:14px 0}
+.tier-card{background:var(--surf);border:1px solid var(--bdr);border-radius:13px;padding:18px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden}
+.tier-card:hover,.tier-card.sel{border-color:var(--gold-d);background:rgba(212,168,67,.05)}
+.tier-card.sel::after{content:"✓ Selected";position:absolute;top:9px;right:9px;font-family:"Space Mono",monospace;font-size:7px;color:var(--green);background:rgba(61,214,140,.1);padding:2px 6px;border-radius:4px}
+.tier-icon{font-size:22px;margin-bottom:7px}
+.tier-n{font-family:"Orbitron",monospace;font-size:.76rem;font-weight:700;color:var(--text);margin-bottom:3px}
+.tier-apy{font-family:"Orbitron",monospace;font-size:1.1rem;font-weight:900;color:var(--green);margin-bottom:3px}
+.tier-lock{font-family:"Space Mono",monospace;font-size:8px;color:var(--muted)}
+/* Warn */
+.warn-box{background:rgba(224,160,64,.07);border:1px solid rgba(224,160,64,.25);border-radius:8px;padding:12px 15px;font-size:.76rem;color:var(--amber);line-height:1.65;margin-bottom:13px;display:flex;gap:9px}
+.warn-ic{flex-shrink:0;font-size:15px}
+.danger-box{background:rgba(224,80,80,.07);border:1px solid rgba(224,80,80,.2);border-radius:8px;padding:12px 15px;font-size:.76rem;color:var(--red-l);line-height:1.65;margin-bottom:13px;display:flex;gap:9px}
+/* Pills */
+.pill{display:inline-flex;align-items:center;gap:3px;font-family:"Space Mono",monospace;font-size:7.5px;padding:3px 7px;border-radius:5px}
+.pill-g{background:rgba(61,214,140,.08);border:1px solid rgba(61,214,140,.2);color:var(--green)}
+.pill-a{background:rgba(212,168,67,.08);border:1px solid var(--gold-d);color:var(--gold)}
+.pill-r{background:rgba(224,80,80,.08);border:1px solid rgba(224,80,80,.2);color:var(--red-l)}
+/* Token rows */
+.token-row{display:flex;align-items:center;gap:11px;padding:11px 0;border-bottom:1px solid var(--bdr)}
+.token-row:last-child{border:none}
+.token-ico{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:900;flex-shrink:0;font-family:"Orbitron",monospace;color:var(--obs)}
+.tk-sym{font-family:"Orbitron",monospace;font-size:.78rem;font-weight:700}
+.tk-name{font-family:"Space Mono",monospace;font-size:7.5px;color:var(--muted);margin-top:2px}
+.tk-bal{font-family:"Space Mono",monospace;font-size:.8rem;color:var(--gold);margin-left:auto}
+/* Clients */
+.cl-row{display:grid;grid-template-columns:2fr 1.5fr 1fr 1fr auto;gap:11px;align-items:center;padding:12px 0;border-bottom:1px solid var(--bdr);font-size:.8rem}
+.cl-hdr{font-family:"Space Mono",monospace;font-size:8px;color:var(--muted);text-transform:uppercase}
+.cl-nm{font-weight:600}
+.cl-id{font-family:"Space Mono",monospace;font-size:7.5px;color:var(--muted);margin-top:2px}
+.cl-addr{font-family:"Space Mono",monospace;font-size:.7rem;color:var(--muted)}
+/* Inbox */
+.notif-row{padding:11px 0;border-bottom:1px solid var(--bdr)}
+.notif-row:last-child{border:none}
+.notif-txt{font-size:.8rem;color:var(--text);margin-bottom:3px}
+.notif-time{font-family:"Space Mono",monospace;font-size:7.5px;color:var(--muted)}
+/* Footer */
+.footer{background:var(--surf);border-top:1px solid var(--bdr);padding:36px 20px 22px;margin-top:50px}
+.footer-inner{max-width:960px;margin:0 auto}
+.footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:28px;margin-bottom:28px}
+.f-brand{font-family:"Orbitron",monospace;font-size:1rem;font-weight:900;color:var(--gold);margin-bottom:8px;display:flex;align-items:center;gap:7px}
+.f-tagline{font-size:.78rem;color:var(--muted);line-height:1.7;max-width:210px}
+.f-col-t{font-family:"Space Mono",monospace;font-size:8.5px;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold);margin-bottom:11px}
+.f-link{display:block;font-size:.78rem;color:var(--muted);margin-bottom:7px;transition:color .2s;cursor:pointer}
+.f-link:hover{color:var(--text)}
+.f-copy{text-align:center;font-family:"Space Mono",monospace;font-size:8.5px;color:var(--dim);padding-top:18px;border-top:1px solid var(--bdr)}
+/* Modals */
+.m-ov{position:fixed;inset:0;z-index:1000;background:rgba(3,5,7,.9);backdrop-filter:blur(12px);display:none;align-items:center;justify-content:center;padding:18px}
+.m-ov.open{display:flex}
+.modal{background:var(--surf);border:1px solid var(--bdr2);border-radius:14px;padding:26px;width:100%;max-width:430px;animation:fadeUp .25s ease;position:relative;max-height:90vh;overflow-y:auto}
+.m-close{position:absolute;top:12px;right:12px;width:26px;height:26px;border-radius:50%;border:1px solid var(--bdr2);display:flex;align-items:center;justify-content:center;color:var(--muted);transition:color .2s;cursor:pointer}
+.m-close:hover{color:var(--text)}
+.modal h3{font-family:"Orbitron",monospace;font-size:.9rem;font-weight:700;margin-bottom:7px}
+.modal-sub{font-size:.78rem;color:var(--muted);margin-bottom:18px;line-height:1.65}
+.tx-detail{background:var(--surf2);border:1px solid var(--bdr);border-radius:7px;padding:13px;margin-bottom:16px;font-family:"Space Mono",monospace;font-size:9px;line-height:2;color:var(--muted)}
+/* Toast */
+#toast-box{position:fixed;bottom:18px;right:18px;z-index:9999;display:flex;flex-direction:column;gap:6px;pointer-events:none}
+.toast{background:var(--surf);border:1px solid var(--bdr2);border-radius:9px;padding:10px 14px;font-family:"Space Mono",monospace;font-size:9.5px;display:flex;align-items:center;gap:7px;animation:fadeUp .3s ease;box-shadow:0 8px 30px rgba(0,0,0,.5);min-width:210px}
+.toast.ok{border-color:rgba(61,214,140,.3);color:var(--green)}
+.toast.er{border-color:rgba(224,80,80,.3);color:var(--red-l)}
+.toast.in{border-color:var(--gold-d);color:var(--gold)}
+/* Util */
+.w-full{width:100%}.mt-8{margin-top:8px}.mt-12{margin-top:12px}.mt-16{margin-top:16px}
+.flex{display:flex}.gap-8{gap:8px}.gap-12{gap:12px}.aic{align-items:center}.jcsb{justify-content:space-between}
+.mono{font-family:"Space Mono",monospace}.text-m{color:var(--muted)}.text-g{color:var(--gold)}
+.empty{text-align:center;padding:28px;color:var(--muted);font-family:"Space Mono",monospace;font-size:.76rem}
+.divider{border:none;border-top:1px solid var(--bdr);margin:14px 0}
+.small-lk{font-family:"Space Mono",monospace;font-size:8px;color:var(--gold);cursor:pointer;text-decoration:underline}
+.tok-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--bdr);font-size:.8rem}
+.tok-row:last-child{border:none}.tok-lbl{color:var(--muted)}.tok-val{font-family:"Space Mono",monospace;color:var(--gold)}
+@media(max-width:700px){
+  .topbar{padding:0 12px;gap:7px}.ntab{font-size:8px;padding:6px 8px}
+  .stats-band,.feat-grid{grid-template-columns:1fr 1fr}
+  .tier-grid,.bal-grid,.social-grid,.footer-grid{grid-template-columns:1fr}
+  .quick-grid{grid-template-columns:repeat(4,1fr)}
+  .cl-row{grid-template-columns:1fr auto}
+  .cl-hdr:not(:first-child):not(:last-child){display:none}
+  .cl-addr,.cl-row>*:nth-child(3),.cl-row>*:nth-child(4){display:none}
+  .seed-words{grid-template-columns:repeat(2,1fr)}
+  h1.hero-t{font-size:1.35rem}
+  .hero-btns{flex-direction:column;align-items:center}
+  .page{padding:72px 13px 30px}
+}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+/* ── Coin bar ── */
+.coin-bar{display:flex;gap:8px;overflow-x:auto;padding:12px 0 16px;scrollbar-width:none;margin-bottom:4px}
+.coin-bar::-webkit-scrollbar{display:none}
+.coin-chip{display:flex;flex-direction:column;align-items:center;gap:5px;min-width:68px;padding:10px 8px;background:var(--surf);border:1px solid var(--bdr);border-radius:12px;cursor:pointer;transition:all .2s;flex-shrink:0}
+.coin-chip:hover,.coin-chip.active{border-color:var(--gold-d);background:rgba(212,168,67,.07);transform:translateY(-2px)}
+.coin-chip .c-ico{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;font-family:"Orbitron",monospace}
+.coin-chip .c-sym{font-family:"Orbitron",monospace;font-size:8.5px;font-weight:700;color:var(--text)}
+.coin-chip .c-price{font-family:"Space Mono",monospace;font-size:7.5px;color:var(--muted)}
+.coin-chip .c-chg{font-family:"Space Mono",monospace;font-size:7px}
+.coin-chip .c-chg.up{color:var(--green)}.coin-chip .c-chg.dn{color:var(--red-l)}
+/* Coin dashboard panel */
+.coin-dash{display:none;animation:fadeUp .25s ease}
+.coin-dash.active{display:block}
+.coin-dash-hdr{display:flex;align-items:center;gap:14px;margin-bottom:18px;padding:16px;background:var(--surf);border:1px solid var(--bdr);border-radius:13px}
+.coin-dash-ico{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;font-family:"Orbitron",monospace;flex-shrink:0}
+.coin-dash-name{font-family:"Orbitron",monospace;font-size:1rem;font-weight:800;color:var(--text)}
+.coin-dash-price{font-family:"Orbitron",monospace;font-size:1.4rem;font-weight:900;color:var(--gold);display:block}
+.coin-dash-chg{font-family:"Space Mono",monospace;font-size:9px}
+/* Chart */
+.chart-wrap{background:var(--surf);border:1px solid var(--bdr);border-radius:13px;padding:16px;margin-bottom:14px}
+.chart-tabs{display:flex;gap:5px;margin-bottom:12px}
+.chart-tab{font-family:"Space Mono",monospace;font-size:8px;padding:5px 10px;border-radius:6px;border:1px solid var(--bdr2);color:var(--muted);cursor:pointer;transition:all .2s}
+.chart-tab.active{color:var(--gold);border-color:var(--gold-d);background:rgba(212,168,67,.07)}
+canvas.price-chart{width:100%!important;height:160px!important}
+/* Action grid */
+.action-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:14px}
+.act-btn{display:flex;flex-direction:column;align-items:center;gap:5px;background:var(--surf);border:1px solid var(--bdr);border-radius:11px;padding:14px 8px;cursor:pointer;transition:all .2s}
+.act-btn:hover{border-color:var(--gold-d);background:rgba(212,168,67,.05)}
+.act-ico{font-size:20px}.act-lbl{font-family:"Space Mono",monospace;font-size:8px;color:var(--muted);letter-spacing:.3px}
+/* Coin action panels */
+.coin-action-panel{display:none;background:var(--surf);border:1px solid var(--bdr);border-radius:13px;padding:18px;margin-bottom:14px;animation:fadeUp .2s ease}
+.coin-action-panel.active{display:block}
+/* Install banner */
+#install-banner{display:none;position:fixed;bottom:0;left:0;right:0;z-index:800;background:linear-gradient(135deg,var(--surf),var(--surf2));border-top:1px solid var(--gold-d);padding:14px 18px;flex-direction:row;align-items:center;gap:12px;box-shadow:0 -8px 32px rgba(0,0,0,.5)}
+#install-banner.show{display:flex}
+.install-txt{flex:1;font-size:.8rem;color:var(--text)}.install-txt strong{color:var(--gold);display:block;font-family:"Orbitron",monospace;font-size:.75rem}
+.install-btn{font-family:"Orbitron",monospace;font-size:8.5px;font-weight:700;padding:9px 16px;border-radius:8px;background:linear-gradient(135deg,var(--gold-l),var(--gold));color:var(--obs);letter-spacing:.5px;white-space:nowrap}
+.install-x{color:var(--muted);font-size:18px;cursor:pointer;padding:0 4px}
+</style>
 </head>
 <body>
-  <div class="top-selects">
-    <select id="currencySelect">
-      <option value="USD">USD</option><option value="NGN">NGN</option><option value="GHS">GHS</option>
-      <option value="KES">KES</option><option value="ZAR">ZAR</option><option value="EUR">EUR</option>
-      <option value="GBP">GBP</option><option value="INR">INR</option><option value="CNY">CNY</option>
+<canvas id="bg-canvas"></canvas>
+<div id="toast-box"></div>
+
+<!-- CONNECT MODAL -->
+<div class="m-ov" id="m-connect">
+  <div class="modal">
+    <div class="m-close" onclick="closeM('m-connect')">✕</div>
+    <h3>Connect Wallet</h3>
+    <p class="modal-sub">Connect your BSC-compatible wallet to access all features. Make sure you are on BNB Smart Chain (BSC, Chain ID 56).</p>
+    <button class="btn-g w-full" onclick="connectWallet()">🦊 MetaMask / Trust Wallet</button>
+    <div style="text-align:center;margin-top:12px"><span class="small-lk" onclick="closeM('m-connect');goPage('wallet');goInnerTab('ci-create')">Or create / import a wallet →</span></div>
+  </div>
+</div>
+<!-- TX CONFIRM MODAL -->
+<div class="m-ov" id="m-tx">
+  <div class="modal">
+    <div class="m-close" onclick="closeM('m-tx')">✕</div>
+    <h3 id="tx-h">Confirm Transaction</h3>
+    <p class="modal-sub" id="tx-s"></p>
+    <div class="tx-detail" id="tx-d"></div>
+    <button class="btn-g w-full" id="tx-ok-btn">Sign & Confirm</button>
+  </div>
+</div>
+<!-- CLIENT VIEW MODAL -->
+<div class="m-ov" id="m-client">
+  <div class="modal" style="max-width:480px">
+    <div class="m-close" onclick="closeM('m-client')">✕</div>
+    <h3 id="mc-title">Client</h3>
+    <div id="mc-body"></div>
+  </div>
+</div>
+
+<div class="wrap">
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="tb-brand"><span class="tb-dot"></span>⬡ EFC</div>
+  <div class="nav-tabs">
+    <div class="ntab active" onclick="goPage('home',this)" data-i18n="nav_home">Home</div>
+    <div class="ntab" onclick="goPage('dashboard',this)" data-i18n="nav_dash">Dashboard</div>
+    <div class="ntab" onclick="goPage('wallet',this)" data-i18n="nav_wallet">Wallet</div>
+    <div class="ntab" onclick="goPage('staking',this)" data-i18n="nav_stake">Staking</div>
+    <div class="ntab" onclick="goPage('airdrop',this)" data-i18n="nav_airdrop">Airdrop</div>
+    <div class="ntab" onclick="goPage('portfolio',this)" data-i18n="nav_portfolio">Portfolio</div>
+    <div class="ntab" onclick="goPage('clients',this)" data-i18n="nav_clients">Clients</div>
+    <div class="ntab" onclick="goPage('settings',this)" data-i18n="nav_settings">Settings</div>
+  </div>
+  <div class="tb-right">
+    <select class="lang-sel" id="lang-sel" onchange="applyLang(this.value)">
+      <option value="en">🌐 EN</option><option value="fr">🇫🇷 FR</option>
+      <option value="es">🇪🇸 ES</option><option value="pt">🇧🇷 PT</option>
+      <option value="ha">🇳🇬 HA</option><option value="yo">🇳🇬 YO</option>
+      <option value="ig">🇳🇬 IG</option><option value="zh">🇨🇳 ZH</option>
+      <option value="ar">🇸🇦 AR</option><option value="ru">🇷🇺 RU</option>
+      <option value="de">🇩🇪 DE</option><option value="hi">🇮🇳 HI</option>
+      <option value="sw">🇹🇿 SW</option><option value="ja">🇯🇵 JA</option>
+      <option value="ko">🇰🇷 KO</option>
     </select>
-    <select id="languageSelect">
-      <option value="en">EN</option><option value="pcm">PID</option><option value="efi">EFK</option>
-      <option value="fr">FR</option><option value="es">ES</option><option value="sw">SW</option>
-      <option value="zh">中文</option><option value="hi">हिं</option><option value="ar">AR</option>
+    <button class="conn-btn" id="conn-btn" onclick="openM('m-connect')" data-i18n="connect">Connect Wallet</button>
+  </div>
+</div>
+<!-- TICKER -->
+<div class="ticker-wrap"><div class="ticker-track" id="ticker"></div></div>
+
+<!-- ══ HOME ══ -->
+<div class="page active" id="page-home">
+  <div class="hero">
+    <div class="coin-scene">
+      <div class="coin-glow"></div>
+      <div class="geo-ring geo-ring-1"></div>
+      <div class="geo-ring geo-ring-2"></div>
+      <div class="geo-ring geo-ring-3"></div>
+      <div class="orb orb-a"></div><div class="orb orb-b"></div><div class="orb orb-c"></div>
+      <div class="coin-core">
+        <div class="coin-ring"></div>
+        <img class="coin-img" id="hero-img" src="https://ipfs.io/ipfs/bafybeihrzyodihyp5met2hs32ppj37qlowuxarvs2lnlrgujgrlwxc7fwe" alt="EFC" onerror="this.style.display='none';document.getElementById('coin-fb').style.display='flex'"/>
+        <div class="coin-fall" id="coin-fb" style="display:none">EFC</div>
+      </div>
+    </div>
+    <div class="sec-tag" data-i18n="hero_tag">⬡ BEP-20 · BSC · Global Charity Ecosystem 🕊️</div>
+    <h1 class="hero-t" data-i18n="hero_title">The Wallet That <span class="acc">Gives Back</span> to the World</h1>
+    <p class="hero-sub" data-i18n="hero_sub">Efikcoin EFC — the people's token. Stake. Earn. Send. Give. Built for real payments: food, school fees, healthcare. For every person, in every nation.</p>
+    <div class="hero-btns">
+      <button class="btn-g" onclick="goPage('dashboard')" data-i18n="btn_launch">🚀 Launch DApp</button>
+      <a class="btn-g" href="https://pancakeswap.finance/swap?outputCurrency=0x677Ce9CBa67f7484ea951a12897CE780cFd8fED1" target="_blank" data-i18n="btn_buy">🥞 Buy EFC</a>
+      <a class="btn-o" href="https://efikcoineternalv.github.io/Charity-Empowerment/" target="_blank" data-i18n="btn_charity">🕊️ Charity Portal</a>
+    </div>
+    <div class="addr-strip">
+      <div class="addr-chip" onclick="copyTxt('0x677Ce9CBa67f7484ea951a12897CE780cFd8fED1')"><span class="d"></span>Token: 0x677C...fED1 ⎘</div>
+      <div class="addr-chip" onclick="copyTxt('0xa1DD6C528882Dc19EcCbC967F50bBC121A29630e')">Pool: 0xa1DD...630e ⎘</div>
+      <div class="addr-chip" onclick="copyTxt('0x676cCf34C191a9D6EFE4B265b84877C619A559d0')">Treasury: 0x676c...59d0 ⎘</div>
+    </div>
+  </div>
+  <div class="stats-band">
+    <div class="stat-box"><span class="stat-n">1B</span><span class="stat-l">Total Supply EFC</span></div>
+    <div class="stat-box"><span class="stat-n">65%</span><span class="stat-l">Max APY Staking</span></div>
+    <div class="stat-box"><span class="stat-n">190+</span><span class="stat-l">Countries Reached</span></div>
+    <div class="stat-box"><span class="stat-n">∞</span><span class="stat-l">Life Impact</span></div>
+  </div>
+  <div style="text-align:center;margin:18px 0 12px"><div class="sec-tag">Features</div><div class="sec-title" data-i18n="feat_title">Why <span class="acc">Efikcoin?</span></div></div>
+  <div class="feat-grid">
+    <div class="feat-card"><div class="feat-icon">🔒</div><div class="feat-t" data-i18n="feat1_t">Real Staking Rewards</div><div class="feat-d" data-i18n="feat1_d">Earn 12%–65% APY. Rewards go directly to your wallet, on-chain, transparently.</div></div>
+    <div class="feat-card"><div class="feat-icon">🕊️</div><div class="feat-t" data-i18n="feat2_t">Built-in Charity</div><div class="feat-d" data-i18n="feat2_d">Every transaction feeds the treasury. Food, school fees, healthcare — funded by the ecosystem.</div></div>
+    <div class="feat-card"><div class="feat-icon">🌍</div><div class="feat-t" data-i18n="feat3_t">Global P2P Payments</div><div class="feat-d" data-i18n="feat3_d">Send EFC to anyone, anywhere, by wallet or EFC Client ID. No bank. No border.</div></div>
+    <div class="feat-card"><div class="feat-icon">🔑</div><div class="feat-t" data-i18n="feat4_t">Self-Custody Wallet</div><div class="feat-d" data-i18n="feat4_d">Generate a new BSC wallet here. Your seed phrase stays on your device only — always.</div></div>
+    <div class="feat-card"><div class="feat-icon">📊</div><div class="feat-t" data-i18n="feat5_t">Live Portfolio Tracker</div><div class="feat-d" data-i18n="feat5_d">EFC balance, staking, rewards, and full transaction history — all in one dashboard.</div></div>
+    <div class="feat-card"><div class="feat-icon">⚡</div><div class="feat-t" data-i18n="feat6_t">BSC Speed &amp; Low Fees</div><div class="feat-d" data-i18n="feat6_d">Transactions confirm in seconds. Gas fees cost fractions of a cent on BSC.</div></div>
+  </div>
+  <div style="text-align:center;margin:18px 0 12px"><div class="sec-tag">Community</div><div class="sec-title" data-i18n="community_title">Join the <span class="acc">Movement</span></div></div>
+  <div class="social-grid">
+    <a class="social-card" href="https://x.com/efikcoineternal" target="_blank"><div class="s-ico">𝕏</div><div><div class="s-name">X (Twitter)</div><div class="s-desc">@efikcoineternal — news &amp; updates</div></div></a>
+    <a class="social-card" href="https://t.me/efikcoinofficialecosystem" target="_blank"><div class="s-ico">✈️</div><div><div class="s-name">Telegram</div><div class="s-desc">Official community channel</div></div></a>
+    <a class="social-card" href="https://chat.whatsapp.com/Fb2tng6Ay2TE8FiRdJIQPG" target="_blank"><div class="s-ico">💬</div><div><div class="s-name">WhatsApp</div><div class="s-desc">Community group — ask anything</div></div></a>
+    <a class="social-card" href="mailto:support@efikcoin.xyz"><div class="s-ico">✉️</div><div><div class="s-name">Email Support</div><div class="s-desc">support@efikcoin.xyz</div></div></a>
+  </div>
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-grid">
+        <div><div class="f-brand">⬡ EFC</div><div class="f-tagline" data-i18n="footer_tagline">Coin is life, and life is coin. Building a world where every person can thrive through blockchain technology.</div></div>
+        <div><div class="f-col-t">DApp</div><div class="f-link" onclick="goPage('dashboard')">Dashboard</div><div class="f-link" onclick="goPage('wallet')">Wallet</div><div class="f-link" onclick="goPage('staking')">Staking</div><div class="f-link" onclick="goPage('portfolio')">Portfolio</div></div>
+        <div><div class="f-col-t">Community</div><a class="f-link" href="https://x.com/efikcoineternal" target="_blank">X (Twitter)</a><a class="f-link" href="https://t.me/efikcoinofficialecosystem" target="_blank">Telegram</a><a class="f-link" href="https://chat.whatsapp.com/Fb2tng6Ay2TE8FiRdJIQPG" target="_blank">WhatsApp</a><a class="f-link" href="https://efikcoineternalv.github.io/Charity-Empowerment/" target="_blank">Charity</a></div>
+        <div><div class="f-col-t">Resources</div><a class="f-link" href="https://bscscan.com/token/0x677Ce9CBa67f7484ea951a12897CE780cFd8fED1" target="_blank">BSCScan</a><a class="f-link" href="https://pancakeswap.finance/swap?outputCurrency=0x677Ce9CBa67f7484ea951a12897CE780cFd8fED1" target="_blank">PancakeSwap</a><div class="f-link" onclick="goPage('settings')">Settings</div></div>
+      </div>
+      <div class="f-copy" data-i18n="footer_copy">© 2025 Efikcoin Eternal Ecosystem · Built for Humanity 🕊️</div>
+    </div>
+  </footer>
+</div>
+
+<!-- ══ DASHBOARD ══ -->
+<div class="page" id="page-dashboard">
+  <div class="sec-tag">Dashboard</div>
+  <div class="sec-title" data-i18n="nav_dash">My <span class="acc">EFC Dashboard</span></div>
+  <div id="dash-empty" style="text-align:center;padding:44px 0">
+    <div style="font-size:52px;margin-bottom:14px">🔗</div>
+    <p class="sec-sub" style="margin:0 auto 18px" data-i18n="dash_empty">Connect your wallet to view live balances, staking rewards, and transaction history.</p>
+    <button class="btn-g" onclick="openM('m-connect')" data-i18n="connect">Connect Wallet</button>
+  </div>
+  <div id="dash-live" style="display:none">
+    <div class="bal-grid">
+      <div class="bal-card" style="border-color:var(--gold-d);background:linear-gradient(135deg,rgba(212,168,67,.08),transparent)"><span class="b-lbl">EFC Balance</span><span class="b-val gold" id="d-efc">—</span><span class="b-sub" id="d-usd">≈ $0.00</span></div>
+      <div class="bal-card"><span class="b-lbl">BNB Balance</span><span class="b-val" id="d-bnb">—</span><span class="b-sub">for gas fees</span></div>
+      <div class="bal-card"><span class="b-lbl">Staked EFC</span><span class="b-val" id="d-stk">—</span><span class="b-sub" id="d-apy">loading...</span></div>
+      <div class="bal-card" style="border-color:rgba(61,214,140,.2)"><span class="b-lbl">Pending Rewards</span><span class="b-val green" id="d-rew">—</span><button class="btn-o mt-8" style="font-size:8px;padding:5px 9px" onclick="doClaimRewards()">Claim →</button></div>
+    </div>
+    <div class="quick-grid">
+      <div class="qbtn" onclick="goPage('wallet');goTab('wd-send')"><div class="q-ic">📤</div><div class="q-lbl">Send</div></div>
+      <div class="qbtn" onclick="goPage('wallet');goTab('wd-receive')"><div class="q-ic">📥</div><div class="q-lbl">Receive</div></div>
+      <div class="qbtn" onclick="goPage('staking')"><div class="q-ic">🔒</div><div class="q-lbl">Stake</div></div>
+      <div class="qbtn" onclick="goPage('wallet');goTab('wd-p2p')"><div class="q-ic">🤝</div><div class="q-lbl">P2P</div></div>
+    </div>
+    <div class="panel">
+      <div class="panel-hdr"><div class="panel-t">My Wallet</div><a id="d-bscscan" href="#" target="_blank" class="pill pill-a">BSCScan ↗</a></div>
+      <div class="mono" style="font-size:.7rem;color:var(--gold);word-break:break-all;margin-bottom:9px" id="d-addr">—</div>
+      <div class="flex gap-8"><button class="btn-o" style="font-size:8.5px;padding:6px 11px" onclick="copyTxt(document.getElementById('d-addr').textContent)">Copy ⎘</button><button class="btn-o" style="font-size:8.5px;padding:6px 11px" onclick="goPage('wallet');goTab('wd-receive')">Show QR</button></div>
+    </div>
+    <div class="panel">
+      <div class="panel-hdr"><div class="panel-t">⚡ Transaction History</div><button class="btn-o" style="font-size:8.5px;padding:6px 11px" onclick="loadTxHistory('d-tx')">↻ Refresh</button></div>
+      <div class="f-group"><label class="f-lbl">Free BSCScan API Key <span style="color:var(--green);font-size:7.5px">(get at bscscan.com/myapikey)</span></label>
+        <div class="flex gap-8"><input class="f-inp" id="bscscan-key" style="flex:1;font-size:.76rem" placeholder="Paste your free BSCScan API key here"/><button class="btn-g" style="padding:9px 12px;font-size:8.5px" onclick="saveBscscanKey()">Save</button></div>
+      </div>
+      <div class="tx-list" id="d-tx"><div class="empty">Save your BSCScan API key above to see real transaction history</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ WALLET ══ -->
+<div class="page" id="page-wallet">
+  <div class="sec-tag">Wallet</div>
+  <div class="sec-title" data-i18n="wallet_title">EFC <span class="acc">Wallet Centre</span></div>
+  <div class="tabs" id="wallet-tabs">
+    <div class="tab active" onclick="goTab('wd-dash',this)">💳 Dashboard</div>
+    <div class="tab" onclick="goTab('wd-send',this)">📤 Send</div>
+    <div class="tab" onclick="goTab('wd-receive',this)">📥 Receive</div>
+    <div class="tab" onclick="goTab('wd-p2p',this)">🤝 P2P</div>
+    <div class="tab" onclick="goTab('wd-tokens',this)">🪙 Tokens</div>
+    <div class="tab" onclick="goTab('wd-create',this)">🔑 Create/Import</div>
+  </div>
+  <!-- Dashboard tab -->
+  <div class="tab-panel active" id="tp-wd-dash">
+    <div id="wd-empty" style="text-align:center;padding:36px 0">
+      <div style="font-size:44px;margin-bottom:12px">🔗</div>
+      <p style="color:var(--muted);font-size:.84rem;margin-bottom:16px">Connect or create a wallet to see your live dashboard.</p>
+      <button class="btn-g" onclick="openM('m-connect')">Connect Wallet</button>
+      <span style="margin:0 9px;color:var(--muted);font-size:.8rem">or</span>
+      <button class="btn-o" onclick="goTab('wd-create',null)">Create Wallet</button>
+    </div>
+    <div id="wd-live" style="display:none">
+      <div class="bal-grid">
+        <div class="bal-card" style="border-color:var(--gold-d)"><span class="b-lbl">EFC Balance</span><span class="b-val gold" id="w-efc">—</span><span class="b-sub" id="w-usd">≈ $0.00</span></div>
+        <div class="bal-card"><span class="b-lbl">BNB Balance</span><span class="b-val" id="w-bnb">—</span><span class="b-sub">gas fees</span></div>
+        <div class="bal-card"><span class="b-lbl">Staked EFC</span><span class="b-val" id="w-stk">—</span><span class="b-sub" id="w-apy">—% APY</span></div>
+        <div class="bal-card" style="border-color:rgba(61,214,140,.2)"><span class="b-lbl">Rewards</span><span class="b-val green" id="w-rew">—</span><button class="btn-o mt-8" style="font-size:8px;padding:5px 9px" onclick="doClaimRewards()">Claim</button></div>
+      </div>
+      <div class="quick-grid">
+        <div class="qbtn" onclick="goTab('wd-send',null)"><div class="q-ic">📤</div><div class="q-lbl">Send EFC</div></div>
+        <div class="qbtn" onclick="goTab('wd-receive',null)"><div class="q-ic">📥</div><div class="q-lbl">Receive</div></div>
+        <div class="qbtn" onclick="goPage('staking')"><div class="q-ic">🔒</div><div class="q-lbl">Stake</div></div>
+        <div class="qbtn" onclick="goTab('wd-p2p',null)"><div class="q-ic">🤝</div><div class="q-lbl">P2P</div></div>
+      </div>
+      <div class="panel">
+        <div class="panel-hdr"><div class="panel-t">My Address</div><a id="w-bscscan" href="#" target="_blank" class="pill pill-a">BSCScan ↗</a></div>
+        <div class="mono" id="w-addr" style="font-size:.7rem;color:var(--gold);word-break:break-all;margin-bottom:9px">—</div>
+        <div class="flex gap-8"><button class="btn-o" style="font-size:8.5px;padding:6px 11px" onclick="copyTxt(document.getElementById('w-addr').textContent)">Copy ⎘</button><button class="btn-o" style="font-size:8.5px;padding:6px 11px" onclick="goTab('wd-receive',null)">Show QR</button></div>
+      </div>
+      <div class="panel">
+        <div class="panel-hdr"><div class="panel-t">Recent Transactions</div><button class="btn-o" style="font-size:8.5px;padding:6px 11px" onclick="loadTxHistory('w-tx')">↻ Load</button></div>
+        <div class="tx-list" id="w-tx"><div class="empty">Click Refresh to load transaction history</div></div>
+      </div>
+    </div>
+  </div>
+  <!-- Send tab -->
+  <div class="tab-panel" id="tp-wd-send">
+    <div class="panel"><div class="panel-hdr"><div class="panel-t">📤 Send EFC</div></div>
+      <div class="warn-box"><span class="warn-ic">⚠</span>3% fee applies: 2% to treasury (charity &amp; ecosystem), 1% to liquidity. Transactions are irreversible — verify address carefully.</div>
+      <div class="f-group"><label class="f-lbl">Recipient Address</label><input class="f-inp" id="send-to" placeholder="0x... recipient wallet address"/></div>
+      <div class="f-group"><label class="f-lbl">Amount (EFC)</label>
+        <div style="position:relative"><input class="f-inp" id="send-amt" type="number" placeholder="0.0" style="padding-right:55px"/>
+        <button onclick="document.getElementById('send-amt').value=document.getElementById('w-efc').textContent.split(' ')[0]" style="position:absolute;right:9px;top:50%;transform:translateY(-50%);font-family:'Space Mono',monospace;font-size:7.5px;color:var(--gold);background:none;border:none;cursor:pointer">MAX</button></div>
+      </div>
+      <button class="btn-g w-full" onclick="doSendEFC()">Send EFC →</button>
+    </div>
+    <div class="panel mt-12"><div class="panel-hdr"><div class="panel-t">Send BNB</div></div>
+      <div class="f-group"><label class="f-lbl">Recipient</label><input class="f-inp" id="send-bnb-to" placeholder="0x..."/></div>
+      <div class="f-group"><label class="f-lbl">Amount (BNB)</label><input class="f-inp" id="send-bnb-amt" type="number" placeholder="0.0"/></div>
+      <button class="btn-g w-full" onclick="doSendBNB()">Send BNB →</button>
+    </div>
+  </div>
+  <!-- Receive tab -->
+  <div class="tab-panel" id="tp-wd-receive">
+    <div class="panel" style="text-align:center">
+      <div class="panel-hdr" style="justify-content:center"><div class="panel-t">📥 Receive EFC / BNB</div></div>
+      <p style="color:var(--muted);font-size:.8rem;margin-bottom:18px">Share your address or QR code to receive tokens on BSC.</p>
+      <div id="rcv-qr" style="display:inline-block;padding:13px;background:#fff;border-radius:12px;margin-bottom:14px;min-width:158px;min-height:158px"></div>
+      <div class="mono" id="rcv-addr" style="font-size:.7rem;color:var(--gold);word-break:break-all;margin:0 auto 13px;background:var(--surf2);border:1px solid var(--bdr);padding:11px;border-radius:8px;max-width:400px;text-align:left">Connect wallet to see address</div>
+      <div class="flex gap-8" style="justify-content:center;flex-wrap:wrap">
+        <button class="btn-g" onclick="copyTxt(document.getElementById('rcv-addr').textContent)">Copy Address ⎘</button>
+        <button class="btn-o" onclick="shareAddr()">Share 📲</button>
+      </div>
+      <div style="background:var(--surf2);border:1px solid var(--bdr);border-radius:9px;padding:13px;margin-top:18px;text-align:left;max-width:400px;margin-left:auto;margin-right:auto">
+        <p class="f-lbl" style="margin-bottom:7px">Network Info</p>
+        <div style="font-size:.77rem;color:var(--muted);line-height:2">Network: <span style="color:var(--text)">BNB Smart Chain (BSC)</span><br/>Chain ID: <span style="color:var(--text)">56</span><br/>Token: <span style="color:var(--gold)">EFC (BEP-20)</span><br/>Contract: <span style="color:var(--gold);font-family:'Space Mono',monospace;font-size:.68rem">0x677C...fED1</span></div>
+      </div>
+    </div>
+  </div>
+  <!-- P2P tab -->
+  <div class="tab-panel" id="tp-wd-p2p">
+    <div class="panel"><div class="panel-hdr"><div class="panel-t">🤝 P2P Transfer</div></div>
+      <p style="color:var(--muted);font-size:.8rem;margin-bottom:14px">Send EFC to any EFC Client ID or wallet address. No middleman. Fully on-chain. Support life expenses — school fees, rent, food, medical.</p>
+      <div class="f-group"><label class="f-lbl">Recipient (EFC-XXXXXX or 0x address)</label>
+        <input class="f-inp" id="p2p-to" placeholder="EFC-ABC123 or 0x..."/><span class="small-lk mt-8" style="display:inline-block;margin-top:6px" onclick="resolveP2P()">🔍 Look up EFC Client ID</span>
+      </div>
+      <div id="p2p-res" style="display:none;background:var(--surf2);border:1px solid rgba(61,214,140,.2);border-radius:7px;padding:9px;margin-bottom:11px;font-family:'Space Mono',monospace;font-size:8.5px;color:var(--green)"></div>
+      <div class="f-group"><label class="f-lbl">Amount (EFC)</label><input class="f-inp" id="p2p-amt" type="number" placeholder="0.0"/></div>
+      <div class="f-group"><label class="f-lbl">Note / Purpose (optional)</label><input class="f-inp" id="p2p-note" placeholder="School fees, groceries, rent, medical..."/></div>
+      <button class="btn-g w-full" onclick="doP2P()">Send P2P →</button>
+    </div>
+    <div class="panel mt-12"><div class="panel-hdr"><div class="panel-t">Recent P2P Activity</div></div><div id="p2p-hist"><div class="empty">No P2P transactions yet</div></div></div>
+  </div>
+  <!-- Tokens tab -->
+  <div class="tab-panel" id="tp-wd-tokens">
+    <div class="panel"><div class="panel-hdr"><div class="panel-t">🪙 My Coins</div><button class="btn-o" style="font-size:8.5px;padding:6px 11px" onclick="loadAllCoinBalances()">↻ Refresh</button></div>
+      <p style="color:var(--muted);font-size:.78rem;margin-bottom:14px">Tap any coin to open its dashboard — send, receive, trade, stake, deposit, withdraw.</p>
+      <div class="coin-bar" id="coin-bar-main"></div>
+      <div style="border-top:1px solid var(--bdr);padding-top:14px;margin-top:4px" id="coin-list-main"></div>
+    </div>
+    <div class="panel mt-12"><div class="panel-hdr"><div class="panel-t">Import BEP-20 Token</div></div>
+      <p style="color:var(--muted);font-size:.8rem;margin-bottom:13px">Add any BEP-20 token by contract address.</p>
+      <div class="f-group"><label class="f-lbl">Token Contract Address</label><input class="f-inp" id="imp-token-addr" placeholder="0x..."/></div>
+      <button class="btn-g" onclick="importToken()">Import Token</button>
+      <div id="imported-tokens" style="margin-top:12px"></div>
+    </div>
+  </div>
+  <!-- Create/Import tab -->
+  <div class="tab-panel" id="tp-wd-create">
+    <div class="warn-box"><span class="warn-ic">🔐</span><div><strong>Security Warning</strong><br/>Your seed phrase and private key are the ONLY way to access your wallet. Efikcoin NEVER stores your keys. Write seed phrases on paper — never type them on another website or share them digitally.</div></div>
+    <div class="tabs" id="ci-tabs">
+      <div class="tab active" onclick="goInnerTab('ci-create',this)">✨ Create New</div>
+      <div class="tab" onclick="goInnerTab('ci-phrase',this)">📝 Import Phrase</div>
+      <div class="tab" onclick="goInnerTab('ci-key',this)">🔑 Import Key</div>
+      <div class="tab" onclick="goInnerTab('ci-qr',this)">📷 QR Code</div>
+    </div>
+    <div class="tab-panel active" id="tp-ci-create">
+      <div id="gen-start" class="gen-box">
+        <div style="font-size:44px;margin-bottom:12px">🔑</div>
+        <p style="color:var(--muted);font-size:.83rem;margin-bottom:18px">Click below to generate a brand-new BSC wallet with a 12-word seed phrase. <strong>Write down the words immediately</strong> — they are shown only once.</p>
+        <button class="btn-g" onclick="generateWallet()">Generate New Wallet</button>
+      </div>
+      <div id="gen-result" style="display:none">
+        <div class="panel"><div class="panel-hdr"><div class="panel-t">✅ New Wallet Generated</div><span class="pill pill-g">NEW</span></div>
+          <div class="danger-box"><span>⚠</span>Write down your seed phrase NOW. It will NEVER be shown again.</div>
+          <label class="f-lbl">Wallet Address</label>
+          <div class="gen-addr" id="gen-addr">—</div>
+          <button class="btn-o" style="font-size:8.5px;padding:6px 11px;margin-bottom:14px" onclick="copyTxt(document.getElementById('gen-addr').textContent)">Copy Address ⎘</button>
+          <label class="f-lbl" style="margin-bottom:8px">12-Word Seed Phrase</label>
+          <div class="seed-words" id="seed-words"></div>
+          <div class="flex gap-8 mt-12" style="flex-wrap:wrap">
+            <button class="btn-o" style="font-size:8.5px;padding:6px 11px;border-color:rgba(224,80,80,.3);color:var(--red-l)" onclick="copySeed()">Copy Seed Phrase ⎘</button>
+            <button class="btn-o" style="font-size:8.5px;padding:6px 11px;border-color:rgba(224,80,80,.3);color:var(--red-l)" onclick="copyTxt(document.getElementById('gen-pk').textContent)">Copy Private Key ⎘</button>
+          </div>
+          <label class="f-lbl" style="margin-top:14px">Private Key (keep secret)</label>
+          <div class="gen-key" id="gen-pk">—</div>
+          <div style="text-align:center;margin-top:14px"><div id="gen-qr"></div></div>
+          <button class="btn-g w-full mt-16" onclick="useGenWallet()">✓ Connect This Wallet →</button>
+        </div>
+      </div>
+    </div>
+    <div class="tab-panel" id="tp-ci-phrase">
+      <div class="panel"><div class="panel-hdr"><div class="panel-t">Import by Seed Phrase</div></div>
+        <p style="color:var(--muted);font-size:.8rem;margin-bottom:13px">Enter your 12 or 24 words separated by spaces.</p>
+        <div class="f-group"><label class="f-lbl">Seed Phrase</label><textarea class="f-inp" id="imp-phrase" placeholder="word1 word2 word3 ... word12" style="height:78px"></textarea></div>
+        <button class="btn-g" onclick="importByPhrase()">Import Wallet</button>
+        <div id="phrase-result" style="display:none;margin-top:13px">
+          <label class="f-lbl">Imported Address</label><div class="gen-addr" id="phrase-addr">—</div>
+          <button class="btn-g w-full mt-8" onclick="useImpWallet()">Connect This Wallet →</button>
+        </div>
+      </div>
+    </div>
+    <div class="tab-panel" id="tp-ci-key">
+      <div class="panel"><div class="panel-hdr"><div class="panel-t">Import by Private Key</div></div>
+        <p style="color:var(--muted);font-size:.8rem;margin-bottom:13px">Enter your 64-character hex private key (starts with 0x).</p>
+        <div class="f-group"><label class="f-lbl">Private Key</label><input class="f-inp" id="imp-pk" type="password" placeholder="0x..."/></div>
+        <button class="btn-g" onclick="importByKey()">Import Wallet</button>
+        <div id="key-result" style="display:none;margin-top:13px">
+          <label class="f-lbl">Imported Address</label><div class="gen-addr" id="key-addr">—</div>
+          <button class="btn-g w-full mt-8" onclick="useImpWallet()">Connect This Wallet →</button>
+        </div>
+      </div>
+    </div>
+    <div class="tab-panel" id="tp-ci-qr">
+      <div class="panel"><div class="panel-hdr"><div class="panel-t">QR Code Generator</div></div>
+        <div class="f-group"><label class="f-lbl">Wallet Address</label><input class="f-inp" id="qr-addr" placeholder="0x..."/></div>
+        <div class="flex gap-8 mt-8">
+          <button class="btn-g" onclick="genQRCode()">Generate QR</button>
+          <button class="btn-o" onclick="if(userAddr){document.getElementById('qr-addr').value=userAddr;genQRCode();}else toast('Connect wallet first','er')">Use My Wallet</button>
+        </div>
+        <div id="qr-result" style="margin-top:16px;text-align:center;display:none"><div id="qr-box" style="display:inline-block;padding:13px;background:#fff;border-radius:12px"></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ STAKING ══ -->
+<div class="page" id="page-staking">
+  <div class="sec-tag">Staking</div>
+  <div class="sec-title" data-i18n="stake_title">Stake EFC &amp; <span class="acc">Earn Rewards</span></div>
+  <p class="sec-sub" data-i18n="stake_sub">Lock your EFC to earn passive income. Rewards come from the treasury staking pool. Choose your tier below.</p>
+  <div class="tier-grid" id="tier-grid">
+    <div class="tier-card sel" onclick="selectTier(0,this)"><div class="tier-icon">🌱</div><div class="tier-n">Seed</div><div class="tier-apy">12% APY</div><div class="tier-lock">Flexible — no lock period</div></div>
+    <div class="tier-card" onclick="selectTier(1,this)"><div class="tier-icon">🌿</div><div class="tier-n">Growth</div><div class="tier-apy">28% APY</div><div class="tier-lock">30-day lock</div></div>
+    <div class="tier-card" onclick="selectTier(2,this)"><div class="tier-icon">🌾</div><div class="tier-n">LP Farm</div><div class="tier-apy">45% APY</div><div class="tier-lock">60-day lock</div></div>
+    <div class="tier-card" onclick="selectTier(3,this)"><div class="tier-icon">👑</div><div class="tier-n">Sovereign</div><div class="tier-apy" style="color:var(--gold)">65% APY</div><div class="tier-lock">90-day lock</div></div>
+  </div>
+  <div class="panel">
+    <div class="panel-hdr"><div class="panel-t">Stake EFC</div><span class="pill pill-a" id="tier-badge">Seed · 12% APY</span></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:11px;margin-bottom:14px">
+      <div style="background:var(--surf2);border:1px solid var(--bdr);border-radius:8px;padding:11px;text-align:center"><div class="f-lbl" style="margin-bottom:3px">Currently Staked</div><div style="font-family:'Orbitron',monospace;font-size:.88rem;color:var(--gold)" id="stk-now">—</div></div>
+      <div style="background:var(--surf2);border:1px solid var(--bdr);border-radius:8px;padding:11px;text-align:center"><div class="f-lbl" style="margin-bottom:3px">Pending Rewards</div><div style="font-family:'Orbitron',monospace;font-size:.88rem;color:var(--green)" id="stk-rew">—</div></div>
+      <div style="background:var(--surf2);border:1px solid var(--bdr);border-radius:8px;padding:11px;text-align:center"><div class="f-lbl" style="margin-bottom:3px">Est. Annual</div><div style="font-family:'Orbitron',monospace;font-size:.88rem;color:var(--text)" id="stk-est">—</div></div>
+    </div>
+    <div class="f-group"><label class="f-lbl">Amount to Stake (EFC)</label><input class="f-inp" id="stk-amt" type="number" placeholder="0.0" oninput="updateStakeEst()"/></div>
+    <div class="flex gap-8 mt-8" style="flex-wrap:wrap">
+      <button class="btn-g" style="flex:1" onclick="doStake()">🔒 Stake EFC</button>
+      <button class="btn-o" style="flex:1" onclick="doUnstake()">Unstake</button>
+      <button class="btn-o" style="flex:1;border-color:rgba(61,214,140,.3);color:var(--green)" onclick="doClaimRewards()">Claim Rewards ✓</button>
+    </div>
+  </div>
+  <div class="panel">
+    <div class="panel-hdr"><div class="panel-t">Pool Stats</div></div>
+    <div class="tok-row"><span class="tok-lbl">Total EFC Staked</span><span class="tok-val" id="pool-total">—</span></div>
+    <div class="tok-row"><span class="tok-lbl">Pool APY</span><span class="tok-val" id="pool-apy">—</span></div>
+    <div class="tok-row"><span class="tok-lbl">Treasury Wallet</span><span class="tok-val" style="font-size:.68rem">0x676c...59d0</span></div>
+    <div class="tok-row"><span class="tok-lbl">Pool Contract</span><a href="https://bscscan.com/address/0xa1DD6C528882Dc19EcCbC967F50bBC121A29630e" target="_blank" class="tok-val" style="font-size:.68rem;color:var(--blue)">0xa1DD...630e ↗</a></div>
+  </div>
+</div>
+
+<!-- ══ AIRDROP ══ -->
+<div class="page" id="page-airdrop">
+  <div class="sec-tag">Airdrop</div>
+  <div class="sec-title">Batch <span class="acc">Airdrop EFC</span></div>
+  <div class="danger-box"><span>⚠</span>Airdrops are permanent on-chain transactions. You must be the contract owner. Verify all addresses before executing.</div>
+  <div class="tabs">
+    <div class="tab active" onclick="goInnerTab('air-u',this)">Uniform Airdrop</div>
+    <div class="tab" onclick="goInnerTab('air-v',this)">Varied Airdrop</div>
+  </div>
+  <div class="tab-panel active" id="tp-air-u">
+    <div class="panel"><div class="panel-hdr"><div class="panel-t">Same Amount to All</div></div>
+      <div class="f-group"><label class="f-lbl">Recipients (one wallet per line)</label><textarea class="f-inp" id="air-u-recs" placeholder="0x1234...&#10;0x5678..." style="height:110px"></textarea></div>
+      <div class="f-group"><label class="f-lbl">Amount Each (EFC)</label><input class="f-inp" id="air-u-amt" type="number" placeholder="100"/></div>
+      <div id="air-preview" style="font-family:'Space Mono',monospace;font-size:8.5px;color:var(--muted);margin-bottom:11px"></div>
+      <button class="btn-g w-full" onclick="doUniformAirdrop()">Execute Airdrop →</button>
+    </div>
+  </div>
+  <div class="tab-panel" id="tp-air-v">
+    <div class="panel"><div class="panel-hdr"><div class="panel-t">Custom Amount per Recipient</div></div>
+      <div class="f-group"><label class="f-lbl">Address,Amount (one per line)</label><textarea class="f-inp" id="air-v-data" placeholder="0x1234...,100&#10;0x5678...,250" style="height:110px"></textarea></div>
+      <button class="btn-g w-full" onclick="doVariedAirdrop()">Execute Varied Airdrop →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ PORTFOLIO ══ -->
+<div class="page" id="page-portfolio">
+  <div class="sec-tag">Portfolio</div>
+  <div class="sec-title">My <span class="acc">Portfolio</span></div>
+  <div class="bal-grid">
+    <div class="bal-card" style="border-color:var(--gold-d)"><span class="b-lbl">EFC Holdings</span><span class="b-val gold" id="pf-efc">—</span><span class="b-sub" id="pf-usd">≈ $0.00</span></div>
+    <div class="bal-card"><span class="b-lbl">Staked EFC</span><span class="b-val" id="pf-stk">—</span><span class="b-sub">earning rewards</span></div>
+    <div class="bal-card"><span class="b-lbl">Pending Rewards</span><span class="b-val green" id="pf-rew">—</span></div>
+    <div class="bal-card"><span class="b-lbl">BNB (Gas)</span><span class="b-val" id="pf-bnb">—</span></div>
+  </div>
+  <div class="panel">
+    <div class="panel-hdr"><div class="panel-t">Holdings Detail</div><button class="btn-o" style="font-size:8.5px;padding:6px 11px" onclick="loadBalances()">↻ Refresh</button></div>
+    <div class="tok-row"><span class="tok-lbl">EFC Token</span><span class="tok-val" id="pf-b-efc">—</span></div>
+    <div class="tok-row"><span class="tok-lbl">Staked EFC</span><span class="tok-val" id="pf-b-stk">—</span></div>
+    <div class="tok-row"><span class="tok-lbl">Pending Rewards</span><span class="tok-val" id="pf-b-rew">—</span></div>
+    <div class="tok-row"><span class="tok-lbl">BNB Balance</span><span class="tok-val" id="pf-b-bnb">—</span></div>
+    <div class="tok-row"><span class="tok-lbl">Contract Owner</span><span class="tok-val" style="font-size:.68rem" id="pf-owner">—</span></div>
+  </div>
+  <div class="panel">
+    <div class="panel-hdr"><div class="panel-t">Quick Links</div></div>
+    <div class="flex gap-8" style="flex-wrap:wrap">
+      <a class="btn-o" href="https://bscscan.com/token/0x677Ce9CBa67f7484ea951a12897CE780cFd8fED1" target="_blank">BSCScan ↗</a>
+      <a class="btn-o" href="https://pancakeswap.finance/swap?outputCurrency=0x677Ce9CBa67f7484ea951a12897CE780cFd8fED1" target="_blank">PancakeSwap ↗</a>
+      <a class="btn-o" href="https://efikcoineternalv.github.io/Charity-Empowerment/" target="_blank">Charity Portal ↗</a>
+    </div>
+  </div>
+</div>
+
+<!-- ══ CLIENTS ══ -->
+<div class="page" id="page-clients">
+  <div class="sec-tag">Community</div>
+  <div class="sec-title">EFC <span class="acc">Client Hub</span></div>
+  <div class="tabs">
+    <div class="tab active" onclick="goInnerTab('cl-my',this)">My Profile</div>
+    <div class="tab" onclick="goInnerTab('cl-all',this)">All Members</div>
+    <div class="tab" onclick="goInnerTab('cl-inbox',this)">📬 Inbox <span id="notif-badge" style="display:none;background:var(--red);color:#fff;font-size:7px;padding:1px 5px;border-radius:8px;margin-left:3px">0</span></div>
+  </div>
+  <div class="tab-panel active" id="tp-cl-my">
+    <div id="cl-reg-form">
+      <div class="panel"><div class="panel-hdr"><div class="panel-t">Register Your EFC Profile</div></div>
+        <p style="color:var(--muted);font-size:.8rem;margin-bottom:14px">Join the global EFC community. Your profile connects you to the ecosystem — receive admin messages, track your balance, and participate.</p>
+        <div class="f-group"><label class="f-lbl">Full Name</label><input class="f-inp" id="reg-name" placeholder="Your full name"/></div>
+        <div class="f-group"><label class="f-lbl">Email</label><input class="f-inp" id="reg-email" type="email" placeholder="you@example.com"/></div>
+        <div class="f-group"><label class="f-lbl">Country</label><input class="f-inp" id="reg-country" placeholder="Nigeria, USA, Ghana..."/></div>
+        <div class="f-group"><label class="f-lbl">Wallet Address</label><input class="f-inp" id="reg-addr" placeholder="0x... (auto-filled if wallet connected)"/></div>
+        <div class="f-group"><label class="f-lbl">How did you hear about EFC?</label>
+          <select class="f-inp" id="reg-src"><option value="">Select...</option><option value="twitter">X / Twitter</option><option value="telegram">Telegram</option><option value="whatsapp">WhatsApp</option><option value="friend">Friend / Family</option><option value="search">Search Engine</option><option value="other">Other</option></select>
+        </div>
+        <button class="btn-g w-full" onclick="registerClient()">Create My EFC Profile →</button>
+      </div>
+    </div>
+    <div id="cl-profile" style="display:none">
+      <div class="panel">
+        <div class="panel-hdr"><div class="panel-t" id="cl-prof-name">My Profile</div><span class="pill pill-g" id="cl-prof-id">EFC-XXXXXX</span></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-bottom:14px">
+          <div><div class="f-lbl">Email</div><div style="font-size:.8rem" id="cl-p-email">—</div></div>
+          <div><div class="f-lbl">Country</div><div style="font-size:.8rem" id="cl-p-country">—</div></div>
+          <div><div class="f-lbl">Wallet</div><div class="mono" style="font-size:.68rem;color:var(--gold)" id="cl-p-wallet">—</div></div>
+          <div><div class="f-lbl">Joined</div><div style="font-size:.8rem" id="cl-p-joined">—</div></div>
+        </div>
+        <div class="divider"></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-bottom:14px">
+          <div style="background:var(--surf2);border:1px solid var(--bdr);border-radius:7px;padding:11px;text-align:center"><div class="f-lbl" style="margin-bottom:3px">EFC Balance</div><div style="font-family:'Orbitron',monospace;color:var(--gold);font-size:.88rem" id="cl-p-efc">—</div></div>
+          <div style="background:var(--surf2);border:1px solid var(--bdr);border-radius:7px;padding:11px;text-align:center"><div class="f-lbl" style="margin-bottom:3px">Staked EFC</div><div style="font-family:'Orbitron',monospace;font-size:.88rem" id="cl-p-stk">—</div></div>
+        </div>
+        <div class="flex gap-8" style="flex-wrap:wrap">
+          <a id="cl-bscscan" href="#" target="_blank" class="btn-o" style="font-size:8.5px;padding:6px 11px">BSCScan ↗</a>
+          <button class="btn-o" style="font-size:8.5px;padding:6px 11px" onclick="editProfile()">Edit</button>
+          <button class="btn-o" style="font-size:8.5px;padding:6px 11px;border-color:rgba(224,80,80,.3);color:var(--red-l)" onclick="deleteProfile()">Delete Profile</button>
+        </div>
+      </div>
+    </div>
+    <div id="cl-blocked" style="display:none">
+      <div class="danger-box"><span>🚫</span><div><strong>Account Restricted</strong><br/>Your profile has been blocked by an administrator. Your on-chain EFC and wallet are NOT affected. Contact support@efikcoin.xyz to appeal.</div></div>
+    </div>
+  </div>
+  <div class="tab-panel" id="tp-cl-all">
+    <div class="panel">
+      <div class="panel-hdr"><div class="panel-t">Community Members</div><button class="btn-o" style="font-size:8.5px;padding:6px 11px" onclick="loadAllClients()">↻ Refresh</button></div>
+      <div class="cl-row cl-hdr"><div>Client</div><div>Address</div><div>Balance</div><div>Joined</div><div></div></div>
+      <div id="cl-all-list"><div class="empty">Loading...</div></div>
+    </div>
+  </div>
+  <div class="tab-panel" id="tp-cl-inbox">
+    <div class="panel">
+      <div class="panel-hdr"><div class="panel-t">📬 Messages from Admin</div></div>
+      <div id="cl-inbox"><div class="empty">No messages yet — register a profile to receive admin updates</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SETTINGS ══ -->
+<div class="page" id="page-settings">
+  <div class="sec-tag">Settings</div>
+  <div class="sec-title">App <span class="acc">Settings</span></div>
+  <div class="panel">
+    <div class="panel-hdr"><div class="panel-t">🔗 Wallet</div></div>
+    <div class="tok-row"><span class="tok-lbl">Connected Address</span><span class="mono" style="font-size:.7rem;color:var(--gold)" id="set-addr">Not connected</span></div>
+    <div class="flex gap-8 mt-12" style="flex-wrap:wrap">
+      <button class="btn-g" onclick="switchToBSC()">Switch to BSC</button>
+      <button class="btn-o" style="border-color:rgba(224,80,80,.3);color:var(--red-l)" onclick="disconnectWallet()">Disconnect</button>
+    </div>
+  </div>
+  <div class="panel">
+    <div class="panel-hdr"><div class="panel-t">🌐 Language</div></div>
+    <select class="f-inp" style="max-width:220px" onchange="applyLang(this.value)">
+      <option value="en">English</option><option value="fr">Français</option><option value="es">Español</option><option value="pt">Português</option><option value="ha">Hausa</option><option value="yo">Yorùbá</option><option value="ig">Igbo</option><option value="zh">中文</option><option value="ar">العربية</option><option value="ru">Русский</option><option value="de">Deutsch</option><option value="hi">हिन्दी</option><option value="sw">Kiswahili</option><option value="ja">日本語</option><option value="ko">한국어</option>
     </select>
   </div>
-
-  <!-- SETUP/UNLOCK -->
-  <div id="setupScreen" class="screen active">
-    <img src="https://ipfs.io/ipfs/bafybeihrzyodihyp5met2hs32ppj37qlowuxarvs2lnlrgujgrlwxc7fwe" class="logo">
-    <h1 data-i18n="app_name">Efikcoin Wallet</h1>
-    <p style="text-align: center; color: #888; margin-bottom: 30px;" data-i18n="tagline">Secure. Global. Yours.</p>
-    
-    <div class="card" id="createCard">
-      <h2 data-i18n="create_password">Create Password</h2>
-      <input type="password" id="newPassword" placeholder="Min 8 characters">
-      <input type="password" id="confirmPassword" placeholder="Confirm Password">
-      <button onclick="createWallet()" data-i18n="create_wallet">Create New Wallet</button>
-      <button class="secondary" onclick="showImport()" data-i18n="import_wallet">Import Existing Wallet</button>
-    </div>
-
-    <div class="card" id="unlockCard" style="display: none;">
-      <h2 data-i18n="welcome_back">Welcome Back</h2>
-      <input type="password" id="unlockPassword" placeholder="Enter Password">
-      <button onclick="unlockWallet()" data-i18n="unlock">Unlock Wallet</button>
-      <button class="danger" onclick="resetWallet()" data-i18n="reset">Reset Wallet</button>
-    </div>
-
-    <div class="card" id="importCard" style="display: none;">
-      <h2 data-i18n="import_wallet">Import Wallet</h2>
-      <textarea id="mnemonicInput" rows="3" placeholder="Enter 12-word seed phrase"></textarea>
-      <input type="password" id="importPassword" placeholder="Set New Password">
-      <button onclick="importWallet()" data-i18n="import">Import</button>
-      <button class="secondary" onclick="showCreate()" data-i18n="back">Back</button>
+  <div class="panel">
+    <div class="panel-hdr"><div class="panel-t">📋 Contract Addresses</div></div>
+    <div class="tok-row"><span class="tok-lbl">EFC Token</span><span class="mono tok-val" style="font-size:.68rem;cursor:pointer" onclick="copyTxt('0x677Ce9CBa67f7484ea951a12897CE780cFd8fED1')">0x677C...fED1 ⎘</span></div>
+    <div class="tok-row"><span class="tok-lbl">Pool Contract</span><span class="mono tok-val" style="font-size:.68rem;cursor:pointer" onclick="copyTxt('0xa1DD6C528882Dc19EcCbC967F50bBC121A29630e')">0xa1DD...630e ⎘</span></div>
+    <div class="tok-row"><span class="tok-lbl">Treasury</span><span class="mono tok-val" style="font-size:.68rem;cursor:pointer" onclick="copyTxt('0x676cCf34C191a9D6EFE4B265b84877C619A559d0')">0x676c...59d0 ⎘</span></div>
+  </div>
+  <div class="panel">
+    <div class="panel-hdr"><div class="panel-t">🔗 Quick Links</div></div>
+    <div class="flex gap-8" style="flex-wrap:wrap">
+      <a class="btn-o" href="https://bscscan.com/token/0x677Ce9CBa67f7484ea951a12897CE780cFd8fED1" target="_blank">BSCScan ↗</a>
+      <a class="btn-o" href="https://pancakeswap.finance/swap?outputCurrency=0x677Ce9CBa67f7484ea951a12897CE780cFd8fED1" target="_blank">PancakeSwap ↗</a>
+      <a class="btn-o" href="https://efikcoineternalv.github.io/Charity-Empowerment/" target="_blank">Charity ↗</a>
     </div>
   </div>
-
-  <!-- SEED SCREEN -->
-  <div id="seedScreen" class="screen">
-    <div class="card">
-      <div class="warning" data-i18n="seed_warning">⚠️ WRITE THESE 12 WORDS ON PAPER. Screenshot = risk of theft. We CANNOT recover them if lost.</div>
-      <div class="label" data-i18n="seed_phrase">Your Secret Recovery Phrase</div>
-      <div class="value" id="seedPhrase" style="background: #0B0B0F; padding: 18px; border-radius: 12px; line-height: 2; font-size: 16px;"></div>
-      <button onclick="confirmSeedSaved()" data-i18n="saved_seed">I Saved Them Safely</button>
-    </div>
-  </div>
-
-  <!-- DASHBOARD -->
-  <div id="dashboardScreen" class="screen">
-    <div style="display: flex; justify-content: space-between; align-items: center; padding: 15px 0;">
-      <img src="https://ipfs.io/ipfs/bafybeihrzyodihyp5met2hs32ppj37qlowuxarvs2lnlrgujgrlwxc7fwe" style="width: 36px; height: 36px; border-radius: 50%;">
-      <div onclick="lockWallet()" style="cursor: pointer; font-size: 26px;">🔒</div>
-    </div>
-    
-    <div class="card">
-      <div class="label" data-i18n="total_balance">Total Portfolio Value</div>
-      <div class="balance" id="totalValue">$0.00</div>
-      <div class="label" id="totalValueLocal">₦0.00</div>
-      <div class="label" data-i18n="address">Wallet Address</div>
-      <div class="value" id="walletAddress" onclick="copyAddress()" style="cursor: pointer; font-size: 11px; color: #F0B90B;"></div>
-    </div>
-
-    <div id="tokenList"></div>
-    <button class="secondary" onclick="showAddToken()" data-i18n="import_token">+ Import Token</button>
-  </div>
-
-  <!-- COIN DASHBOARD -->
-  <div id="coinScreen" class="screen">
-    <div style="display: flex; align-items: center; margin-bottom: 20px;">
-      <div onclick="showScreen('dashboardScreen')" style="cursor: pointer; font-size: 28px; margin-right: 15px;">←</div>
-      <img id="coinLogo" style="width: 48px; height: 48px; border-radius: 50%; margin-right: 15px;">
-      <div>
-        <div id="coinName" style="font-size: 22px; font-weight: 800;"></div>
-        <div id="coinSymbol" style="color: #888;"></div>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="balance" id="coinBalance">0</div>
-      <div class="label" id="coinValue">$0.00</div>
-      <div id="chartContainer"><canvas id="priceChart"></canvas></div>
-    </div>
-
-    <div class="row">
-      <button onclick="showSendModal()" data-i18n="send">Send</button>
-      <button class="secondary" onclick="showReceiveModal()" data-i18n="receive">Receive</button>
-    </div>
-    <div class="row">
-      <button class="secondary" onclick="showSwapModal()" data-i18n="swap">Swap</button>
-      <button class="secondary" onclick="showStakeModal()" data-i18n="stake">Stake</button>
-    </div>
-
-    <div class="card">
-      <h3 data-i18n="transactions">Transactions</h3>
-      <div id="txList"></div>
-    </div>
-  </div>
-
-  <!-- BROWSER/DAPPS -->
-  <div id="browserScreen" class="screen">
-    <h1 data-i18n="dapps">DApps Browser</h1>
-    <input type="text" id="dappUrl" placeholder="Search or enter dapp URL" style="margin-bottom: 20px;">
-    <div class="dapp-grid">
-      <div class="dapp-item" onclick="openDapp('https://pancakeswap.finance/swap')">
-        <img src="https://pancakeswap.finance/logo.png" class="dapp-logo">
-        <div style="font-size: 13px;">PancakeSwap</div>
-      </div>
-      <div class="dapp-item" onclick="openDapp('https://app.uniswap.org')">
-        <img src="https://uniswap.org/favicon.ico" class="dapp-logo">
-        <div style="font-size: 13px;">Uniswap</div>
-      </div>
-      <div class="dapp-item" onclick="openDapp('https://1inch.io')">
-        <img src="https://1inch.io/img/favicon/safari-pinned-tab.svg" class="dapp-logo">
-        <div style="font-size: 13px;">1inch</div>
-      </div>
-      <div class="dapp-item" onclick="alert('Add your EFC staking dapp URL here')">
-        <img src="https://ipfs.io/ipfs/bafybeihrzyodihyp5met2hs32ppj37qlowuxarvs2lnlrgujgrlwxc7fwe" class="dapp-logo">
-        <div style="font-size: 13px;">EFC Stake</div>
-      </div>
-    </div>
-    <iframe id="dappFrame" class="browser-frame" style="display:none; margin-top: 20px;"></iframe>
-  </div>
-
-  <!-- MODALS -->
-  <div id="sendModal" class="modal">
-    <div class="card" style="max-width: 500px; width: 100%;">
-      <h2 data-i18n="send_token">Send <span id="sendTokenSymbol"></span></h2>
-      <div class="label" data-i18n="to_address">To Address</div>
-      <input id="sendToAddress" placeholder="0x... or BTC address">
-      <div class="label" data-i18n="amount">Amount</div>
-      <input id="sendAmount" type="number" placeholder="0.0">
-      <div class="label" data-i18n="password_confirm">Password to Confirm</div>
-      <input type="password" id="sendPassword" placeholder="Wallet Password">
-      <button onclick="executeSend()" data-i18n="send_now">Send Now</button>
-      <button class="secondary" onclick="closeModal('sendModal')" data-i18n="cancel">Cancel</button>
-    </div>
-  </div>
-
-  <div id="receiveModal" class="modal">
-    <div class="card" style="max-width: 500px; width: 100%; text-align: center;">
-      <h2 data-i18n="receive_token">Receive <span id="receiveTokenSymbol"></span></h2>
-      <div id="qrCode" style="margin: 20px auto; background: white; padding: 15px; border-radius: 12px; display: inline-block;"></div>
-      <div class="value" id="receiveAddress" style="font-size: 12px;"></div>
-      <button onclick="copyReceiveAddress()" data-i18n="copy_address">Copy Address</button>
-      <button class="secondary" onclick="closeModal('receiveModal')" data-i18n="close">Close</button>
-    </div>
-  </div>
-
-  <div id="addTokenModal" class="modal">
-    <div class="card" style="max-width: 500px; width: 100%;">
-      <h2 data-i18n="import_token">Import Token</h2>
-      <select id="addTokenChain">
-        <option value="BSC">BSC (BEP20)</option>
-        <option value="ETH">Ethereum (ERC20)</option>
-        <option value="POLYGON">Polygon</option>
-        <option value="TRON">TRON (TRC20)</option>
-      </select>
-      <input id="addTokenAddress" placeholder="Token Contract Address">
-      <button onclick="addCustomToken()" data-i18n="import">Import</button>
-      <button class="secondary" onclick="closeModal('addTokenModal')" data-i18n="cancel">Cancel</button>
-    </div>
-  </div>
-
-  <!-- BOTTOM NAV -->
-  <div class="bottom-nav">
-    <div class="nav-item active" onclick="showScreen('dashboardScreen')"><div class="nav-icon">🏠</div><span data-i18n="wallet">Wallet</span></div>
-    <div class="nav-item" onclick="showScreen('browserScreen')"><div class="nav-icon">🌐</div><span data-i18n="browser">Browser</span></div>
-    <div class="nav-item" onclick="alert('P2P: Buy/Sell EFC with Bank Transfer. Coming with escrow smart contract.')"><div class="nav-icon">🤝</div><span data-i18n="p2p">P2P</span></div>
-    <div class="nav-item" onclick="alert('Merchant: Generate QR for School Fees, Food, Hospital. Customer scans & pays EFC instantly.')"><div class="nav-icon">🛍️</div><span data-i18n="merchant">Merchant</span></div>
-    <div class="nav-item" onclick="alert('More: Settings, Export Key, Support, Stake')"><div class="nav-icon">⚙️</div><span data-i18n="more">More</span></div>
-  </div>
+</div>
+</div>
 
 <script>
-// Ece, this is COMPLETE. All functions work. No more broken buttons.
-const EFC_ADDRESS = '0xa1dd6c528882dc19eccbc967f50bbc121a29630e';
-const EFC_LOGO = 'https://ipfs.io/ipfs/bafybeihrzyodihyp5met2hs32ppj37qlowuxarvs2lnlrgujgrlwxc7fwe';
-const WBNB_ADDRESS = '0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c';
-const USDT_BEP20 = '0x55d398326f99059fF775485246999027B3197955';
-const USDT_TRC20 = 'TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t';
-const PANCAKE_ROUTER = '0x10ED43C718714eb63d5aA57B78B54704E256024E';
-
-const CHAINS = {
-  BSC: { rpc: 'https://bsc-dataseed.binance.org/', chainId: 56, scan: 'https://bscscan.com', symbol: 'BNB' },
-  ETH: { rpc: 'https://eth.llamarpc.com', chainId: 1, scan: 'https://etherscan.io', symbol: 'ETH' },
-  POLYGON: { rpc: 'https://polygon-rpc.com', chainId: 137, scan: 'https://polygonscan.com', symbol: 'MATIC' },
-  TRON: { rpc: 'https://api.trongrid.io', symbol: 'TRX' },
-  BTC: { symbol: 'BTC', api: 'https://blockstream.info/api' }
-};
-
-const ERC20_ABI = ['function balanceOf(address) view returns (uint256)', 'function decimals() view returns (uint8)', 'function symbol() view returns (string)', 'function name() view returns (string)', 'function transfer(address to, uint amount) returns (bool)', 'function approve(address spender, uint amount) returns (bool)'];
-const ROUTER_ABI = ['function swapExactETHForTokens(uint amountOutMin, address[] calldata path, address to, uint deadline) payable returns (uint[] memory amounts)', 'function swapExactTokensForTokens(uint amountIn, uint amountOutMin, address[] calldata path, address to, uint deadline) returns (uint[] memory amounts)', 'function getAmountsOut(uint amountIn, address[] calldata path) view returns (uint[] memory amounts)'];
-
-const FX_RATES = { USD: 1, NGN: 1550, EUR: 0.92, GBP: 0.79, GHS: 15.5, KES: 129, ZAR: 18.2, CNY: 7.1, INR: 83.5 };
-const TRANSLATIONS = {
-  en: { app_name: 'Efikcoin Wallet', tagline: 'Secure. Global. Yours.', create_password: 'Create Password', welcome_back: 'Welcome Back', unlock: 'Unlock Wallet', import_wallet: 'Import Existing Wallet', create_wallet: 'Create New Wallet', total_balance: 'Total Portfolio Value', address: 'Wallet Address', wallet: 'Wallet', browser: 'Browser', p2p: 'P2P', merchant: 'Merchant', more: 'More', send_token: 'Send', receive_token: 'Receive', seed_warning: '⚠️ WRITE THESE 12 WORDS ON PAPER. Screenshot = risk of theft. We CANNOT recover them if lost.', seed_phrase: 'Your Secret Recovery Phrase', saved_seed: 'I Saved Them Safely', reset: 'Reset Wallet', import_token: 'Import Token', send_now: 'Send Now', cancel: 'Cancel', close: 'Close', copy_address: 'Copy Address', to_address: 'To Address', amount: 'Amount', password_confirm: 'Password to Confirm', send: 'Send', receive: 'Receive', swap: 'Swap', stake: 'Stake', transactions: 'Transactions', dapps: 'DApps Browser' },
-  pcm: { app_name: 'Efikcoin Wallet', tagline: 'Safe. For Everybody. Na Yours.', create_password: 'Make Password', welcome_back: 'Welcome Back My Padi', unlock: 'Open Wallet', import_wallet: 'Bring Old Wallet', create_wallet: 'Make New Wallet', total_balance: 'All Your Money', address: 'Your Wallet Address', wallet: 'Wallet', browser: 'Internet', p2p: 'Trade', merchant: 'Seller', more: 'More', send_token: 'Send', receive_token: 'Collect', seed_warning: '⚠️ WRITE THESE 12 WORDS FOR PAPER. If you lose am, your money don go.', seed_phrase: 'Your Secret Words', saved_seed: 'I Don Write Am', reset: 'Delete Wallet', import_token: 'Add Token', send_now: 'Send Am Now', cancel: 'Cancel', close: 'Close', copy_address: 'Copy Address', to_address: 'Who You Wan Send', amount: 'How Much', password_confirm: 'Put Password', send: 'Send', receive: 'Collect', swap: 'Change', stake: 'Farm', transactions: 'Your Money Movement', dapps: 'DApps' },
-  efi: { app_name: 'Efikcoin Wallet', tagline: 'Mfọn. Ofuri ererimbot. Okpo.', create_password: 'Nam password', welcome_back: 'Emedi', unlock: 'Kupere wallet', import_wallet: 'Da wallet ekededi', create_wallet: 'Nam wallet obufa', total_balance: 'Okuk kpukpru', address: 'Adres fo', wallet: 'Wallet', browser: 'Internet', p2p: 'Unyam', merchant: 'Asua', more: 'En̄wen', send_token: 'Nọ', receive_token: 'Bọ', seed_warning: '⚠️ Tin̄ ikọ 12 emi ke n̄wed. Kupụre mfọn fo.', seed_phrase: 'Ikọ udibe fo', saved_seed: 'Ntin̄ mmọ', reset: 'Sop wallet', import_token: 'Da token', send_now: 'Nọ keemi', cancel: 'Kabaña', close: 'Kpri', copy_address: 'Copy Adres', to_address: 'Adres owo', amount: 'Iyip', password_confirm: 'Sin password', send: 'Nọ', receive: 'Bọ', swap: 'Kaban̄a', stake: 'Okpok', transactions: 'Nkọ', dapps: 'DApps' },
-  fr: { app_name: 'Portefeuille Efikcoin', tagline: 'Sécurisé. Mondial. Le vôtre.', create_password: 'Créer un mot de passe', welcome_back: 'Bon retour', unlock: 'Déverrouiller', import_wallet: 'Importer un portefeuille', create_wallet: 'Créer un portefeuille', total_balance: 'Valeur totale du portefeuille', address: 'Adresse du portefeuille', wallet: 'Portefeuille', browser: 'Navigateur', p2p: 'P2P', merchant: 'Marchand', more: 'Plus', send_token: 'Envoyer', receive_token: 'Recevoir' },
-  es: { app_name: 'Billetera Efikcoin', tagline: 'Segura. Global. Tuya.', create_password: 'Crear contraseña', welcome_back: 'Bienvenido de nuevo', unlock: 'Desbloquear billetera', import_wallet: 'Importar billetera', create_wallet: 'Crear billetera', total_balance: 'Valor total de la cartera', address: 'Dirección de billetera', wallet: 'Billetera', browser: 'Navegador', p2p: 'P2P', merchant: 'Comerciante', more: 'Más', send_token: 'Enviar', receive_token: 'Recibir' },
-  sw: { app_name: 'Mkoba wa Efikcoin', tagline: 'Salama. Ulimwenguni. Yako.', create_password: 'Unda Nywila', welcome_back: 'Karibu tena', unlock: 'Fungua Mkoba', import_wallet: 'Leta Mkoba', create_wallet: 'Unda Mkoba', total_balance: 'Thamani ya Jumla', address: 'Anwani ya Mkoba', wallet: 'Mkoba', browser: 'Kivinjari', p2p: 'P2P', merchant: 'Mfanyabiashara', more: 'Zaidi', send_token: 'Tuma', receive_token: 'Pokea' },
-  zh: { app_name: 'Efikcoin钱包', tagline: '安全。全球。你的。', create_password: '创建密码', welcome_back: '欢迎回来', unlock: '解锁钱包', import_wallet: '导入钱包', create_wallet: '创建新钱包', total_balance: '投资组合总值', address: '钱包地址', wallet: '钱包', browser: '浏览器', p2p: 'P2P', merchant: '商家', more: '更多', send_token: '发送', receive_token: '接收' },
-  hi: { app_name: 'Efikcoin वॉलेट', tagline: 'सुरक्षित। वैश्विक। आपका।', create_password: 'पासवर्ड बनाएं', welcome_back: 'वापसी पर स्वागत है', unlock: 'वॉलेट अनलॉक करें', import_wallet: 'वॉलेट आयात करें', create_wallet: 'नया वॉलेट बनाएं', total_balance: 'कुल पोर्टफोलियो मूल्य', address: 'वॉलेट पता', wallet: 'वॉलेट', browser: 'ब्राउज़र', p2p: 'P2P', merchant: 'व्यापारी', more: 'अधिक', send_token: 'भेजें', receive_token: 'प्राप्त करें' },
-  ar: { app_name: 'محفظة Efikcoin', tagline: 'آمنة. عالمية. لك.', create_password: 'إنشاء كلمة مرور', welcome_back: 'مرحبا بعودتك', unlock: 'فتح المحفظة', import_wallet: 'استيراد المحفظة', create_wallet: 'إنشاء محفظة', total_balance: 'إجمالي قيمة المحفظة', address: 'عنوان المحفظة', wallet: 'محفظة', browser: 'المتصفح', p2p: 'P2P', merchant: 'التاجر', more: 'المزيد', send_token: 'إرسال', receive_token: 'استلام' }
-};
-
-let wallet = null, tronWallet = null, btcWallet = null, currentPassword = null, currentCurrency = 'USD', currentLang = 'en', currentToken = null;
-let provider = new ethers.providers.JsonRpcProvider(CHAINS.BSC.rpc);
-let priceChart = null;
-let tokens = [
-  { chain: 'BSC', address: EFC_ADDRESS, symbol: 'EFC', name: 'Efikcoin', logo: EFC_LOGO, decimals: 18, price: 0.001, coingecko: 'efikcoin' },
-  { chain: 'BSC', address: WBNB_ADDRESS, symbol: 'BNB', name: 'BNB', logo: 'https://tokens.pancakeswap.finance/images/0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c.png', decimals: 18, price: 605, coingecko: 'binancecoin' },
-  { chain: 'BSC', address: USDT_BEP20, symbol: 'USDT', name: 'Tether USD BEP20', logo: 'https://tokens.pancakeswap.finance/images/0x55d398326f99059fF775485246999027B3197955.png', decimals: 18, price: 1, coingecko: '  { chain: 'ETH', address: '0x0000000000000000000000000000', symbol: 'ETH', name: 'Ethereum', logo: 'https://tokens.pancakeswap.finance/images/0x2170Ed0880ac9A755fd29B2688956BD959F933F8.png', decimals: 18, price: 3500, coingecko: 'ethereum' },
-  { chain: 'POLYGON', address: '0x0000000000000000000000001010', symbol: 'MATIC', name: 'Polygon', logo: 'https://wallet-asset.matic.network/img/tokens/matic.svg', decimals: 18, price: 0.85, coingecko: 'matic-network' },
-  { chain: 'BTC', address: 'BTC', symbol: 'BTC', name: 'Bitcoin', logo: 'https://assets.coingecko.com/coins/images/1/large/bitcoin.png', decimals: 8, price: 65000, coingecko: 'bitcoin' },
-  { chain: 'TRON', address: USDT_TRC20, symbol: 'USDT', name: 'Tether TRC20', logo: 'https://assets.coingecko.com/coins/images/325/large/Tether.png', decimals: 6, price: 1, coingecko: 'tether' }
+/* ── CONSTANTS ── */
+const EFC='0x677Ce9CBa67f7484ea951a12897CE780cFd8fED1';
+const POOL='0xa1DD6C528882Dc19EcCbC967F50bBC121A29630e';
+const TREASURY='0x676cCf34C191a9D6EFE4B265b84877C619A559d0';
+const BSC_ID='0x38';
+const EFC_ABI=[
+  {"inputs":[{"internalType":"address","name":"a","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
+  {"inputs":[{"internalType":"address","name":"user","type":"address"}],"name":"staked","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
+  {"inputs":[{"internalType":"address","name":"user","type":"address"}],"name":"pendingReward","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
+  {"inputs":[],"name":"totalStaked","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
+  {"inputs":[],"name":"APY","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
+  {"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},
+  {"inputs":[],"name":"totalSupply","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
+  {"inputs":[],"name":"tradingOpen","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},
+  {"inputs":[{"internalType":"address","name":"s","type":"address"},{"internalType":"uint256","name":"a","type":"uint256"}],"name":"approve","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},
+  {"inputs":[{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"a","type":"uint256"}],"name":"transfer","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},
+  {"inputs":[{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"deposit","outputs":[],"stateMutability":"nonpayable","type":"function"},
+  {"inputs":[{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"withdraw","outputs":[],"stateMutability":"nonpayable","type":"function"},
+  {"inputs":[],"name":"claimRewards","outputs":[],"stateMutability":"nonpayable","type":"function"},
+  {"inputs":[{"internalType":"address[]","name":"recipients","type":"address[]"},{"internalType":"uint256","name":"amountEach","type":"uint256"}],"name":"airdrop","outputs":[],"stateMutability":"nonpayable","type":"function"},
+  {"inputs":[{"internalType":"address[]","name":"recipients","type":"address[]"},{"internalType":"uint256[]","name":"amounts","type":"uint256[]"}],"name":"airdropVaried","outputs":[],"stateMutability":"nonpayable","type":"function"},
+  {"inputs":[{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"fundStaking","outputs":[],"stateMutability":"nonpayable","type":"function"},
+  {"inputs":[{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"burn","outputs":[],"stateMutability":"nonpayable","type":"function"},
+  {"inputs":[],"name":"openTrading","outputs":[],"stateMutability":"nonpayable","type":"function"},
+  {"inputs":[],"name":"renounceOwnership","outputs":[],"stateMutability":"nonpayable","type":"function"},
+  {"inputs":[{"internalType":"address","name":"a","type":"address"},{"internalType":"bool","name":"e","type":"bool"}],"name":"setFeeExempt","outputs":[],"stateMutability":"nonpayable","type":"function"},
+  {"inputs":[],"name":"treasuryWallet","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"}
 ];
 
-window.onload = () => {
-  if (localStorage.getItem('efc_encrypted_wallet')) {
-    document.getElementById('createCard').style.display = 'none';
-    document.getElementById('unlockCard').style.display = 'block';
-  }
-  changeLanguage();
-  document.getElementById('currencySelect').addEventListener('change', changeCurrency);
-  document.getElementById('languageSelect').addEventListener('change', changeLanguage);
-};
+/* ── STATE ── */
+let provider=null,signer=null,userAddr=null,efcContract=null;
+let _genWallet=null,_impWallet=null,selectedTierAPY=12;
+const p2pHistory=[];const importedTks=[];
 
-function showScreen(id) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  if (id === 'dashboardScreen') document.querySelectorAll('.nav-item')[0].classList.add('active');
-  if (id === 'browserScreen') document.querySelectorAll('.nav-item')[1].classList.add('active');
-}
-
-function changeLanguage() {
-  currentLang = document.getElementById('languageSelect').value;
-  document.querySelectorAll('[data-i18n]').forEach(el => {
-    const key = el.getAttribute('data-i18n');
-    if (TRANSLATIONS[currentLang]?.[key]) el.textContent = TRANSLATIONS[currentLang][key];
+/* ── FIREBASE ── */
+function fb(){return window.__fb;}
+async function waitFB(ms=5000){
+  if(window.__fbReady)return true;
+  return new Promise(r=>{
+    const t=setTimeout(()=>r(false),ms);
+    window.addEventListener('fb-ready',()=>{clearTimeout(t);r(true);},{once:true});
   });
 }
 
-function changeCurrency() {
-  currentCurrency = document.getElementById('currencySelect').value;
-  if (wallet) updateBalances();
+/* ── CANVAS BACKGROUND ── */
+const cv=document.getElementById('bg-canvas');
+const cx=cv.getContext('2d');
+let stars=[];
+function resizeCv(){cv.width=innerWidth;cv.height=innerHeight;stars=Array.from({length:80},()=>({x:Math.random()*cv.width,y:Math.random()*cv.height,r:Math.random()*1.5+.3,s:Math.random()*.3+.05,o:Math.random()}));}
+function drawCv(){
+  cx.clearRect(0,0,cv.width,cv.height);
+  stars.forEach(s=>{s.o+=Math.random()>.5?s.s:-s.s;s.o=Math.max(0,Math.min(1,s.o));cx.beginPath();cx.arc(s.x,s.y,s.r,0,Math.PI*2);cx.fillStyle=`rgba(212,168,67,${s.o*.6})`;cx.fill();});
+  requestAnimationFrame(drawCv);
+}
+window.addEventListener('resize',resizeCv);resizeCv();drawCv();
+
+/* ── TICKER ── */
+function buildTicker(){
+  const items=[{l:'EFC/USDT',v:'$0.0042',d:'+3.2%',u:true},{l:'BNB/USDT',v:'$580',d:'+1.1%',u:true},{l:'Total Staked',v:'12.4M EFC',d:''},{l:'Max APY',v:'65%',d:''},{l:'Treasury',v:'Active',d:''},{l:'Chain',v:'BSC · 56',d:''},{l:'Holders',v:'47,000+',d:''}];
+  const h=items.map(i=>`<div class="ticker-item"><strong>${i.l}</strong> ${i.v}${i.d?` <span class="${i.u?'up':'dn'}">${i.d}</span>`:''}</div>`).join('');
+  const el=document.getElementById('ticker');if(el)el.innerHTML=h+h;
 }
 
-function encrypt(text, password) { return CryptoJS.AES.encrypt(text, password).toString(); }
-function decrypt(ciphertext, password) { try { return CryptoJS.AES.decrypt(ciphertext, password).toString(CryptoJS.enc.Utf8); } catch (e) { return null; } }
-
-async function createWallet() {
-  const pass = document.getElementById('newPassword').value;
-  const confirm = document.getElementById('confirmPassword').value;
-  if (pass.length < 8) return alert('Password must be 8+ characters');
-  if (pass!== confirm) return alert('Passwords do not match');
-  
-  currentPassword = pass;
-  const newWallet = ethers.Wallet.createRandom();
-  const encrypted = encrypt(newWallet.mnemonic.phrase, pass);
-  localStorage.setItem('efc_encrypted_wallet', encrypted);
-  
-  document.getElementById('seedPhrase').textContent = newWallet.mnemonic.phrase;
-  showScreen('seedScreen');
+/* ── NAVIGATION ── */
+function goPage(name,el){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.ntab').forEach(t=>t.classList.remove('active'));
+  const pg=document.getElementById('page-'+name);if(pg)pg.classList.add('active');
+  if(el)el.classList.add('active');
+  else document.querySelectorAll('.ntab').forEach(t=>{if((t.getAttribute('onclick')||'').includes("'"+name+"'"))t.classList.add('active');});
+  window.scrollTo(0,0);
+  if(name==='clients')loadClientProfile();
+  if(name==='portfolio'&&userAddr)loadBalances();
 }
 
-function confirmSeedSaved() {
-  wallet = ethers.Wallet.fromMnemonic(
-    decrypt(localStorage.getItem('efc_encrypted_wallet'), currentPassword)
-  ).connect(provider);
-  loadDashboard();
+function goTab(name,el){
+  const panel=document.getElementById('tp-'+name);if(!panel)return;
+  const parent=panel.parentElement;
+  parent.querySelectorAll(':scope>.tab-panel').forEach(p=>p.classList.remove('active'));
+  panel.classList.add('active');
+  if(el){const tp=el.parentElement;tp.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));el.classList.add('active');}
+  else document.querySelectorAll('.tab').forEach(t=>{if((t.getAttribute('onclick')||'').includes("'"+name+"'"))t.classList.add('active');});
+  if(name==='wd-receive'&&userAddr)genReceiveQR();
 }
 
-async function unlockWallet() {
-  const pass = document.getElementById('unlockPassword').value;
-  const encrypted = localStorage.getItem('efc_encrypted_wallet');
-  try {
-    const mnemonic = decrypt(encrypted, pass);
-    if (!mnemonic) throw new Error();
-    currentPassword = pass;
-    wallet = ethers.Wallet.fromMnemonic(mnemonic).connect(provider);
-    loadDashboard();
-  } catch (e) {
-    alert('Wrong password');
-  }
+function goInnerTab(name,el){
+  const panel=document.getElementById('tp-'+name);if(!panel)return;
+  const parent=panel.parentElement;
+  parent.querySelectorAll(':scope>.tab-panel').forEach(p=>p.classList.remove('active'));
+  panel.classList.add('active');
+  if(el){const tp=el.parentElement;tp.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));el.classList.add('active');}
+  if(name==='cl-all')loadAllClients();
+  if(name==='cl-inbox')loadInbox();
 }
 
-function showImport() {
-  document.getElementById('createCard').style.display = 'none';
-  document.getElementById('unlockCard').style.display = 'none';
-  document.getElementById('importCard').style.display = 'block';
+/* ── MODALS ── */
+function openM(id){document.getElementById(id).classList.add('open');}
+function closeM(id){document.getElementById(id).classList.remove('open');}
+document.addEventListener('click',e=>{if(e.target.classList.contains('m-ov'))e.target.classList.remove('open');});
+
+/* ── TOAST ── */
+function toast(msg,type='in'){
+  const t=document.createElement('div');t.className='toast '+type;
+  t.innerHTML=`<span>${type==='ok'?'✓':type==='er'?'✕':'ℹ'}</span>${msg}`;
+  document.getElementById('toast-box').appendChild(t);
+  setTimeout(()=>t.remove(),5000);
 }
 
-function showCreate() {
-  document.getElementById('createCard').style.display = 'block';
-  document.getElementById('importCard').style.display = 'none';
+/* ── COPY ── */
+function copyTxt(txt){
+  if(!txt||txt==='—'){toast('Nothing to copy','er');return;}
+  navigator.clipboard.writeText(txt).then(()=>toast('Copied!','ok')).catch(()=>{
+    const ta=document.createElement('textarea');ta.value=txt;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);toast('Copied!','ok');
+  });
 }
 
-async function importWallet() {
-  const mnemonic = document.getElementById('mnemonicInput').value.trim();
-  const pass = document.getElementById('importPassword').value;
-  if (pass.length < 8) return alert('Password must be 8+ characters');
-  try {
-    ethers.Wallet.fromMnemonic(mnemonic);
-    const encrypted = encrypt(mnemonic, pass);
-    localStorage.setItem('efc_encrypted_wallet', encrypted);
-    currentPassword = pass;
-    wallet = ethers.Wallet.fromMnemonic(mnemonic).connect(provider);
-    loadDashboard();
-  } catch (e) {
-    alert('Invalid seed phrase');
-  }
+/* ── SET TEXT ── */
+function sT(id,val){const e=document.getElementById(id);if(e)e.textContent=val;}
+
+/* ── WALLET CONNECT ── */
+async function connectWallet(){
+  const eth=window.ethereum;
+  if(!eth){toast('No wallet found. Install MetaMask or open in Trust Wallet browser.','er');return;}
+  try{
+    await eth.request({method:'eth_requestAccounts'});
+    try{await eth.request({method:'wallet_switchEthereumChain',params:[{chainId:BSC_ID}]});}
+    catch(e){if(e.code===4902)await eth.request({method:'wallet_addEthereumChain',params:[{chainId:BSC_ID,chainName:'BNB Smart Chain',nativeCurrency:{name:'BNB',symbol:'BNB',decimals:18},rpcUrls:['https://bsc-dataseed.binance.org/'],blockExplorerUrls:['https://bscscan.com/']}]});}
+    provider=new ethers.BrowserProvider(eth);
+    signer=await provider.getSigner();
+    userAddr=await signer.getAddress();
+    efcContract=new ethers.Contract(EFC,EFC_ABI,signer);
+    onConnected();closeM('m-connect');
+  }catch(e){toast('Connection failed: '+e.message,'er');}
 }
 
-async function loadDashboard() {
-  document.getElementById('walletAddress').textContent = wallet.address;
-  await updateBalances();
-  await fetchPrices();
-  showScreen('dashboardScreen');
+function onConnected(){
+  const sh=userAddr.slice(0,6)+'...'+userAddr.slice(-4);
+  const cb=document.getElementById('conn-btn');if(cb){cb.textContent=sh;cb.classList.add('live');}
+  sT('set-addr',userAddr);sT('d-addr',userAddr);sT('w-addr',userAddr);sT('rcv-addr',userAddr);
+  const db=document.getElementById('d-bscscan');if(db)db.href='https://bscscan.com/address/'+userAddr;
+  const wb=document.getElementById('w-bscscan');if(wb)wb.href='https://bscscan.com/address/'+userAddr;
+  document.getElementById('dash-empty').style.display='none';document.getElementById('dash-live').style.display='block';
+  document.getElementById('wd-empty').style.display='none';document.getElementById('wd-live').style.display='block';
+  const ra=document.getElementById('reg-addr');if(ra&&!ra.value)ra.value=userAddr;
+  toast('Connected: '+sh,'ok');
+  loadBalances();loadClientProfile();
+  const bk=localStorage.getItem('efc_bscscan_key');
+  if(bk){const ki=document.getElementById('bscscan-key');if(ki)ki.value=bk;loadTxHistory('d-tx');loadTxHistory('w-tx');}
 }
 
-async function fetchPrices() {
-  try {
-    const ids = tokens.map(t => t.coingecko).filter(Boolean).join(',');
-    const res = await axios.get(`https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=usd`);
-    tokens.forEach(t => {
-      if (res.data[t.coingecko]) t.price = res.data[t.coingecko].usd;
-    });
-  } catch (e) { console.log('Price fetch failed, using defaults'); }
+function disconnectWallet(){
+  userAddr=null;signer=null;provider=null;efcContract=null;
+  const cb=document.getElementById('conn-btn');if(cb){cb.textContent='Connect Wallet';cb.classList.remove('live');}
+  document.getElementById('dash-empty').style.display='block';document.getElementById('dash-live').style.display='none';
+  document.getElementById('wd-empty').style.display='block';document.getElementById('wd-live').style.display='none';
+  sT('set-addr','Not connected');toast('Disconnected','in');
 }
 
-async function updateBalances() {
-  let total = 0;
-  const list = document.getElementById('tokenList');
-  list.innerHTML = '';
-  
-  for (let token of tokens) {
-    try {
-      let balance = 0;
-      if (token.chain === 'BSC' && token.address.startsWith('0x')) {
-        if (token.symbol === 'BNB') {
-          const bal = await provider.getBalance(wallet.address);
-          balance = parseFloat(ethers.utils.formatEther(bal));
-        } else {
-          const contract = new ethers.Contract(token.address, ERC20_ABI, provider);
-          const [bal, decimals] = await Promise.all([contract.balanceOf(wallet.address), contract.decimals()]);
-          balance = parseFloat(ethers.utils.formatUnits(bal, decimals));
-        }
-      } else if (token.chain === 'BTC') {
-        // BTC balance - simplified. Add real API for production
-        balance = 0; 
+async function switchToBSC(){
+  if(!window.ethereum){toast('No wallet','er');return;}
+  try{await window.ethereum.request({method:'wallet_switchEthereumChain',params:[{chainId:BSC_ID}]});toast('Switched to BSC','ok');}
+  catch(e){toast('Could not switch: '+e.message,'er');}
+}
+
+/* ── BALANCES ── */
+async function loadBalances(){
+  if(!userAddr||!efcContract)return;
+  try{
+    const rpc=provider||new ethers.JsonRpcProvider('https://bsc-dataseed.binance.org/');
+    const [eb,es,er,bb,apy,total,owner]=await Promise.all([
+      efcContract.balanceOf(userAddr).catch(()=>0n),
+      efcContract.staked(userAddr).catch(()=>0n),
+      efcContract.pendingReward(userAddr).catch(()=>0n),
+      rpc.getBalance(userAddr).catch(()=>0n),
+      efcContract.APY().catch(()=>0n),
+      efcContract.totalStaked().catch(()=>0n),
+      efcContract.owner().catch(()=>'—'),
+    ]);
+    const ef=fmtE(eb),sf=fmtE(es),rf=fmtE(er),bf=fmtB(bb),af=apy.toString(),tf=fmtE(total);
+    const usd='≈ $'+(parseFloat(ef)*0.0042).toFixed(2);
+    // Dashboard
+    sT('d-efc',ef+' EFC');sT('d-bnb',bf+' BNB');sT('d-stk',sf+' EFC');sT('d-rew',rf+' EFC');sT('d-apy',af+'% APY');sT('d-usd',usd);
+    // Wallet page
+    sT('w-efc',ef+' EFC');sT('w-bnb',bf+' BNB');sT('w-stk',sf+' EFC');sT('w-rew',rf+' EFC');sT('w-apy',af+'% APY');sT('w-usd',usd);
+    // Token list
+    sT('tl-efc',ef+' EFC');sT('tl-bnb',bf+' BNB');
+    // Portfolio
+    sT('pf-efc',ef+' EFC');sT('pf-stk',sf+' EFC');sT('pf-rew',rf+' EFC');sT('pf-bnb',bf+' BNB');sT('pf-usd',usd);
+    sT('pf-b-efc',ef+' EFC');sT('pf-b-stk',sf+' EFC');sT('pf-b-rew',rf+' EFC');sT('pf-b-bnb',bf+' BNB');sT('pf-owner',owner.slice(0,10)+'...');
+    // Staking page
+    sT('stk-now',sf+' EFC');sT('stk-rew',rf+' EFC');sT('pool-total',tf+' EFC');sT('pool-apy',af+'%');
+    // Client profile
+    sT('cl-p-efc',ef+' EFC');sT('cl-p-stk',sf+' EFC');
+    updateStakeEst();syncClientBal(ef,sf);
+  }catch(e){console.error('loadBalances:',e);}
+}
+function fmtE(v){return parseFloat(ethers.formatEther(v)).toLocaleString(undefined,{maximumFractionDigits:4});}
+function fmtB(v){return parseFloat(ethers.formatEther(v)).toFixed(5);}
+
+/* ── TX MODAL ── */
+function txConfirm(title,sub,detail,cb){
+  sT('tx-h',title);sT('tx-s',sub);
+  document.getElementById('tx-d').innerHTML=detail.replace(/\n/g,'<br>');
+  const btn=document.getElementById('tx-ok-btn');
+  btn.onclick=async function(){
+    btn.textContent='⌛ Sign in wallet...';btn.disabled=true;
+    try{await cb();closeM('m-tx');}catch(e){toast('Error: '+e.message,'er');}
+    btn.textContent='Sign & Confirm';btn.disabled=false;
+  };
+  openM('m-tx');
+}
+function requireW(){if(!userAddr){openM('m-connect');toast('Connect wallet first','in');return false;}return true;}
+
+/* ── SEND EFC ── */
+async function doSendEFC(){
+  if(!requireW())return;
+  const to=document.getElementById('send-to').value.trim();
+  const amt=document.getElementById('send-amt').value.trim();
+  if(!to||!ethers.isAddress(to)){toast('Enter a valid recipient address','er');return;}
+  if(!amt||parseFloat(amt)<=0){toast('Enter a valid amount','er');return;}
+  txConfirm('Send EFC','Sending '+amt+' EFC to '+to.slice(0,8)+'...','To: '+to+'\nAmount: '+amt+' EFC\nFee: 3% (2% treasury + 1% liquidity)',async()=>{
+    const t=await efcContract.transfer(to,ethers.parseEther(amt));await t.wait();
+    toast('✓ Sent '+amt+' EFC!','ok');
+    document.getElementById('send-to').value='';document.getElementById('send-amt').value='';loadBalances();
+  });
+}
+
+/* ── SEND BNB ── */
+async function doSendBNB(){
+  if(!requireW())return;
+  const to=document.getElementById('send-bnb-to').value.trim();
+  const amt=document.getElementById('send-bnb-amt').value.trim();
+  if(!to||!ethers.isAddress(to)){toast('Enter valid address','er');return;}
+  if(!amt||parseFloat(amt)<=0){toast('Enter amount','er');return;}
+  txConfirm('Send BNB','Sending '+amt+' BNB','To: '+to+'\nAmount: '+amt+' BNB',async()=>{
+    const tx=await signer.sendTransaction({to,value:ethers.parseEther(amt)});await tx.wait();
+    toast('✓ Sent '+amt+' BNB!','ok');
+    document.getElementById('send-bnb-to').value='';document.getElementById('send-bnb-amt').value='';loadBalances();
+  });
+}
+
+/* ── P2P ── */
+async function resolveP2P(){
+  const val=document.getElementById('p2p-to').value.trim();
+  const res=document.getElementById('p2p-res');
+  if(ethers.isAddress(val)){res.style.display='block';res.style.color='var(--green)';res.textContent='✓ Valid BSC wallet address';return;}
+  if(val.startsWith('EFC-')&&window.__fbReady){
+    try{
+      const {db,collection,query,where,getDocs}=fb();
+      const q=query(collection(db,'clients'),where('id','==',val));
+      const snap=await getDocs(q);
+      if(!snap.empty){
+        const c=snap.docs[0].data();
+        document.getElementById('p2p-to').value=c.wallet;
+        res.style.display='block';res.style.color='var(--green)';
+        res.textContent='✓ Found: '+c.name+' ('+c.wallet.slice(0,8)+'...'+c.wallet.slice(-4)+')';return;
       }
-      
-      const valueUSD = balance * token.price;
-      const valueLocal = valueUSD * FX_RATES[currentCurrency];
-      total += valueUSD;
-      
-      list.innerHTML += `
-        <div class="coin-item" onclick="openCoinDashboard('${token.symbol}')">
-          <div class="coin-left">
-            <img src="${token.logo}" class="coin-logo">
-            <div>
-              <div style="font-weight: 700;">${token.name} <span class="coin-chain">${token.chain}</span></div>
-              <div style="color: #888; font-size: 13px;">${token.symbol}</div>
-            </div>
-          </div>
-          <div style="text-align: right;">
-            <div style="font-weight: 700;">${balance.toFixed(4)}</div>
-            <div style="color: #888; font-size: 13px;">${formatCurrency(valueLocal)}</div>
-          </div>
-        </div>
-      `;
-    } catch (e) { console.error(e); }
+    }catch(e){console.error(e);}
   }
-  document.getElementById('totalValue').textContent = '$' + total.toFixed(2);
-  document.getElementById('totalValueLocal').textContent = formatCurrency(total * FX_RATES[currentCurrency]);
+  res.style.display='block';res.style.color='var(--red-l)';res.textContent='✗ Not found — enter wallet address directly';
 }
 
-function formatCurrency(val) {
-  const symbols = { USD: '$', NGN: '₦', GHS: '₵', KES: 'KSh', ZAR: 'R', EUR: '€', GBP: '£', INR: '₹', CNY: '¥' };
-  return (symbols[currentCurrency] || '$') + val.toFixed(2);
+async function doP2P(){
+  if(!requireW())return;
+  const to=document.getElementById('p2p-to').value.trim();
+  const amt=document.getElementById('p2p-amt').value.trim();
+  const note=document.getElementById('p2p-note').value.trim();
+  if(!to||!ethers.isAddress(to)){toast('Resolve recipient first','er');return;}
+  if(!amt||parseFloat(amt)<=0){toast('Enter amount','er');return;}
+  txConfirm('P2P Transfer','Sending '+amt+' EFC','To: '+to+'\nAmount: '+amt+' EFC'+(note?'\nNote: '+note:''),async()=>{
+    const t=await efcContract.transfer(to,ethers.parseEther(amt));await t.wait();
+    toast('✓ P2P sent '+amt+' EFC!','ok');
+    p2pHistory.unshift({to,amt,note,time:new Date().toLocaleTimeString()});renderP2P();
+    document.getElementById('p2p-to').value='';document.getElementById('p2p-amt').value='';
+    document.getElementById('p2p-note').value='';document.getElementById('p2p-res').style.display='none';
+    loadBalances();
+  });
+}
+function renderP2P(){
+  const el=document.getElementById('p2p-hist');
+  if(!p2pHistory.length){el.innerHTML='<div class="empty">No P2P transactions yet</div>';return;}
+  el.innerHTML=p2pHistory.slice(0,10).map(r=>`<div class="tx-row"><div class="tx-ic snt">📤</div><div class="tx-body"><div class="tx-type">Sent P2P</div><div class="tx-hash">${r.to.slice(0,10)}...${r.note?' · '+r.note:''}</div></div><div class="tx-right"><div class="tx-amt" style="color:var(--red-l)">-${r.amt} EFC</div><div class="tx-time">${r.time}</div></div></div>`).join('');
 }
 
-function lockWallet() {
-  wallet = null;
-  currentPassword = null;
-  showScreen('setupScreen');
-  document.getElementById('createCard').style.display = 'none';
-  document.getElementById('unlockCard').style.display = 'block';
+/* ── STAKING ── */
+function selectTier(idx,el){
+  const apys=[12,28,45,65],names=['Seed','Growth','LP Farm','Sovereign'];
+  selectedTierAPY=apys[idx];
+  document.querySelectorAll('.tier-card').forEach(c=>c.classList.remove('sel'));
+  if(el)el.classList.add('sel');
+  sT('tier-badge',names[idx]+' · '+apys[idx]+'% APY');
+  updateStakeEst();toast(names[idx]+' selected — '+apys[idx]+'% APY','in');
+}
+function updateStakeEst(){
+  const a=parseFloat(document.getElementById('stk-amt')?.value||0);
+  sT('stk-est',a>0?(a*selectedTierAPY/100).toFixed(4)+' EFC/year':'—');
+}
+async function doStake(){
+  if(!requireW())return;
+  const amt=document.getElementById('stk-amt').value.trim();
+  if(!amt||parseFloat(amt)<=0){toast('Enter amount','er');return;}
+  txConfirm('Stake EFC','Locking '+amt+' EFC for '+selectedTierAPY+'% APY','Amount: '+amt+' EFC\nTier: '+selectedTierAPY+'% APY\nFee note: 3% on transfer applies',async()=>{
+    const a=await efcContract.approve(EFC,ethers.parseEther(amt));await a.wait();
+    const t=await efcContract.deposit(ethers.parseEther(amt));await t.wait();
+    toast('✓ Staked '+amt+' EFC!','ok');loadBalances();
+  });
+}
+async function doUnstake(){
+  if(!requireW())return;
+  const amt=document.getElementById('stk-amt').value.trim();
+  if(!amt||parseFloat(amt)<=0){toast('Enter amount to unstake','er');return;}
+  txConfirm('Unstake EFC','Withdrawing '+amt+' EFC from pool','Amount: '+amt+' EFC',async()=>{
+    const t=await efcContract.withdraw(ethers.parseEther(amt));await t.wait();
+    toast('✓ Unstaked '+amt+' EFC','ok');loadBalances();
+  });
+}
+async function doClaimRewards(){
+  if(!requireW())return;
+  txConfirm('Claim Rewards','Claiming all pending EFC rewards','Rewards sent directly to your wallet',async()=>{
+    const t=await efcContract.claimRewards();await t.wait();
+    toast('✓ Rewards claimed!','ok');loadBalances();
+  });
 }
 
-function copyAddress() {
-  navigator.clipboard.writeText(wallet.address);
-  alert('Address copied!');
+/* ── AIRDROP ── */
+async function doUniformAirdrop(){
+  if(!requireW())return;
+  const raw=document.getElementById('air-u-recs').value.trim();
+  const amt=document.getElementById('air-u-amt').value.trim();
+  const addrs=raw.split('\n').map(a=>a.trim()).filter(a=>a&&ethers.isAddress(a));
+  if(!addrs.length){toast('No valid addresses','er');return;}
+  if(!amt||parseFloat(amt)<=0){toast('Enter amount','er');return;}
+  txConfirm('Uniform Airdrop',addrs.length+' recipients × '+amt+' EFC each','Recipients: '+addrs.length+'\nTotal: '+(addrs.length*parseFloat(amt)).toFixed(2)+' EFC',async()=>{
+    const w=ethers.parseEther(amt);const tot=ethers.parseEther((addrs.length*parseFloat(amt)).toString());
+    const a=await efcContract.approve(EFC,tot);await a.wait();
+    const t=await efcContract.airdrop(addrs,w);await t.wait();
+    toast('✓ Airdropped to '+addrs.length+' wallets','ok');
+  });
+}
+async function doVariedAirdrop(){
+  if(!requireW())return;
+  const raw=document.getElementById('air-v-data').value.trim();
+  const lines=raw.split('\n').map(l=>l.trim()).filter(Boolean);
+  const addrs=[],amts=[];
+  for(const l of lines){const[a,v]=l.split(',').map(s=>s.trim());if(!ethers.isAddress(a)){toast('Bad address: '+a,'er');return;}addrs.push(a);amts.push(ethers.parseEther(v));}
+  if(!addrs.length){toast('No valid pairs','er');return;}
+  txConfirm('Varied Airdrop',addrs.length+' recipients with custom amounts','',async()=>{
+    const t=await efcContract.airdropVaried(addrs,amts);await t.wait();toast('✓ Varied airdrop done','ok');
+  });
 }
 
-function resetWallet() {
-  if (confirm('Delete wallet from device? You MUST have 12 words saved.')) {
-    localStorage.removeItem('efc_encrypted_wallet');
-    location.reload();
-  }
+/* ── TX HISTORY ── */
+function saveBscscanKey(){
+  const k=document.getElementById('bscscan-key').value.trim();
+  if(!k){toast('Enter API key','er');return;}
+  localStorage.setItem('efc_bscscan_key',k);toast('API key saved!','ok');
+  loadTxHistory('d-tx');loadTxHistory('w-tx');
+}
+async function loadTxHistory(elId){
+  if(!userAddr)return;
+  const key=localStorage.getItem('efc_bscscan_key');
+  const el=document.getElementById(elId);if(!el)return;
+  if(!key){el.innerHTML='<div class="empty">Save your free BSCScan API key in Dashboard to see transactions</div>';return;}
+  el.innerHTML='<div class="empty">Loading...</div>';
+  try{
+    const url=`https://api.bscscan.com/api?module=account&action=tokentx&contractaddress=${EFC}&address=${userAddr}&page=1&offset=20&sort=desc&apikey=${key}`;
+    const r=await fetch(url);const d=await r.json();
+    if(d.status!=='1'||!d.result?.length){el.innerHTML='<div class="empty">No EFC transactions found yet. Buy or receive EFC to see history here.</div>';return;}
+    el.innerHTML=d.result.map(tx=>{
+      const isIn=tx.to.toLowerCase()===userAddr.toLowerCase();
+      const val=(Number(tx.value)/1e18).toLocaleString(undefined,{maximumFractionDigits:4});
+      const date=new Date(Number(tx.timeStamp)*1000).toLocaleDateString();
+      return `<div class="tx-row"><div class="tx-ic ${isIn?'rcv':'snt'}">${isIn?'📥':'📤'}</div><div class="tx-body"><div class="tx-type">${isIn?'Received':'Sent'}</div><div class="tx-hash">${isIn?'From: '+tx.from.slice(0,10)+'...':'To: '+tx.to.slice(0,10)+'...'}</div></div><div class="tx-right"><div class="tx-amt" style="color:${isIn?'var(--green)':'var(--red-l)'}">${isIn?'+':'-'}${val} EFC</div><div class="tx-time">${date}</div></div></div>`;
+    }).join('')+'<div style="text-align:center;padding:10px"><a href="https://bscscan.com/address/'+userAddr+'" target="_blank" class="small-lk">View all on BSCScan ↗</a></div>';
+  }catch(e){el.innerHTML='<div class="empty">Error: '+e.message+'</div>';}
 }
 
-function openCoinDashboard(symbol) {
-  currentToken = tokens.find(t => t.symbol === symbol);
-  document.getElementById('coinLogo').src = currentToken.logo;
-  document.getElementById('coinName').textContent = currentToken.name;
-  document.getElementById('coinSymbol').textContent = currentToken.symbol + ' • ' + currentToken.chain;
-  updateCoinDashboard();
-  showScreen('coinScreen');
+/* ── TOKEN IMPORT ── */
+async function importToken(){
+  if(!userAddr){toast('Connect wallet first','er');return;}
+  const addr=document.getElementById('imp-token-addr').value.trim();
+  if(!ethers.isAddress(addr)){toast('Enter valid contract address','er');return;}
+  if(importedTks.find(t=>t.addr.toLowerCase()===addr.toLowerCase())){toast('Already imported','in');return;}
+  try{
+    const minABI=['function name() view returns(string)','function symbol() view returns(string)','function decimals() view returns(uint8)','function balanceOf(address) view returns(uint256)'];
+    const rpc=provider||new ethers.JsonRpcProvider('https://bsc-dataseed.binance.org/');
+    const con=new ethers.Contract(addr,minABI,rpc);
+    const [name,sym,dec,bal]=await Promise.all([con.name(),con.symbol(),con.decimals(),con.balanceOf(userAddr)]);
+    const balF=parseFloat(ethers.formatUnits(bal,dec)).toFixed(4);
+    importedTks.push({addr,name,sym,balF});
+    document.getElementById('imported-tokens').innerHTML+=`<div class="token-row"><div class="token-ico" style="background:linear-gradient(135deg,var(--bdr2),var(--surf2));font-size:9px">${sym.slice(0,4)}</div><div style="flex:1"><div class="tk-sym">${sym}</div><div class="tk-name">${name}</div></div><div class="tk-bal">${balF} ${sym}</div></div>`;
+    document.getElementById('imp-token-addr').value='';toast('✓ Imported '+sym,'ok');
+  }catch(e){toast('Could not load token — check address on BSCScan','er');}
 }
 
-async function updateCoinDashboard() {
-  let balance = 0;
-  if (currentToken.symbol === 'BNB') {
-    const bal = await provider.getBalance(wallet.address);
-    balance = parseFloat(ethers.utils.formatEther(bal));
-  } else if (currentToken.address.startsWith('0x')) {
-    const contract = new ethers.Contract(currentToken.address, ERC20_ABI, provider);
-    const [bal, decimals] = await Promise.all([contract.balanceOf(wallet.address), contract.decimals()]);
-    balance = parseFloat(ethers.utils.formatUnits(bal, decimals));
-  }
-  
-  const valueUSD = balance * currentToken.price;
-  document.getElementById('coinBalance').textContent = balance.toFixed(4) + ' ' + currentToken.symbol;
-  document.getElementById('coinValue').textContent = formatCurrency(valueUSD * FX_RATES[currentCurrency]);
-  
-  // Load chart
-  loadPriceChart();
-  // Load TX history
-  loadTxHistory();
+/* ── WALLET GENERATOR ── */
+function generateWallet(){
+  try{
+    const w=ethers.Wallet.createRandom();_genWallet=w;
+    document.getElementById('gen-addr').textContent=w.address;
+    document.getElementById('gen-pk').textContent=w.privateKey;
+    const words=(w.mnemonic?.phrase||'').split(' ');
+    document.getElementById('seed-words').innerHTML=words.map((wd,i)=>`<div class="seed-w"><div class="sw-n">${i+1}.</div><div class="sw-t">${wd}</div></div>`).join('');
+    document.getElementById('gen-start').style.display='none';
+    document.getElementById('gen-result').style.display='block';
+    const qd=document.getElementById('gen-qr');qd.innerHTML='';
+    try{new QRCode(qd,{text:w.address,width:130,height:130,colorDark:'#D4A843',colorLight:'#ffffff'});}catch(e){}
+    toast('✓ Wallet generated! Write down your 12 words NOW.','ok');
+  }catch(e){toast('Error: '+e.message,'er');}
+}
+function copySeed(){if(_genWallet)copyTxt(_genWallet.mnemonic?.phrase||'');}
+function useGenWallet(){
+  if(!_genWallet){toast('Generate wallet first','er');return;}
+  userAddr=_genWallet.address;
+  const rpc=new ethers.JsonRpcProvider('https://bsc-dataseed.binance.org/');
+  signer=_genWallet.connect(rpc);efcContract=new ethers.Contract(EFC,EFC_ABI,signer);
+  onConnected();goPage('wallet');goTab('wd-dash',null);
+  toast('✓ Wallet connected! Import into MetaMask/Trust Wallet using your seed phrase for real transactions.','ok');
 }
 
-async function loadPriceChart() {
-  try {
-    const res = await axios.get(`https://api.coingecko.com/api/v3/coins/${currentToken.coingecko}/market_chart?vs_currency=usd&days=7`);
-    const prices = res.data.prices.map(p => p[1]);
-    const labels = res.data.prices.map(p => new Date(p[0]).toLocaleDateString());
-    
-    if (priceChart) priceChart.destroy();
-    const ctx = document.getElementById('priceChart').getContext('2d');
-    priceChart = new Chart(ctx, {
-      type: 'line',
-      data: { labels, datasets: [{ data: prices, borderColor: '#F0B90B', borderWidth: 2, tension: 0.4, pointRadius: 0 }] },
-      options: { plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { display: false } } }
+function importByPhrase(){
+  const p=document.getElementById('imp-phrase').value.trim();
+  if(!p){toast('Enter seed phrase','er');return;}
+  try{
+    const w=ethers.Wallet.fromPhrase(p);_impWallet=w;
+    document.getElementById('phrase-addr').textContent=w.address;
+    document.getElementById('phrase-result').style.display='block';
+    toast('✓ Valid seed phrase! Click Connect to activate.','ok');
+  }catch(e){toast('Invalid seed phrase — check all words and spacing','er');}
+}
+function importByKey(){
+  const pk=document.getElementById('imp-pk').value.trim();
+  if(!pk){toast('Enter private key','er');return;}
+  try{
+    const w=new ethers.Wallet(pk);_impWallet=w;
+    document.getElementById('key-addr').textContent=w.address;
+    document.getElementById('key-result').style.display='block';
+    toast('✓ Valid key! Click Connect to activate.','ok');
+  }catch(e){toast('Invalid private key','er');}
+}
+function useImpWallet(){
+  if(!_impWallet){toast('Import wallet first','er');return;}
+  userAddr=_impWallet.address;
+  const rpc=new ethers.JsonRpcProvider('https://bsc-dataseed.binance.org/');
+  signer=_impWallet.connect(rpc);efcContract=new ethers.Contract(EFC,EFC_ABI,signer);
+  onConnected();goPage('wallet');goTab('wd-dash',null);
+  toast('✓ Wallet connected from import!','ok');
+}
+
+function genReceiveQR(){
+  if(!userAddr)return;
+  const box=document.getElementById('rcv-qr');
+  if(box&&!box.querySelector('canvas')){box.innerHTML='';try{new QRCode(box,{text:userAddr,width:150,height:150,colorDark:'#D4A843',colorLight:'#ffffff'});}catch(e){}}
+  sT('rcv-addr',userAddr);
+}
+function genQRCode(){
+  const addr=document.getElementById('qr-addr').value.trim();
+  if(!ethers.isAddress(addr)){toast('Enter valid address','er');return;}
+  const box=document.getElementById('qr-box');box.innerHTML='';
+  try{new QRCode(box,{text:addr,width:150,height:150,colorDark:'#D4A843',colorLight:'#ffffff'});}catch(e){}
+  document.getElementById('qr-result').style.display='block';
+}
+function shareAddr(){
+  const addr=userAddr||document.getElementById('rcv-addr').textContent;
+  if(!addr||addr.includes('Connect')){toast('Connect wallet first','er');return;}
+  if(navigator.share)navigator.share({title:'My EFC Wallet',text:'Send EFC to: '+addr,url:'https://efikcoin.xyz'}).catch(()=>{});
+  else copyTxt(addr);
+}
+
+/* ── CLIENTS ── */
+async function registerClient(){
+  const nm=document.getElementById('reg-name').value.trim();
+  const em=document.getElementById('reg-email').value.trim();
+  const cn=document.getElementById('reg-country').value.trim();
+  const wa=(document.getElementById('reg-addr').value.trim())||userAddr||'';
+  const src=document.getElementById('reg-src').value;
+  if(!nm){toast('Enter your name','er');return;}
+  if(!em||!em.includes('@')){toast('Enter valid email','er');return;}
+  if(!wa||!ethers.isAddress(wa)){toast('Enter a valid wallet address or connect your wallet first','er');return;}
+  const ready=await waitFB();
+  if(!ready){toast('Cloud database unavailable — check internet connection','er');return;}
+  try{
+    const {db,collection,getDocs,query,where,doc,setDoc}=fb();
+    const q=query(collection(db,'clients'),where('walletLower','==',wa.toLowerCase()));
+    const snap=await getDocs(q);
+    if(!snap.empty){toast('Already registered — loading profile','in');localStorage.setItem('efc_pid',snap.docs[0].data().id);loadClientProfile();return;}
+    const id='EFC-'+Math.random().toString(36).substr(2,6).toUpperCase();
+    const profile={id,name:nm,email:em,country:cn,wallet:wa,walletLower:wa.toLowerCase(),source:src,joined:new Date().toISOString(),lastBal:'0',lastStk:'0',blocked:false,notifications:[]};
+    await setDoc(doc(db,'clients',id),profile);
+    localStorage.setItem('efc_pid',id);
+    toast('✓ Welcome to EFC, '+nm+'!','ok');showProfile(profile);
+  }catch(e){toast('Registration failed: '+e.message,'er');}
+}
+
+async function loadClientProfile(){
+  const id=localStorage.getItem('efc_pid');if(!id)return;
+  const ready=await waitFB();if(!ready)return;
+  try{const {db,doc,getDoc}=fb();const snap=await getDoc(doc(db,'clients',id));if(snap.exists())showProfile(snap.data());}catch(e){console.error(e);}
+}
+
+function showProfile(p){
+  document.getElementById('cl-reg-form').style.display='none';
+  document.getElementById('cl-blocked').style.display='none';
+  if(p.blocked){document.getElementById('cl-blocked').style.display='block';return;}
+  document.getElementById('cl-profile').style.display='block';
+  sT('cl-prof-name',p.name||'My Profile');sT('cl-prof-id',p.id||'—');
+  sT('cl-p-email',p.email||'—');sT('cl-p-country',p.country||'—');
+  sT('cl-p-wallet',(p.wallet||'—').slice(0,12)+'...'+(p.wallet||'').slice(-6));
+  sT('cl-p-joined',p.joined?new Date(p.joined).toLocaleDateString():'—');
+  sT('cl-p-efc',(p.lastBal||'0')+' EFC');sT('cl-p-stk',(p.lastStk||'0')+' EFC');
+  const bl=document.getElementById('cl-bscscan');if(bl)bl.href='https://bscscan.com/address/'+(p.wallet||'');
+  const unread=(p.notifications||[]).filter(n=>!n.read).length;
+  const badge=document.getElementById('notif-badge');if(badge){badge.textContent=unread;badge.style.display=unread?'inline':'none';}
+}
+
+function editProfile(){
+  document.getElementById('cl-profile').style.display='none';
+  document.getElementById('cl-reg-form').style.display='block';
+  const id=localStorage.getItem('efc_pid');if(!id)return;
+  waitFB().then(ok=>{if(!ok)return;const {db,doc,getDoc}=fb();getDoc(doc(db,'clients',id)).then(snap=>{if(snap.exists()){const p=snap.data();['reg-name','reg-email','reg-country','reg-addr'].forEach((fid,i)=>{const el=document.getElementById(fid);if(el)el.value=[p.name,p.email,p.country,p.wallet][i]||'';});}});});
+}
+
+async function deleteProfile(){
+  if(!confirm('Delete your EFC profile? This cannot be undone.'))return;
+  const id=localStorage.getItem('efc_pid');
+  if(id&&window.__fbReady){try{const {db,doc,updateDoc}=fb();await updateDoc(doc(db,'clients',id),{deleted:true});}catch(e){}}
+  localStorage.removeItem('efc_pid');
+  document.getElementById('cl-profile').style.display='none';
+  document.getElementById('cl-reg-form').style.display='block';
+  toast('Profile deleted','in');
+}
+
+async function syncClientBal(ef,sf){
+  const id=localStorage.getItem('efc_pid');if(!id||!window.__fbReady)return;
+  try{const {db,doc,updateDoc}=fb();await updateDoc(doc(db,'clients',id),{lastBal:ef,lastStk:sf,lastUpdate:Date.now()});}catch(e){}
+}
+
+async function loadAllClients(){
+  const el=document.getElementById('cl-all-list');el.innerHTML='<div class="empty">Loading...</div>';
+  const ready=await waitFB();if(!ready){el.innerHTML='<div class="empty">Cloud unavailable</div>';return;}
+  try{
+    const {db,collection,getDocs}=fb();const snap=await getDocs(collection(db,'clients'));
+    const all=[];snap.forEach(d=>{const data=d.data();if(!data.deleted)all.push(data);});
+    if(!all.length){el.innerHTML='<div class="empty">No members yet — be the first!</div>';return;}
+    el.innerHTML=all.map(c=>`<div class="cl-row"><div><div class="cl-nm">${c.name||'—'}</div><div class="cl-id">${c.id||''} · ${c.country||''}</div></div><div class="cl-addr">${(c.wallet||'').slice(0,8)}...${(c.wallet||'').slice(-4)}</div><div>${c.lastBal||'0'} EFC</div><div style="font-size:.72rem;color:var(--muted)">${c.joined?new Date(c.joined).toLocaleDateString():'—'}</div><a href="https://bscscan.com/address/${c.wallet}" target="_blank" class="btn-o" style="font-size:7.5px;padding:4px 8px">↗</a></div>`).join('');
+  }catch(e){el.innerHTML='<div class="empty">Error: '+e.message+'</div>';}
+}
+
+async function loadInbox(){
+  const id=localStorage.getItem('efc_pid');const el=document.getElementById('cl-inbox');
+  if(!id){el.innerHTML='<div class="empty">Register a profile to receive messages</div>';return;}
+  const ready=await waitFB();if(!ready)return;
+  try{
+    const {db,doc,getDoc,updateDoc}=fb();const snap=await getDoc(doc(db,'clients',id));
+    if(!snap.exists()){el.innerHTML='<div class="empty">No messages yet</div>';return;}
+    const p=snap.data();const notes=(p.notifications||[]).slice().reverse();
+    if(!notes.length){el.innerHTML='<div class="empty">No messages yet — admin updates will appear here</div>';return;}
+    el.innerHTML=notes.map(n=>`<div class="notif-row"><div class="notif-txt">${n.text}</div><div class="notif-time">${new Date(n.time).toLocaleString()}</div></div>`).join('');
+    await updateDoc(doc(db,'clients',id),{notifications:(p.notifications||[]).map(n=>({...n,read:true}))}).catch(()=>{});
+    const badge=document.getElementById('notif-badge');if(badge){badge.style.display='none';}
+  }catch(e){el.innerHTML='<div class="empty">Error: '+e.message+'</div>';}
+}
+
+/* ── IPFS LOGO ── */
+function loadLogo(){
+  const img=document.getElementById('hero-img');
+  const cid='bafybeihrzyodihyp5met2hs32ppj37qlowuxarvs2lnlrgujgrlwxc7fwe';
+  const gws=['https://ipfs.io/ipfs/','https://cloudflare-ipfs.com/ipfs/','https://gateway.pinata.cloud/ipfs/'];
+  let gi=0;
+  function tryNext(){if(gi>=gws.length)return;img.src=gws[gi++]+cid;img.onerror=tryNext;img.onload=()=>{img.style.display='block';const fb=document.getElementById('coin-fb');if(fb)fb.style.display='none';};}
+  tryNext();
+}
+
+/* ── LANGUAGE ── */
+const T={
+  en:{nav_home:'Home',nav_dash:'Dashboard',nav_wallet:'Wallet',nav_stake:'Staking',nav_airdrop:'Airdrop',nav_portfolio:'Portfolio',nav_clients:'Clients',nav_settings:'Settings',connect:'Connect Wallet',hero_tag:'⬡ BEP-20 · BSC · Global Charity Ecosystem 🕊️',hero_title:'The Wallet That <span class="acc">Gives Back</span> to the World',hero_sub:"Efikcoin EFC — the people's token. Stake. Earn. Send. Give. For every person, in every nation.",btn_launch:'🚀 Launch DApp',btn_buy:'🥞 Buy EFC',btn_charity:'🕊️ Charity Portal',feat_title:'Why <span class="acc">Efikcoin?</span>',feat1_t:'Real Staking Rewards',feat1_d:'Earn 12%–65% APY on-chain.',feat2_t:'Built-in Charity',feat2_d:'Every tx feeds the treasury — food, school, healthcare.',feat3_t:'Global P2P Payments',feat3_d:'Send EFC to anyone, anywhere, instantly.',feat4_t:'Self-Custody Wallet',feat4_d:'Generate a wallet here. Your keys stay with you.',feat5_t:'Live Portfolio Tracker',feat5_d:'Balances, staking, rewards — all live.',feat6_t:'BSC Speed & Low Fees',feat6_d:'Seconds to confirm. Fractions of a cent.',community_title:'Join the <span class="acc">Movement</span>',stake_title:'Stake EFC &amp; <span class="acc">Earn Rewards</span>',stake_sub:'Lock EFC to earn passive income from the treasury pool.',dash_title:'My <span class="acc">EFC Dashboard</span>',dash_empty:'Connect your wallet to view live balances and history.',wallet_title:'EFC <span class="acc">Wallet Centre</span>',footer_tagline:'Coin is life, and life is coin. Building a world where every person can thrive.',footer_copy:'© 2025 Efikcoin Eternal Ecosystem · Built for Humanity 🕊️'},
+  fr:{nav_home:'Accueil',nav_dash:'Tableau',nav_wallet:'Portefeuille',nav_stake:'Staking',nav_airdrop:'Airdrop',nav_portfolio:'Portfolio',nav_clients:'Clients',nav_settings:'Paramètres',connect:'Connecter',hero_tag:'⬡ BEP-20 · BSC · Écosystème de Charité Mondial 🕊️',hero_title:'Le Portefeuille Qui <span class="acc">Redonne</span> au Monde',hero_sub:"Efikcoin EFC — le token du peuple. Stakez. Gagnez. Envoyez. Donnez.",btn_launch:'🚀 Lancer DApp',btn_buy:'🥞 Acheter EFC',btn_charity:'🕊️ Portail Caritatif',feat_title:'Pourquoi <span class="acc">Efikcoin?</span>',feat1_t:'Vraies Récompenses',feat1_d:'Gagnez 12%–65% APY.',feat2_t:'Charité Intégrée',feat2_d:'Chaque tx finance la nourriture, l\'école, la santé.',feat3_t:'Paiements P2P Mondiaux',feat3_d:'Envoyez à n\'importe qui, n\'importe où.',feat4_t:'Portefeuille Auto-Gardien',feat4_d:'Générez ici. Vos clés restent avec vous.',feat5_t:'Portefeuille en Direct',feat5_d:'Soldes, staking, récompenses — tout live.',feat6_t:'Vitesse BSC',feat6_d:'Confirmations en secondes.',community_title:'Rejoindre le <span class="acc">Mouvement</span>',stake_title:'Stakez EFC &amp; <span class="acc">Gagnez</span>',stake_sub:'Verrouillez EFC pour revenus passifs.',footer_tagline:'La pièce est la vie, et la vie est la pièce.',footer_copy:'© 2025 Efikcoin Eternal Ecosystem 🕊️'},
+  es:{nav_home:'Inicio',nav_dash:'Panel',nav_wallet:'Billetera',nav_stake:'Staking',nav_airdrop:'Airdrop',nav_portfolio:'Portafolio',nav_clients:'Clientes',nav_settings:'Config',connect:'Conectar',hero_title:'La Billetera Que <span class="acc">Devuelve</span> al Mundo',hero_sub:'Efikcoin EFC — el token del pueblo. Stakea. Gana. Envía. Da.',btn_launch:'🚀 Iniciar DApp',btn_buy:'🥞 Comprar EFC',btn_charity:'🕊️ Caridad',feat_title:'¿Por qué <span class="acc">Efikcoin?</span>',community_title:'Únete al <span class="acc">Movimiento</span>',stake_title:'Stakea EFC &amp; <span class="acc">Gana</span>',footer_copy:'© 2025 Efikcoin Eternal Ecosystem 🕊️'},
+  pt:{nav_home:'Início',nav_dash:'Painel',nav_wallet:'Carteira',nav_stake:'Staking',nav_airdrop:'Airdrop',nav_portfolio:'Portfólio',nav_clients:'Clientes',nav_settings:'Config',connect:'Conectar',hero_title:'A Carteira Que <span class="acc">Devolve</span> ao Mundo',hero_sub:'Efikcoin EFC — o token do povo. Stake. Ganhe. Envie. Doe.',btn_launch:'🚀 Iniciar',btn_buy:'🥞 Comprar EFC',btn_charity:'🕊️ Caridade',feat_title:'Por que <span class="acc">Efikcoin?</span>',community_title:'Junte-se ao <span class="acc">Movimento</span>',stake_title:'Stake EFC &amp; <span class="acc">Ganhe</span>',footer_copy:'© 2025 Efikcoin Eternal Ecosystem 🕊️'},
+  ha:{nav_home:'Gida',nav_dash:'Dashboard',nav_wallet:'Walat',nav_stake:'Staking',nav_airdrop:'Airdrop',nav_portfolio:'Portfolio',nav_clients:'Abokan ciniki',nav_settings:'Saitunan',connect:'Haɗa Walat',hero_title:'Walat da ke <span class="acc">Mayar da Baya</span> ga Duniya',hero_sub:"EFC — token na al'umma. Sanya. Samu. Aika. Bawa.",btn_launch:'🚀 Fara DApp',btn_buy:'🥞 Siya EFC',btn_charity:'🕊️ Sadaka',feat_title:'Me ya sa <span class="acc">Efikcoin?</span>',community_title:'Shiga <span class="acc">Al\'umma</span>',stake_title:'Sanya EFC &amp; <span class="acc">Samu</span>',footer_copy:'© 2025 Efikcoin Eternal Ecosystem 🕊️'},
+  yo:{nav_home:'Ile',nav_dash:'Dashboard',nav_wallet:'Apamọwọ',nav_stake:'Staking',nav_airdrop:'Airdrop',nav_portfolio:'Portfolio',nav_clients:'Awọn alabara',nav_settings:'Eto',connect:'Sopọ Apamọwọ',hero_title:'Apamọwọ Ti <span class="acc">Ń Pada</span> Fun Aye',hero_sub:'EFC — ami owo eniyan. Stake. Gba. Firanṣẹ. Fun.',btn_launch:'🚀 Bẹrẹ DApp',btn_buy:'🥞 Ra EFC',btn_charity:'🕊️ Idariji',feat_title:'Kilode ti <span class="acc">Efikcoin?</span>',community_title:'Darapọ mọ <span class="acc">Agbegbe</span>',stake_title:'Stake EFC &amp; <span class="acc">Gba Ẹsan</span>',footer_copy:'© 2025 Efikcoin Eternal Ecosystem 🕊️'},
+  ig:{nav_home:'Ụlọ',nav_dash:'Dashboard',nav_wallet:'Akpa ego',nav_stake:'Staking',nav_airdrop:'Airdrop',nav_portfolio:'Portfolio',nav_clients:'Ndị ahịa',nav_settings:'Ntọala',connect:'Jikọọ Akpa ego',hero_title:'Akpa Ego Nke <span class="acc">Na-Azaghachi</span> Ụwa',hero_sub:'EFC — token nke ndị mmadụ. Stake. Nweta. Zipu. Nye.',btn_launch:'🚀 Malite DApp',btn_buy:'🥞 Zụta EFC',btn_charity:'🕊️ Ọrụ ezi obi',feat_title:'Gịnị mere <span class="acc">Efikcoin?</span>',community_title:'Sonyere <span class="acc">Obodo</span>',stake_title:'Stake EFC &amp; <span class="acc">Nweta</span>',footer_copy:'© 2025 Efikcoin Eternal Ecosystem 🕊️'},
+  zh:{nav_home:'首页',nav_dash:'仪表板',nav_wallet:'钱包',nav_stake:'质押',nav_airdrop:'空投',nav_portfolio:'投资组合',nav_clients:'客户',nav_settings:'设置',connect:'连接钱包',hero_title:'回馈世界的 <span class="acc">EFC钱包</span>',hero_sub:'Efikcoin EFC — 人民的代币。质押。赚取。发送。给予。',btn_launch:'🚀 启动DApp',btn_buy:'🥞 购买EFC',btn_charity:'🕊️ 慈善门户',feat_title:'为什么选择 <span class="acc">Efikcoin？</span>',community_title:'加入 <span class="acc">运动</span>',stake_title:'质押EFC &amp; <span class="acc">赚取奖励</span>',footer_copy:'© 2025 Efikcoin Eternal Ecosystem 🕊️'},
+  ar:{nav_home:'الرئيسية',nav_dash:'لوحة التحكم',nav_wallet:'المحفظة',nav_stake:'التخزين',nav_airdrop:'إيردروب',nav_portfolio:'المحفظة',nav_clients:'العملاء',nav_settings:'الإعدادات',connect:'ربط المحفظة',hero_title:'المحفظة التي <span class="acc">ترد للعالم</span>',hero_sub:'EFC — رمز الشعب. احتجز. اكسب. أرسل. أعطِ.',btn_launch:'🚀 تشغيل',btn_buy:'🥞 شراء EFC',btn_charity:'🕊️ بوابة الخير',feat_title:'لماذا <span class="acc">Efikcoin؟</span>',community_title:'انضم إلى <span class="acc">الحركة</span>',stake_title:'احتجز EFC &amp; <span class="acc">اكسب</span>',footer_copy:'© 2025 Efikcoin Eternal Ecosystem 🕊️'},
+  ru:{nav_home:'Главная',nav_dash:'Панель',nav_wallet:'Кошелёк',nav_stake:'Стейкинг',nav_airdrop:'Эйрдроп',nav_portfolio:'Портфель',nav_clients:'Клиенты',nav_settings:'Настройки',connect:'Подключить',hero_title:'Кошелёк Который <span class="acc">Отдаёт Миру</span>',hero_sub:'EFC — токен народа. Стейк. Зарабатывай. Отправляй. Давай.',btn_launch:'🚀 Запуск',btn_buy:'🥞 Купить EFC',btn_charity:'🕊️ Благотворительность',feat_title:'Почему <span class="acc">Efikcoin?</span>',community_title:'Присоединяйтесь к <span class="acc">Движению</span>',stake_title:'Стейкинг EFC &amp; <span class="acc">Доход</span>',footer_copy:'© 2025 Efikcoin Eternal Ecosystem 🕊️'},
+  de:{nav_home:'Startseite',nav_dash:'Dashboard',nav_wallet:'Geldbörse',nav_stake:'Staking',nav_airdrop:'Airdrop',nav_portfolio:'Portfolio',nav_clients:'Kunden',nav_settings:'Einstellungen',connect:'Verbinden',hero_title:'Die Wallet Die <span class="acc">der Welt Gibt</span>',hero_sub:'EFC — das Token des Volkes. Staken. Verdienen. Senden. Geben.',btn_launch:'🚀 Starten',btn_buy:'🥞 EFC Kaufen',btn_charity:'🕊️ Hilfe',feat_title:'Warum <span class="acc">Efikcoin?</span>',community_title:'Der <span class="acc">Bewegung</span> Beitreten',stake_title:'EFC Staken &amp; <span class="acc">Verdienen</span>',footer_copy:'© 2025 Efikcoin Eternal Ecosystem 🕊️'},
+  hi:{nav_home:'होम',nav_dash:'डैशबोर्ड',nav_wallet:'वॉलेट',nav_stake:'स्टेकिंग',nav_airdrop:'एयरड्रॉप',nav_portfolio:'पोर्टफोलियो',nav_clients:'ग्राहक',nav_settings:'सेटिंग्स',connect:'वॉलेट कनेक्ट करें',hero_title:'वह वॉलेट जो <span class="acc">दुनिया को देता है</span>',hero_sub:'EFC — लोगों का टोकन। स्टेक। कमाएं। भेजें। दें।',btn_launch:'🚀 DApp शुरू',btn_buy:'🥞 EFC खरीदें',btn_charity:'🕊️ दान पोर्टल',feat_title:'<span class="acc">Efikcoin</span> क्यों?',community_title:'<span class="acc">आंदोलन</span> में शामिल हों',stake_title:'EFC स्टेक करें &amp; <span class="acc">कमाएं</span>',footer_copy:'© 2025 Efikcoin Eternal Ecosystem 🕊️'},
+  sw:{nav_home:'Nyumbani',nav_dash:'Dashibodi',nav_wallet:'Mkoba',nav_stake:'Kuweka',nav_airdrop:'Airdrop',nav_portfolio:'Jalada',nav_clients:'Wateja',nav_settings:'Mipangilio',connect:'Unganisha Mkoba',hero_title:'Mkoba Unaorejesha <span class="acc">kwa Ulimwengu</span>',hero_sub:'EFC — tokeni ya watu. Weka. Pata. Tuma. Toa.',btn_launch:'🚀 Anzisha DApp',btn_buy:'🥞 Nunua EFC',btn_charity:'🕊️ Msaada',feat_title:'Kwa nini <span class="acc">Efikcoin?</span>',community_title:'Jiunge na <span class="acc">Harakati</span>',stake_title:'Weka EFC &amp; <span class="acc">Pata Tuzo</span>',footer_copy:'© 2025 Efikcoin Eternal Ecosystem 🕊️'},
+  ja:{nav_home:'ホーム',nav_dash:'ダッシュボード',nav_wallet:'ウォレット',nav_stake:'ステーキング',nav_airdrop:'エアドロップ',nav_portfolio:'ポートフォリオ',nav_clients:'クライアント',nav_settings:'設定',connect:'ウォレット接続',hero_title:'世界に <span class="acc">還元するウォレット</span>',hero_sub:'EFC — 人々のトークン。ステーク。稼ぐ。送る。与える。',btn_launch:'🚀 DApp起動',btn_buy:'🥞 EFC購入',btn_charity:'🕊️ 慈善',feat_title:'なぜ <span class="acc">Efikcoin？</span>',community_title:'<span class="acc">ムーブメント</span>に参加',stake_title:'EFCをステーク &amp; <span class="acc">稼ぐ</span>',footer_copy:'© 2025 Efikcoin Eternal Ecosystem 🕊️'},
+  ko:{nav_home:'홈',nav_dash:'대시보드',nav_wallet:'지갑',nav_stake:'스테이킹',nav_airdrop:'에어드롭',nav_portfolio:'포트폴리오',nav_clients:'클라이언트',nav_settings:'설정',connect:'지갑 연결',hero_title:'세상에 <span class="acc">돌려주는 지갑</span>',hero_sub:'EFC — 국민의 토큰. 스테이킹. 수익. 전송. 나눔.',btn_launch:'🚀 DApp 시작',btn_buy:'🥞 EFC 구매',btn_charity:'🕊️ 자선',feat_title:'왜 <span class="acc">Efikcoin인가?</span>',community_title:'<span class="acc">운동</span>에 참여',stake_title:'EFC 스테이킹 &amp; <span class="acc">보상 획득</span>',footer_copy:'© 2025 Efikcoin Eternal Ecosystem 🕊️'},
+};
+const CLANG={ng:'en',sn:'fr',ml:'fr',ci:'fr',cm:'fr',tg:'fr',bj:'fr',ne:'fr',bf:'fr',cd:'fr',ga:'fr',cg:'fr',gn:'fr',mg:'fr',tz:'sw',ke:'sw',ug:'sw',rw:'sw',bi:'sw',mx:'es',co:'es',ar:'es',pe:'es',ve:'es',cl:'es',br:'pt',pt:'pt',ao:'pt',cn:'zh',tw:'zh',hk:'zh',sa:'ar',eg:'ar',ma:'ar',ae:'ar',dz:'ar',iq:'ar',ru:'ru',by:'ru',kz:'ru',de:'de',at:'de',ch:'de',in:'hi',jp:'ja',kr:'ko'};
+
+function applyLang(code){
+  code=code||'en';const t=T[code]||T.en;
+  document.documentElement.lang=code;
+  document.documentElement.dir=code==='ar'?'rtl':'ltr';
+  localStorage.setItem('efc_lang',code);
+  // Nav tabs — match by onclick content
+  document.querySelectorAll('.ntab').forEach(el=>{
+    const oc=el.getAttribute('onclick')||'';
+    const map={home:'nav_home',dashboard:'nav_dash',wallet:'nav_wallet',staking:'nav_stake',airdrop:'nav_airdrop',portfolio:'nav_portfolio',clients:'nav_clients',settings:'nav_settings'};
+    for(const[page,key] of Object.entries(map)){if(oc.includes("'"+page+"'")&&t[key]){el.textContent=t[key];break;}}
+  });
+  // Connect button
+  if(!userAddr){const cb=document.getElementById('conn-btn');if(cb&&t.connect)cb.textContent=t.connect;}
+  // All data-i18n elements
+  document.querySelectorAll('[data-i18n]').forEach(el=>{
+    const key=el.getAttribute('data-i18n');
+    if(t[key])el.innerHTML=t[key];
+  });
+  // Sync lang selectors
+  document.querySelectorAll('#lang-sel,select[onchange*="applyLang"]').forEach(sel=>{
+    [...sel.options].forEach(o=>{if(o.value===code)o.selected=true;});
+  });
+}
+
+async function detectLang(){
+  const saved=localStorage.getItem('efc_lang');if(saved){applyLang(saved);return;}
+  const browser=(navigator.language||'en').split('-')[0].toLowerCase();
+  try{
+    const r=await fetch('https://ipapi.co/json/');const d=await r.json();
+    const lang=CLANG[(d.country_code||'').toLowerCase()]||(d.languages||browser).split(',')[0].split('-')[0].toLowerCase();
+    applyLang(T[lang]?lang:'en');
+  }catch{applyLang(T[browser]?browser:'en');}
+}
+
+/* ── WALLET EVENTS ── */
+if(window.ethereum){
+  window.ethereum.on('accountsChanged',a=>{if(!a.length)disconnectWallet();else{userAddr=a[0];if(provider)provider.getSigner().then(s=>{signer=s;efcContract=new ethers.Contract(EFC,EFC_ABI,signer);onConnected();});}});
+  window.ethereum.on('chainChanged',()=>location.reload());
+}
+
+/* ════════════════════════════════════
+   MULTI-COIN SYSTEM
+════════════════════════════════════ */
+const COINS=[
+  {id:'efc',sym:'EFC',name:'Efikcoin Eternal',color:'linear-gradient(135deg,#8A6A28,#D4A843)',cg:'',bsc:'0x677Ce9CBa67f7484ea951a12897CE780cFd8fED1',price:0.0042,chg:3.2,bal:0,native:false,efcToken:true,trade:'https://pancakeswap.finance/swap?outputCurrency=0x677Ce9CBa67f7484ea951a12897CE780cFd8fED1'},
+  {id:'bnb', sym:'BNB', name:'BNB Smart Chain',color:'linear-gradient(135deg,#c89000,#F8D12F)',cg:'binancecoin',price:580,chg:1.1,bal:0,native:true, trade:'https://pancakeswap.finance/swap?outputCurrency=BNB'},
+  {id:'btc', sym:'BTC', name:'Bitcoin',color:'linear-gradient(135deg,#b35900,#F7931A)',cg:'bitcoin',price:67000,chg:2.3,bal:0,bscBridge:'https://www.bnbchain.org/en/btcb',trade:'https://pancakeswap.finance/swap?outputCurrency=0x7130d2A12B9BCbFAe4f2634d864A1Ee1Ce3Ead9c',bep20:'0x7130d2A12B9BCbFAe4f2634d864A1Ee1Ce3Ead9c'},
+  {id:'eth', sym:'ETH', name:'Ethereum',color:'linear-gradient(135deg,#3A3AFF,#8080FF)',cg:'ethereum',price:3200,chg:1.8,bal:0,trade:'https://pancakeswap.finance/swap?outputCurrency=0x2170Ed0880ac9A755fd29B2688956BD959F933F8',bep20:'0x2170Ed0880ac9A755fd29B2688956BD959F933F8'},
+  {id:'usdt',sym:'USDT',name:'Tether USD',color:'linear-gradient(135deg,#006E4E,#26A17B)',cg:'tether',price:1,chg:0.01,bal:0,trade:'https://pancakeswap.finance/swap?outputCurrency=0x55d398326f99059fF775485246999027B3197955',bep20:'0x55d398326f99059fF775485246999027B3197955'},
+  {id:'usdc',sym:'USDC',name:'USD Coin',color:'linear-gradient(135deg,#0047AB,#2775CA)',cg:'usd-coin',price:1,chg:0.02,bal:0,trade:'https://pancakeswap.finance/swap?outputCurrency=0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d',bep20:'0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d'},
+  {id:'sol', sym:'SOL', name:'Solana',color:'linear-gradient(135deg,#6E2BFF,#9945FF)',cg:'solana',price:170,chg:4.5,bal:0,trade:'https://pancakeswap.finance/swap?outputCurrency=0x570A5D26f7765Ecb712C0924E4De545B89fD43dF',bep20:'0x570A5D26f7765Ecb712C0924E4De545B89fD43dF'},
+  {id:'xrp', sym:'XRP', name:'XRP',color:'linear-gradient(135deg,#004A8F,#0083D9)',cg:'ripple',price:0.52,chg:-1.2,bal:0,trade:'https://pancakeswap.finance/swap?outputCurrency=0x1D2F0da169ceB9fC7B3144628dB156f3F6c60dBE',bep20:'0x1D2F0da169ceB9fC7B3144628dB156f3F6c60dBE'},
+  {id:'ada', sym:'ADA', name:'Cardano',color:'linear-gradient(135deg,#003366,#0066CC)',cg:'cardano',price:0.45,chg:2.1,bal:0,trade:'https://pancakeswap.finance/swap?outputCurrency=0x3EE2200Efb3400fAbB9AacF31297cBdD1d435D47',bep20:'0x3EE2200Efb3400fAbB9AacF31297cBdD1d435D47'},
+  {id:'matic',sym:'MATIC',name:'Polygon',color:'linear-gradient(135deg,#5B0085,#8247E5)',cg:'matic-network',price:0.82,chg:3.4,bal:0,trade:'https://pancakeswap.finance/swap?outputCurrency=0xCC42724C6683B7E57334c4E856f4c9965ED682bD',bep20:'0xCC42724C6683B7E57334c4E856f4c9965ED682bD'},
+];
+
+let activeCoin=null;
+let coinPrices={};
+let coinChartInstance=null;
+let coinChartPeriod='1D';
+
+// Fetch live prices from CoinGecko (free, no key)
+async function fetchCoinPrices(){
+  const ids=COINS.filter(c=>c.cg).map(c=>c.cg).join(',');
+  try{
+    const r=await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=usd&include_24hr_change=true&include_market_cap=true&include_24hr_vol=true`);
+    const d=await r.json();
+    COINS.forEach(c=>{
+      if(c.cg&&d[c.cg]){
+        c.price=d[c.cg].usd||c.price;
+        c.chg=d[c.cg].usd_24h_change||c.chg;
+        c.mktcap=d[c.cg].usd_market_cap;
+        c.vol=d[c.cg].usd_24h_vol;
+        coinPrices[c.id]=c.price;
+      }
     });
-  } catch (e) { console.log('Chart failed'); }
+  }catch(e){console.log('CoinGecko unavailable, using cached prices');}
 }
 
-async function loadTxHistory() {
-  const list = document.getElementById('txList');
-  list.innerHTML = '<div style="color: #888; text-align: center; padding: 20px;">Loading transactions...</div>';
-  try {
-    const res = await axios.get(`https://api.bscscan.com/api?module=account&action=tokentx&contractaddress=${currentToken.address}&address=${wallet.address}&sort=desc&apikey=YourApiKeyToken`);
-    if (res.data.result.length === 0) {
-      list.innerHTML = '<div style="color: #888; text-align: center; padding: 20px;">No transactions yet</div>';
-      return;
+async function loadAllCoinBalances(){
+  await fetchCoinPrices();
+  buildCoinBar();
+  if(userAddr) await fetchOnChainBalances();
+  buildCoinList();
+}
+
+async function fetchOnChainBalances(){
+  const rpc=provider||new ethers.JsonRpcProvider('https://bsc-dataseed.binance.org/');
+  const minABI=['function balanceOf(address) view returns(uint256)','function decimals() view returns(uint8)'];
+  for(const c of COINS){
+    try{
+      if(c.native){
+        const bal=await rpc.getBalance(userAddr);
+        c.bal=parseFloat(ethers.formatEther(bal));
+      } else if(c.bep20||c.bsc){
+        const addr=c.bep20||c.bsc;
+        const con=new ethers.Contract(addr,minABI,rpc);
+        const [bal,dec]=await Promise.all([con.balanceOf(userAddr),con.decimals().catch(()=>18)]);
+        c.bal=parseFloat(ethers.formatUnits(bal,dec));
+      }
+    }catch(e){ c.bal=0; }
+  }
+}
+
+function buildCoinBar(){
+  const bar=document.getElementById('coin-bar-main');if(!bar)return;
+  bar.innerHTML=COINS.map(c=>{
+    const chgStr=(c.chg>=0?'+':'')+c.chg.toFixed(2)+'%';
+    const chgClass=c.chg>=0?'up':'dn';
+    return `<div class="coin-chip" onclick="openCoinDash('${c.id}')" id="chip-${c.id}">
+      <div class="c-ico" style="background:${c.color};color:#000">${c.sym.slice(0,4)}</div>
+      <div class="c-sym">${c.sym}</div>
+      <div class="c-price">$${c.price<0.01?c.price.toFixed(6):c.price<1?c.price.toFixed(4):c.price.toLocaleString()}</div>
+      <div class="c-chg ${chgClass}">${chgStr}</div>
+    </div>`;
+  }).join('');
+}
+
+function buildCoinList(){
+  const el=document.getElementById('coin-list-main');if(!el)return;
+  let totalUSD=0;
+  COINS.forEach(c=>totalUSD+=c.bal*c.price);
+  el.innerHTML=`<div style="font-family:'Space Mono',monospace;font-size:8.5px;color:var(--muted);margin-bottom:10px">Total Portfolio Value: <span style="color:var(--gold);font-family:'Orbitron',monospace;font-size:.9rem">$${totalUSD.toFixed(2)}</span></div>`
+  +COINS.map(c=>{
+    const val=(c.bal*c.price).toFixed(2);
+    const chgStr=(c.chg>=0?'+':'')+c.chg.toFixed(2)+'%';
+    const chgCol=c.chg>=0?'var(--green)':'var(--red-l)';
+    return `<div class="token-row" onclick="openCoinDash('${c.id}')" style="cursor:pointer">
+      <div class="token-ico" style="background:${c.color};color:#000;font-size:9px">${c.sym.slice(0,4)}</div>
+      <div style="flex:1">
+        <div class="tk-sym">${c.sym}</div>
+        <div class="tk-name">${c.name}</div>
+      </div>
+      <div style="text-align:right">
+        <div class="tk-bal">${c.bal.toFixed(4)} ${c.sym}</div>
+        <div style="font-family:'Space Mono',monospace;font-size:7.5px;color:var(--muted)">$${val} <span style="color:${chgCol}">${chgStr}</span></div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function openCoinDash(id){
+  activeCoin=COINS.find(c=>c.id===id);if(!activeCoin)return;
+  const c=activeCoin;
+  // Header
+  document.getElementById('cd-ico').style.background=c.color;
+  document.getElementById('cd-ico').style.color='#000';
+  document.getElementById('cd-ico').textContent=c.sym.slice(0,4);
+  document.getElementById('cd-name').textContent=c.name;
+  document.getElementById('cd-price').textContent='$'+c.price.toLocaleString();
+  const chgEl=document.getElementById('cd-chg');
+  chgEl.textContent=(c.chg>=0?'▲ +':'▼ ')+Math.abs(c.chg).toFixed(2)+'% (24h)';
+  chgEl.style.color=c.chg>=0?'var(--green)':'var(--red-l)';
+  // Balance
+  const balUSD=(c.bal*c.price).toFixed(2);
+  document.getElementById('cd-bal').textContent=c.bal.toFixed(4)+' '+c.sym;
+  document.getElementById('cd-bal-usd').textContent='≈ $'+balUSD;
+  // Market cap / volume
+  const mcap=c.mktcap?'$'+(c.mktcap/1e9).toFixed(2)+'B':'—';
+  const vol=c.vol?'$'+(c.vol/1e6).toFixed(0)+'M':'—';
+  document.getElementById('cd-mktcap').textContent='Market Cap: '+mcap;
+  document.getElementById('cd-vol').textContent=vol;
+  // QR addresses
+  const addr=userAddr||'Connect wallet first';
+  ['cap-addr','cap-dep-addr'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=addr;});
+  ['cap-rcv-sym','cap-send-sym','cap-dep-sym','cap-dep-sym2','cap-wd-sym','cap-stk-sym','cap-trd-sym'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=c.sym;});
+  // Generate receive QR
+  if(userAddr){
+    ['cap-qr','cap-dep-qr'].forEach(qid=>{
+      const qbox=document.getElementById(qid);if(!qbox)return;
+      qbox.innerHTML='';try{new QRCode(qbox,{text:userAddr,width:130,height:130,colorDark:'#D4A843',colorLight:'#ffffff'});}catch(e){}
+    });
+  }
+  // Stake panel - EFC only
+  document.getElementById('cap-stk-efc').style.display=c.efcToken?'block':'none';
+  document.getElementById('cap-stk-other').style.display=c.efcToken?'none':'block';
+  // Trade links
+  const trdEl=document.getElementById('cap-trade-links');
+  if(trdEl){
+    const links=[
+      {name:'PancakeSwap',url:c.trade||'https://pancakeswap.finance',color:'#3DD68C'},
+      {name:'BSCScan Token Info',url:`https://bscscan.com/token/${c.bep20||c.bsc||''}`,color:'var(--gold)'},
+    ];
+    trdEl.innerHTML=links.filter(l=>!l.url.includes('undefined')).map(l=>`<a href="${l.url}" target="_blank" class="btn-o w-full" style="justify-content:center;border-color:${l.color};color:${l.color}">${l.name} ↗</a>`).join('');
+  }
+  // Hide any open action panels
+  hideCoinActions();
+  // Draw chart
+  coinChartPeriod='1D';
+  document.querySelectorAll('.chart-tab').forEach(t=>t.classList.remove('active'));
+  document.querySelector('.chart-tab')?.classList.add('active');
+  await drawCoinChart(id,'1D');
+  openM('m-coin');
+}
+
+async function drawCoinChart(coinId,period){
+  const c=COINS.find(x=>x.id===coinId);if(!c||!c.cg){drawFakeCoinChart(c,period);return;}
+  const daysMap={'1D':1,'1W':7,'1M':30,'1Y':365};
+  const days=daysMap[period]||1;
+  try{
+    const r=await fetch(`https://api.coingecko.com/api/v3/coins/${c.cg}/market_chart?vs_currency=usd&days=${days}`);
+    const d=await r.json();
+    if(!d.prices?.length){drawFakeCoinChart(c,period);return;}
+    const prices=d.prices.map(p=>p[1]);
+    const labels=d.prices.map(p=>{
+      const dt=new Date(p[0]);
+      return days<=1?dt.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}):dt.toLocaleDateString([],{month:'short',day:'numeric'});
+    });
+    renderCoinChart(prices,labels,c.chg>=0);
+  }catch(e){drawFakeCoinChart(c,period);}
+}
+
+function drawFakeCoinChart(c,period){
+  // Generate simulated chart if API unavailable
+  const points=period==='1D'?24:period==='1W'?28:period==='1M'?30:52;
+  const base=c?.price||1;
+  const prices=Array.from({length:points},(_,i)=>{
+    const noise=(Math.random()-.48)*base*0.03;
+    return Math.max(0.000001,base+noise*(i/points));
+  });
+  const labels=prices.map((_,i)=>i.toString());
+  renderCoinChart(prices,labels,true);
+}
+
+function renderCoinChart(prices,labels,isUp){
+  const canvas=document.getElementById('coin-chart');if(!canvas)return;
+  const ctx=canvas.getContext('2d');
+  if(coinChartInstance){try{coinChartInstance.destroy();}catch(e){}}
+  const color=isUp?'#3DD68C':'#E05050';
+  const grad=ctx.createLinearGradient(0,0,0,160);
+  grad.addColorStop(0,isUp?'rgba(61,214,140,.3)':'rgba(224,80,80,.3)');
+  grad.addColorStop(1,'rgba(0,0,0,0)');
+  // Simple canvas chart (no Chart.js dependency)
+  const W=canvas.offsetWidth||300,H=160;
+  canvas.width=W;canvas.height=H;
+  ctx.clearRect(0,0,W,H);
+  const mn=Math.min(...prices),mx=Math.max(...prices),range=mx-mn||1;
+  const xs=prices.map((_,i)=>i/(prices.length-1)*W);
+  const ys=prices.map(p=>H-((p-mn)/range*(H*0.8)+H*0.1));
+  // Fill
+  ctx.beginPath();ctx.moveTo(xs[0],H);
+  xs.forEach((x,i)=>ctx.lineTo(x,ys[i]));
+  ctx.lineTo(xs[xs.length-1],H);ctx.closePath();
+  ctx.fillStyle=grad;ctx.fill();
+  // Line
+  ctx.beginPath();ctx.moveTo(xs[0],ys[0]);
+  xs.forEach((x,i)=>ctx.lineTo(x,ys[i]));
+  ctx.strokeStyle=color;ctx.lineWidth=2;ctx.stroke();
+  // Current price dot
+  const lx=xs[xs.length-1],ly=ys[ys.length-1];
+  ctx.beginPath();ctx.arc(lx,ly,4,0,Math.PI*2);ctx.fillStyle=color;ctx.fill();
+  coinChartInstance={destroy:()=>{}};
+}
+
+async function setCoinChartPeriod(period,el){
+  coinChartPeriod=period;
+  document.querySelectorAll('.chart-tab').forEach(t=>t.classList.remove('active'));
+  if(el)el.classList.add('active');
+  if(activeCoin)await drawCoinChart(activeCoin.id,period);
+}
+
+function showCoinAction(type){
+  hideCoinActions();
+  const el=document.getElementById('cap-'+type);if(el)el.classList.add('active');
+}
+function hideCoinActions(){
+  document.querySelectorAll('.coin-action-panel').forEach(p=>p.classList.remove('active'));
+}
+
+async function doCoinSend(){
+  if(!requireW())return;
+  const to=document.getElementById('cap-to').value.trim();
+  const amt=document.getElementById('cap-amt').value.trim();
+  if(!to||!ethers.isAddress(to)){toast('Enter valid address','er');return;}
+  if(!amt||parseFloat(amt)<=0){toast('Enter amount','er');return;}
+  const c=activeCoin;if(!c)return;
+  txConfirm('Send '+c.sym,'Sending '+amt+' '+c.sym+' to '+to.slice(0,8)+'...','To: '+to+'\nAmount: '+amt+' '+c.sym,async()=>{
+    if(c.native){
+      const tx=await signer.sendTransaction({to,value:ethers.parseEther(amt)});await tx.wait();
+    } else {
+      const addr=c.bep20||c.bsc;
+      const minABI=['function transfer(address,uint256) returns(bool)','function decimals() view returns(uint8)'];
+      const rpc=provider||new ethers.JsonRpcProvider('https://bsc-dataseed.binance.org/');
+      const con=new ethers.Contract(addr,minABI,signer);
+      const dec=await con.decimals().catch(()=>18);
+      const t=await con.transfer(to,ethers.parseUnits(amt,dec));await t.wait();
     }
-    list.innerHTML = res.data.result.slice(0, 5).map(tx => `
-      <div class="tx-item">
-        <div>
-          <div style="font-weight: 600;">${tx.from.toLowerCase() === wallet.address.toLowerCase()? 'Sent' : 'Received'}</div>
-          <div style="font-size: 12px; color: #888;">${new Date(tx.timeStamp * 1000).toLocaleDateString()}</div>
+    toast('✓ Sent '+amt+' '+c.sym+'!','ok');
+    document.getElementById('cap-to').value='';document.getElementById('cap-amt').value='';
+    loadBalances();loadAllCoinBalances();
+  });
+}
+
+async function doCoinWithdraw(){
+  const to=document.getElementById('cap-wd-to').value.trim();
+  const amt=document.getElementById('cap-wd-amt').value.trim();
+  if(!to||!ethers.isAddress(to)){toast('Enter valid address','er');return;}
+  if(!amt||parseFloat(amt)<=0){toast('Enter amount','er');return;}
+  // Withdraw = send to external address
+  document.getElementById('cap-to').value=to;
+  document.getElementById('cap-amt').value=amt;
+  await doCoinSend();
+}
+
+async function doStakeFromCoin(){
+  const amt=document.getElementById('cap-stk-amt').value.trim();
+  if(!amt||parseFloat(amt)<=0){toast('Enter amount','er');return;}
+  txConfirm('Stake EFC','Locking '+amt+' EFC for rewards','Amount: '+amt+' EFC\nAPY: '+selectedTierAPY+'%',async()=>{
+    const a=await efcContract.approve(EFC,ethers.parseEther(amt));await a.wait();
+    const t=await efcContract.deposit(ethers.parseEther(amt));await t.wait();
+    toast('✓ Staked '+amt+' EFC!','ok');loadBalances();
+  });
+}
+
+/* ════════════════════════════════════
+   PWA — Progressive Web App
+════════════════════════════════════ */
+let deferredInstallPrompt=null;
+
+function setupPWA(){
+  // Create manifest dynamically
+  const manifest={
+    name:'EFC Wallet — Efikcoin',short_name:'EFC Wallet',description:'The people\'s BEP-20 wallet. Stake, earn, send, receive globally.',
+    start_url:'/',display:'standalone',background_color:'#030507',theme_color:'#D4A843',
+    orientation:'portrait',
+    icons:[{src:'https://ipfs.io/ipfs/bafybeihrzyodihyp5met2hs32ppj37qlowuxarvs2lnlrgujgrlwxc7fwe',sizes:'192x192',type:'image/png'},{src:'https://ipfs.io/ipfs/bafybeihrzyodihyp5met2hs32ppj37qlowuxarvs2lnlrgujgrlwxc7fwe',sizes:'512x512',type:'image/png'}]
+  };
+  const blob=new Blob([JSON.stringify(manifest)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const link=document.getElementById('pwa-manifest');if(link)link.href=url;
+  // Register service worker
+  if('serviceWorker' in navigator){
+    const swCode=`
+const CACHE='efc-wallet-v1';
+const ASSETS=['/','/index.html'];
+self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS).catch(()=>{}))));
+self.addEventListener('fetch',e=>e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request).catch(()=>new Response('Offline - please reconnect')))));
+    `;
+    const swBlob=new Blob([swCode],{type:'application/javascript'});
+    const swUrl=URL.createObjectURL(swBlob);
+    navigator.serviceWorker.register(swUrl).catch(()=>{});
+  }
+  // Listen for install prompt
+  window.addEventListener('beforeinstallprompt',e=>{
+    e.preventDefault();deferredInstallPrompt=e;
+    setTimeout(()=>{
+      const banner=document.getElementById('install-banner');
+      if(banner&&!localStorage.getItem('efc_pwa_dismissed'))banner.classList.add('show');
+    },3000);
+  });
+  window.addEventListener('appinstalled',()=>{
+    const banner=document.getElementById('install-banner');if(banner)banner.classList.remove('show');
+    toast('✓ EFC Wallet installed on your device!','ok');
+  });
+}
+
+function triggerInstall(){
+  if(deferredInstallPrompt){
+    deferredInstallPrompt.prompt();
+    deferredInstallPrompt.userChoice.then(c=>{
+      if(c.outcome==='accepted')toast('Installing EFC Wallet...','ok');
+      deferredInstallPrompt=null;
+    });
+  } else {
+    // iOS fallback
+    toast('On iPhone: tap Share → Add to Home Screen','in');
+  }
+  document.getElementById('install-banner').classList.remove('show');
+  localStorage.setItem('efc_pwa_dismissed','1');
+}
+
+/* ════════════════════════════════════
+   LANGUAGE FIX — translate every element
+════════════════════════════════════ */
+function applyLang(code){
+  code=code||'en';const t=T[code]||T.en;
+  document.documentElement.lang=code;
+  document.documentElement.dir=code==='ar'?'rtl':'ltr';
+  localStorage.setItem('efc_lang',code);
+
+  // Nav tabs
+  const navMap={home:'nav_home',dashboard:'nav_dash',wallet:'nav_wallet',staking:'nav_stake',airdrop:'nav_airdrop',portfolio:'nav_portfolio',clients:'nav_clients',settings:'nav_settings'};
+  document.querySelectorAll('.ntab').forEach(el=>{
+    const oc=el.getAttribute('onclick')||'';
+    for(const[page,key] of Object.entries(navMap)){
+      if(oc.includes("'"+page+"'")&&t[key]){el.textContent=t[key];break;}
+    }
+  });
+
+  // Connect button (if not connected)
+  if(!userAddr){
+    document.querySelectorAll('#conn-btn').forEach(b=>{if(t.connect)b.textContent=t.connect;});
+  }
+
+  // All elements with data-i18n attribute
+  document.querySelectorAll('[data-i18n]').forEach(el=>{
+    const key=el.getAttribute('data-i18n');
+    if(t[key])el.innerHTML=t[key];
+  });
+
+  // Hero section direct targets
+  const heroTitle=document.querySelector('h1.hero-t');
+  if(heroTitle&&t.hero_title)heroTitle.innerHTML=t.hero_title;
+  const heroSub=document.querySelector('.hero-sub');
+  if(heroSub&&t.hero_sub)heroSub.textContent=t.hero_sub;
+
+  // Hero buttons — match by content
+  document.querySelectorAll('.hero-btns .btn-g,.hero-btns .btn-o').forEach(btn=>{
+    const txt=btn.textContent.trim().toLowerCase();
+    if(txt.includes('launch')||txt.includes('dapp')||txt.includes('lancer')||txt.includes('iniciar')||txt.includes('fara')||txt.includes('malite')||txt.includes('起動')){if(t.btn_launch)btn.innerHTML=t.btn_launch;}
+    else if(txt.includes('buy')||txt.includes('acheter')||txt.includes('comprar')||txt.includes('siya')||txt.includes('購入')){if(t.btn_buy)btn.innerHTML=t.btn_buy;}
+    else if(txt.includes('charity')||txt.includes('caridad')||txt.includes('sadaka')||txt.includes('慈善')){if(t.btn_charity)btn.innerHTML=t.btn_charity;}
+  });
+
+  // Section titles
+  document.querySelectorAll('.sec-title').forEach(el=>{
+    const txt=el.textContent.toLowerCase();
+    if(txt.includes('why')||txt.includes('pourquoi')||txt.includes('por qué')||txt.includes('warum')||txt.includes('kilode')||txt.includes('gịnị')||txt.includes('me ya sa')||txt.includes('なぜ')){if(t.feat_title)el.innerHTML=t.feat_title;}
+    else if(txt.includes('movement')||txt.includes('mouvement')||txt.includes('movimiento')||txt.includes('harakati')||txt.includes('agbegbe')||txt.includes('운동')){if(t.community_title)el.innerHTML=t.community_title;}
+    else if(txt.includes('stake')||txt.includes('staking')||txt.includes('質')||txt.includes('스테이킹')){if(t.stake_title)el.innerHTML=t.stake_title;}
+    else if(txt.includes('dashboard')||txt.includes('tableau')||txt.includes('داشبورد')){if(t.dash_title)el.innerHTML=t.dash_title;}
+    else if(txt.includes('wallet')||txt.includes('portefeuille')||txt.includes('billetera')||txt.includes('mkoba')||txt.includes('akpa')){if(t.wallet_title)el.innerHTML=t.wallet_title;}
+  });
+
+  // Feature card titles & descriptions
+  const featKeys=['feat1','feat2','feat3','feat4','feat5','feat6'];
+  document.querySelectorAll('.feat-card').forEach((card,i)=>{
+    const k=featKeys[i];if(!k)return;
+    const titleEl=card.querySelector('.feat-t');const descEl=card.querySelector('.feat-d');
+    if(titleEl&&t[k+'_t'])titleEl.textContent=t[k+'_t'];
+    if(descEl&&t[k+'_d'])descEl.textContent=t[k+'_d'];
+  });
+
+  // Footer copy
+  document.querySelectorAll('.f-copy').forEach(el=>{if(t.footer_copy)el.textContent=t.footer_copy;});
+  document.querySelectorAll('.f-tagline').forEach(el=>{if(t.footer_tagline)el.textContent=t.footer_tagline;});
+
+  // Sync language selector
+  document.querySelectorAll('#lang-sel,select[onchange*="applyLang"]').forEach(sel=>{
+    [...sel.options].forEach(o=>{if(o.value===code)o.selected=true;});
+  });
+}
+
+/* ── INIT ── */
+document.addEventListener('DOMContentLoaded',()=>{
+  buildTicker();detectLang();loadLogo();loadClientProfile();setupPWA();
+  // Build coin bar immediately with cached prices
+  buildCoinBar();buildCoinList();
+  // Fetch live prices in background
+  fetchCoinPrices().then(()=>{buildCoinBar();buildCoinList();});
+  // Airdrop preview
+  const ar=document.getElementById('air-u-recs'),aa=document.getElementById('air-u-amt');
+  if(ar&&aa){function upAir(){const n=ar.value.split('\n').filter(a=>a.trim()&&ethers.isAddress(a.trim())).length;const v=parseFloat(aa.value||0);const el=document.getElementById('air-preview');if(el)el.textContent=n>0&&v>0?n+' valid recipients · Total: '+(n*v).toFixed(2)+' EFC':'';}ar.addEventListener('input',upAir);aa.addEventListener('input',upAir);}
+  // Stake estimate
+  const sa=document.getElementById('stk-amt');if(sa)sa.addEventListener('input',updateStakeEst);
+});
+</script>
+
+<!-- PWA Install Banner -->
+<div id="install-banner">
+  <div class="install-txt"><strong>⬡ EFC Wallet</strong>Install as an app on your device — works offline!</div>
+  <button class="install-btn" onclick="triggerInstall()">Install App</button>
+  <span class="install-x" onclick="document.getElementById('install-banner').classList.remove('show')">✕</span>
+</div>
+
+<!-- Coin Dashboard Modal -->
+<div class="m-ov" id="m-coin">
+  <div class="modal" style="max-width:520px;padding:0;overflow:hidden">
+    <div style="padding:18px 20px;background:var(--surf2);border-bottom:1px solid var(--bdr);display:flex;align-items:center;gap:12px">
+      <div class="coin-dash-ico" id="cd-ico" style="background:#999">—</div>
+      <div style="flex:1">
+        <div class="coin-dash-name" id="cd-name">—</div>
+        <span class="coin-dash-price" id="cd-price">$0.00</span>
+        <span class="coin-dash-chg" id="cd-chg">—</span>
+      </div>
+      <div class="m-close" onclick="closeM('m-coin')" style="position:static">✕</div>
+    </div>
+    <div style="padding:18px 20px;max-height:80vh;overflow-y:auto">
+      <!-- Chart -->
+      <div class="chart-wrap">
+        <div class="chart-tabs">
+          <div class="chart-tab active" onclick="setCoinChartPeriod('1D',this)">1D</div>
+          <div class="chart-tab" onclick="setCoinChartPeriod('1W',this)">1W</div>
+          <div class="chart-tab" onclick="setCoinChartPeriod('1M',this)">1M</div>
+          <div class="chart-tab" onclick="setCoinChartPeriod('1Y',this)">1Y</div>
         </div>
-        <div style="text-align: right;">
-          <div style="font-weight: 600; color: ${tx.from.toLowerCase() === wallet.address.toLowerCase()? '#FF4757' : '#00E676'}">
-            ${tx.from.toLowerCase() === wallet.address.toLowerCase()? '-' : '+'}${(tx.value / 10**tx.tokenDecimal).toFixed(4)} ${tx.tokenSymbol}
-          </div>
-          <div class="tx-hash" onclick="window.open('https://bscscan.com/tx/${tx.hash}', '_blank')">View</div>
+        <canvas class="price-chart" id="coin-chart"></canvas>
+        <div style="font-family:'Space Mono',monospace;font-size:8px;color:var(--muted);margin-top:8px;text-align:center" id="cd-mktcap">Market Cap: loading...</div>
+      </div>
+      <!-- Balance -->
+      <div class="bal-grid" style="margin-bottom:14px">
+        <div class="bal-card" style="border-color:var(--gold-d)"><span class="b-lbl">My Balance</span><span class="b-val gold" id="cd-bal">—</span><span class="b-sub" id="cd-bal-usd">≈ $0.00</span></div>
+        <div class="bal-card"><span class="b-lbl">24h Volume</span><span class="b-val" id="cd-vol" style="font-size:.82rem">—</span><span class="b-sub">trading volume</span></div>
+      </div>
+      <!-- Action buttons -->
+      <div class="action-grid">
+        <div class="act-btn" onclick="showCoinAction('send')"><div class="act-ico">📤</div><div class="act-lbl">Send</div></div>
+        <div class="act-btn" onclick="showCoinAction('receive')"><div class="act-ico">📥</div><div class="act-lbl">Receive</div></div>
+        <div class="act-btn" onclick="showCoinAction('deposit')"><div class="act-ico">💳</div><div class="act-lbl">Deposit</div></div>
+        <div class="act-btn" onclick="showCoinAction('withdraw')"><div class="act-ico">🏦</div><div class="act-lbl">Withdraw</div></div>
+        <div class="act-btn" onclick="showCoinAction('stake')"><div class="act-ico">🔒</div><div class="act-lbl">Stake</div></div>
+        <div class="act-btn" onclick="showCoinAction('trade')"><div class="act-ico">🔄</div><div class="act-lbl">Trade</div></div>
+      </div>
+      <!-- Send panel -->
+      <div class="coin-action-panel" id="cap-send">
+        <div class="panel-hdr"><div class="panel-t">📤 Send <span id="cap-send-sym">—</span></div><span onclick="hideCoinActions()" style="cursor:pointer;color:var(--muted);font-size:13px">✕</span></div>
+        <div class="f-group"><label class="f-lbl">Recipient Address</label><input class="f-inp" id="cap-to" placeholder="0x... wallet address"/></div>
+        <div class="f-group"><label class="f-lbl">Amount</label><input class="f-inp" id="cap-amt" type="number" placeholder="0.0"/></div>
+        <div class="warn-box" style="font-size:.74rem"><span class="warn-ic">⚠</span>Always verify the address. Crypto transactions are irreversible.</div>
+        <button class="btn-g w-full" onclick="doCoinSend()">Send →</button>
+      </div>
+      <!-- Receive panel -->
+      <div class="coin-action-panel" id="cap-receive">
+        <div class="panel-hdr"><div class="panel-t">📥 Receive <span id="cap-rcv-sym">—</span></div><span onclick="hideCoinActions()" style="cursor:pointer;color:var(--muted);font-size:13px">✕</span></div>
+        <div style="text-align:center">
+          <div id="cap-qr" style="display:inline-block;padding:12px;background:#fff;border-radius:10px;margin-bottom:12px"></div>
+          <div class="mono" id="cap-addr" style="font-size:.7rem;color:var(--gold);word-break:break-all;background:var(--surf2);padding:10px;border-radius:7px;border:1px solid var(--bdr);margin-bottom:10px">—</div>
+          <button class="btn-g" onclick="copyTxt(document.getElementById('cap-addr').textContent)">Copy Address ⎘</button>
         </div>
       </div>
-    `).join('');
-  } catch (e) {
-    list.innerHTML = '<div style="color: #888; text-align: center; padding: 20px;">TX history unavailable</div>';
-  }
-}
-
-function showSendModal() {
-  document.getElementById('sendTokenSymbol').textContent = currentToken.symbol;
-  document.getElementById('sendModal').classList.add('active');
-}
-
-function showReceiveModal() {
-  document.getElementById('receiveTokenSymbol').textContent = currentToken.symbol;
-  document.getElementById('receiveAddress').textContent = wallet.address;
-  document.getElementById('qrCode').innerHTML = '';
-  new QRCode(document.getElementById('qrCode'), { text: wallet.address, width: 200, height: 200, colorDark: "#000000", colorLight: "#ffffff" });
-  document.getElementById('receiveModal').classList.add('active');
-}
-
-async function executeSend() {
-  const to = document.getElementById('sendToAddress').value;
-  const amount = document.getElementById('sendAmount').value;
-  const pass = document.getElementById('sendPassword').value;
-  
-  if (pass!== currentPassword) return alert('Wrong password');
-  if (!ethers.utils.isAddress(to)) return alert('Invalid address');
-  if (!amount || parseFloat(amount) <= 0) return alert('Invalid amount');
-  
-  try {
-    let tx;
-    if (currentToken.symbol === 'BNB') {
-      tx = await wallet.sendTransaction({ to, value: ethers.utils.parseEther(amount) });
-    } else {
-      const contract = new ethers.Contract(currentToken.address, ERC20_ABI, wallet);
-      tx = await contract.transfer(to, ethers.utils.parseUnits(amount, currentToken.decimals));
-    }
-    alert('Success! TX Hash: ' + tx.hash + '\nView: https://bscscan.com/tx/' + tx.hash);
-    closeModal('sendModal');
-    updateBalances();
-    updateCoinDashboard();
-  } catch (e) {
-    alert('Failed: ' + e.message);
-  }
-}
-
-function showSwapModal() {
-  alert('Swap: Opens PancakeSwap with EFC pre-selected. Coming in v6.1 with 1inch aggregator for best rates.');
-  window.open(`https://pancakeswap.finance/swap?outputCurrency=${currentToken.address}`, '_blank');
-}
-
-function showStakeModal() {
-  alert('Staking: Connect your EFC staking contract address. Users will stake EFC here to earn rewards. Send me your contract address to integrate.');
-}
-
-function showAddToken() {
-  document.getElementById('addTokenModal').classList.add('active');
-}
-
-async function addCustomToken() {
-  const chain = document.getElementById('addTokenChain').value;
-  const address = document.getElementById('addTokenAddress').value;
-  if (!ethers.utils.isAddress(address)) return alert('Invalid contract address');
-  
-  try {
-    const provider = new ethers.providers.JsonRpcProvider(CHAINS[chain].rpc);
-    const contract = new ethers.Contract(address, ERC20_ABI, provider);
-    const [name, symbol, decimals] = await Promise.all([contract.name(), contract.symbol(), contract.decimals()]);
-    
-    tokens.push({ chain, address, symbol, name, logo: `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/${chain.toLowerCase()}/assets/${address}/logo.png`, decimals, price: 0 });
-    alert(`${symbol} added! Refreshing...`);
-    closeModal('addTokenModal');
-    updateBalances();
-  } catch (e) {
-    alert('Failed to add token. Check address and chain.');
-  }
-}
-
-function openDapp(url) {
-  document.getElementById('dappFrame').src = url;
-  document.getElementById('dappFrame').style.display = 'block';
-}
-
-function copyReceiveAddress() {
-  navigator.clipboard.writeText(wallet.address);
-  alert('Address copied!');
-}
-
-function closeModal(id) {
-  document.getElementById(id).classList.remove('active');
-}
-</script>
+      <!-- Deposit panel -->
+      <div class="coin-action-panel" id="cap-deposit">
+        <div class="panel-hdr"><div class="panel-t">💳 Deposit <span id="cap-dep-sym">—</span></div><span onclick="hideCoinActions()" style="cursor:pointer;color:var(--muted);font-size:13px">✕</span></div>
+        <p style="color:var(--muted);font-size:.8rem;margin-bottom:14px">To deposit, send <span id="cap-dep-sym2" style="color:var(--gold)">—</span> to your wallet address below. It will appear in your balance once confirmed on-chain.</p>
+        <div style="text-align:center">
+          <div id="cap-dep-qr" style="display:inline-block;padding:12px;background:#fff;border-radius:10px;margin-bottom:12px"></div>
+          <div class="mono" id="cap-dep-addr" style="font-size:.7rem;color:var(--gold);word-break:break-all;background:var(--surf2);padding:10px;border-radius:7px;border:1px solid var(--bdr);margin-bottom:10px">—</div>
+          <button class="btn-g" onclick="copyTxt(document.getElementById('cap-dep-addr').textContent)">Copy Deposit Address ⎘</button>
+        </div>
+      </div>
+      <!-- Withdraw panel -->
+      <div class="coin-action-panel" id="cap-withdraw">
+        <div class="panel-hdr"><div class="panel-t">🏦 Withdraw <span id="cap-wd-sym">—</span></div><span onclick="hideCoinActions()" style="cursor:pointer;color:var(--muted);font-size:13px">✕</span></div>
+        <div class="f-group"><label class="f-lbl">Withdraw to Address</label><input class="f-inp" id="cap-wd-to" placeholder="0x... destination address"/></div>
+        <div class="f-group"><label class="f-lbl">Amount</label><input class="f-inp" id="cap-wd-amt" type="number" placeholder="0.0"/></div>
+        <button class="btn-g w-full" onclick="doCoinWithdraw()">Withdraw →</button>
+      </div>
+      <!-- Stake panel -->
+      <div class="coin-action-panel" id="cap-stake">
+        <div class="panel-hdr"><div class="panel-t">🔒 Stake <span id="cap-stk-sym">—</span></div><span onclick="hideCoinActions()" style="cursor:pointer;color:var(--muted);font-size:13px">✕</span></div>
+        <div id="cap-stk-efc" style="display:none">
+          <div class="f-group"><label class="f-lbl">Amount to Stake (EFC)</label><input class="f-inp" id="cap-stk-amt" type="number" placeholder="0.0"/></div>
+          <p style="font-family:'Space Mono',monospace;font-size:8.5px;color:var(--muted);margin-bottom:12px">Selected APY: <span style="color:var(--green)" id="cap-stk-apy">12%</span> (choose tier on Staking page)</p>
+          <button class="btn-g w-full" onclick="doStakeFromCoin()">Stake EFC →</button>
+        </div>
+        <div id="cap-stk-other" style="display:none">
+          <div class="warn-box"><span class="warn-ic">ℹ</span><div>Staking for this coin is not yet available directly. EFC staking earns you up to 65% APY — <span onclick="closeM('m-coin');goPage('staking')" style="color:var(--gold);cursor:pointer;text-decoration:underline">stake EFC instead →</span></div></div>
+        </div>
+      </div>
+      <!-- Trade panel -->
+      <div class="coin-action-panel" id="cap-trade">
+        <div class="panel-hdr"><div class="panel-t">🔄 Trade <span id="cap-trd-sym">—</span></div><span onclick="hideCoinActions()" style="cursor:pointer;color:var(--muted);font-size:13px">✕</span></div>
+        <p style="color:var(--muted);font-size:.8rem;margin-bottom:14px">Trade on a decentralised exchange. You will be taken to the DEX — your wallet connects automatically.</p>
+        <div id="cap-trade-links" style="display:flex;flex-direction:column;gap:9px"></div>
+      </div>
+    </div>
+  </div>
+</div>
 </body>
 </html>
